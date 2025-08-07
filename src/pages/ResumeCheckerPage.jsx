@@ -84,7 +84,7 @@ const ResumeCheckerPage = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/check-resume", {
+      const response = await fetch("https://careerhub25.onrender.com/check-resume", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

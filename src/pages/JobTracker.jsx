@@ -23,7 +23,7 @@ const JobTracker = () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found");
-        const response = await fetch("http://localhost:5000/api/jobs", {
+        const response = await fetch("https://careerhub25.onrender.com/api/jobs", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -63,7 +63,7 @@ const JobTracker = () => {
           if (formData[key]) formDataToSend.append(key, formData[key]);
         });
       }
-      const response = await fetch("http://localhost:5000/api/jobs", {
+      const response = await fetch("https://careerhub25.onrender.com/api/jobs", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -94,7 +94,7 @@ const JobTracker = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found");
-      const response = await fetch(`http://localhost:5000/api/jobs/${id}`, {
+      const response = await fetch(`https://careerhub25.onrender.com/api/jobs/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -114,7 +114,7 @@ const JobTracker = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found");
-      const response = await fetch(`http://localhost:5000/api/jobs/${id}`, {
+      const response = await fetch(`https://careerhub25.onrender.com/api/jobs/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

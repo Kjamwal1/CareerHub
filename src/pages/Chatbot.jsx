@@ -34,7 +34,7 @@ const Chatbot = () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found");
-        const response = await fetch("http://localhost:5000/api/chat/history", {
+        const response = await fetch("https://careerhub25.onrender.com/api/chat/history", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -60,7 +60,7 @@ const Chatbot = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found");
-      const response = await fetch("http://localhost:5000/api/chat/save", {
+      const response = await fetch("https://careerhub25.onrender.com/api/chat/save", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -85,7 +85,7 @@ const Chatbot = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found");
-      const response = await fetch("http://localhost:5000/api/chat", {
+      const response = await fetch("https://careerhub25.onrender.com/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

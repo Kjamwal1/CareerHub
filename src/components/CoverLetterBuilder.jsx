@@ -23,7 +23,7 @@ const CoverLetterBuilder = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/api/cover-letter", {
+      const response = await fetch("https://careerhub25.onrender.com/api/cover-letter", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

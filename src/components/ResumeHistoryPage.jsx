@@ -14,7 +14,7 @@ const ResumeHistoryPage = () => {
       setLoading(true);
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:5000/api/resume-analyses", {
+        const response = await fetch("https://careerhub25.onrender.com/api/resume-analyses", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

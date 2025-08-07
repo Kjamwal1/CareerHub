@@ -24,7 +24,7 @@ const IndustrySelection = () => {
     try {
       const token = localStorage.getItem("token");
       console.log("Token used:", token ? "Present" : "Missing", token);
-      const response = await fetch(process.env.NODE_ENV === "development" ? "http://localhost:5000/api/user/industry" : "/api/user/industry", {
+      const response = await fetch(process.env.NODE_ENV === "development" ? "https://careerhub25.onrender.com/api/user/industry" : "/api/user/industry", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
