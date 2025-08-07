@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import Header from "../components/Header";
 import Hero from "../components/Hero";
-import resumeImg from "../assets/resume-preview.gif";
-import linkedinImg from "../assets/linkedin.gif";
 import Spline from "@splinetool/react-spline";
 
 const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
@@ -97,7 +95,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
             data-aos-delay="200"
           >
             <img
-              src={resumeImg}
+              src="/resume-preview.gif"
               alt="Resume preview"
               className="rounded-3xl shadow-2xl w-full max-w-[500px] mx-auto"
             />
@@ -280,7 +278,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
             data-aos-easing="ease-in-sine"
           >
             <img
-              src={linkedinImg}
+              src="linkedin.gif"
               alt="LinkedIn illustration"
               className="w-full rounded-xl shadow-lg"
             />

@@ -1,5 +1,4 @@
 import "boxicons/css/boxicons.min.css";
-import logo from "../assets/logo.png";
 
 const Header = ({ onLoginClick, onSignupClick }) => {
   const toggleMobileMenu = () => {
@@ -16,7 +15,7 @@ const Header = ({ onLoginClick, onSignupClick }) => {
       {/* Logo and Name */}
       <div className="flex items-center gap-0">
         <img
-          src={logo}
+          src="/logo.png"
           alt="Caryo Logo"
           className="h-12 md:h-16 lg:h-20 w-auto object-contain mt-2"
         />
