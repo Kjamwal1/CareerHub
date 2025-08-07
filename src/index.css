@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base{
+
+  body{
+    @apply bg-black text-white relative font-sans h-screen overflow-x-hidden
+  }
+}
+
+@font-face {
+  font-family: 'BitcountGridSingle';
+  src: url('./assets/fonts/BitcountGridSingle.ttf') format('truetype'); /* or .woff2 */
+  font-weight: normal;
+  font-style: normal;
+}
+.feature-card {
+  position: relative;
+  transition: transform 0.3s ease;
+  z-index: 0;
+}
+
+.feature-card::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 1rem;
+  z-index: -1;
+  background: linear-gradient(135deg, #3B82F6, #9333EA); /* blue to purple */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  filter: blur(12px);
+}
+
+.feature-card:hover::before,
+.feature-card:focus::before {
+  opacity: 1;
+}

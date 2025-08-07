@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>imagemagick.app</id>
+    <version>7.1.2</version>
+    <title>ImageMagick (Install)</title>
+    <authors>ImageMagick Studio LLC</authors>
+    <owners>Brian Dukes</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://www.imagemagick.org/script/license.php</licenseUrl>
+    <projectUrl>https://www.imagemagick.org/</projectUrl>
+    <iconUrl>https://cdn.jsdelivr.net/gh/bdukes/Chocolatey-Packages@c8afd71590e0567e3c66e2a70bd6e4ca61f15715/icons/imagemagick.png</iconUrl>
+    <description>ImageMagick® is a software suite to create, edit, compose, or convert bitmap images. It can read and write images in a variety of formats (over 100) including DPX, EXR, GIF, JPEG, JPEG-2000, PDF, PhotoCD, PNG, Postscript, SVG, and TIFF. Use ImageMagick to resize, flip, mirror, rotate, distort, shear and transform images, adjust image colors, apply various special effects, or draw text, lines, polygons, ellipses and Bézier curves.
+
+This package installs the dynamic 16 bits-per-pixel (with high dynamic-range imaging enabled for x64) version of ImageMagick.
+
+You can add -PackageParameters InstallDevelopmentHeaders=true to the choco install command in order to install the development headers and libraries for C and C++
+
+You can add -PackageParameters LegacySupport=true to the choco install command in order to install the legacy utilities (e.g. convert)
+
+You can add -PackageParameters NoDesktop=true to the choco install command in order to not create a desktop icon
+    
+You can add -PackageParameters InstallOldFFmpeg=true to the choco install command to install the FFmpeg included with ImageMagick</description>
+    <summary>ImageMagick® is a software suite to create, edit, compose, or convert bitmap images</summary>
+    <releaseNotes>https://www.imagemagick.org/script/changelog.php</releaseNotes>
+    <copyright>© 2020 ImageMagick Studio LLC</copyright>
+    <tags>imagemagick images picture graphics convert</tags>
+    <projectSourceUrl>https://github.com/ImageMagick/ImageMagick</projectSourceUrl>
+    <packageSourceUrl>https://github.com/bdukes/Chocolatey-Packages</packageSourceUrl>
+    <docsUrl>https://www.imagemagick.org/script/command-line-processing.php</docsUrl>
+    <mailingListUrl>https://github.com/ImageMagick/ImageMagick/discussions</mailingListUrl>
+    <bugTrackerUrl>https://github.com/ImageMagick/ImageMagick/issues</bugTrackerUrl>
+    <dependencies>
+      <dependency id="vcredist140" version="14.34.31938" />
+    </dependencies>
+  </metadata>
+</package>

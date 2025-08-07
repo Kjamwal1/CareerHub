@@ -1,0 +1,36 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@fortawesome/free-solid-svg-icons": "^7.0.0",
+    "@fortawesome/react-fontawesome": "^0.2.3",
+    "axios": "^1.11.0",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mammoth": "^1.10.0",
+    "mongoose": "^8.17.0",
+    "multer": "^2.0.2",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^7.0.5",
+    "openai": "^5.11.0",
+    "pdf-parse": "^1.1.1",
+    "pdf2json": "^3.2.0",
+    "prop-types": "^15.8.1",
+    "puppeteer": "^24.15.0",
+    "react-toastify": "^11.0.5",
+    "tesseract.js": "^6.0.1",
+    "twilio": "^5.8.0"
+  }
+}
