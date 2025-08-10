@@ -14,14 +14,18 @@ const LoginModal = ({ onClose, switchToSignup, onLoginSuccess }) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("https://careerhub25.onrender.com/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: e.target.email.value,
-          password: e.target.password.value,
-        }),
-      });
+      const response = await fetch(
+        "https://careerhub25.onrender.com/api/resume/check",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData, // Assuming multipart/form-data for file upload
+        }
+      );
+
       const data = await response.json();
       console.log("Login response:", data);
       if (response.ok) {
