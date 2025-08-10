@@ -17,16 +17,24 @@ require("dotenv").config({ quiet: true });
 const app = express();
 
 // Middleware
-app.use(
-  cors({
-    origin: [
-      process.env.CLIENT_URL,
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    credentials: true,
-  })
-);
 app.use(express.json());
+
+// Updated CORS configuration
+const corsOptions = {
+origin: process.env.CLIENT_URL || "https://career-hub-25.vercel.app",
+methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+allowedHeaders: ["Content-Type", "Authorization"],
+credentials: true,
+};
+
+// Log CORS configuration for debugging
+console.log("CORS Origin:", process.env.CLIENT_URL || "https://career-hub-25.vercel.app");
+
+// Apply CORS middleware
+app.use(cors(corsOptions));
+
+// Explicitly handle OPTIONS preflight requests
+app.options("*", cors(corsOptions));
 
 // Validate environment variables
 if (!process.env.MONGO_URI) {
