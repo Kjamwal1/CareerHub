@@ -12,25 +12,19 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const cron = require("node-cron");
-require("dotenv").config({ silent: true }); // Fixed: Changed 'quiet' to 'silent'
+require("dotenv").config({ quiet: true });
 
 const app = express();
 
 // Middleware
+app.use(
+  cors({
+    origin: [process.env.CLIENT_URL],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
+  })
+);
 app.use(express.json());
-
-// CORS configuration
-const corsOptions = {
-  origin: process.env.CLIENT_URL || "https://career-hub-25.vercel.app",
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
-};
-
-console.log("CORS Origin:", process.env.CLIENT_URL || "https://career-hub-25.vercel.app");
-
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
 
 // Validate environment variables
 if (!process.env.MONGO_URI) {
@@ -59,6 +53,11 @@ mongoose
     process.exit(1);
   });
 
+// Health Check Endpoint
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", message: "Server is running" });
+});
+
 // User Schema
 const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -66,7 +65,6 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true },
   profileImage: { type: String, default: "/default.jpg" },
   plan: { type: String, default: "Free" },
-  industry: { type: String }, // Added from /api/user/industry route
 });
 
 const User = mongoose.model("User", UserSchema);
@@ -121,34 +119,26 @@ const JobSchema = new mongoose.Schema({
 
 const Job = mongoose.model("Job", JobSchema);
 
-// Cover Letter Schema
-const CoverLetterSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  content: { type: String, required: true },
-  jobTitle: { type: String },
-  company: { type: String },
-  createdAt: { type: Date, default: Date.now },
-});
-
-const CoverLetter = mongoose.model("CoverLetter", CoverLetterSchema);
-
-// Multer configuration
+// Configure multer to store files in uploads/ directory with file size limit
 const upload = multer({
   dest: "uploads/",
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
 });
 
-// JWT Middleware
+// JWT Secret
+const JWT_SECRET = process.env.JWT_SECRET;
+
+// Authentication Middleware
 const authenticateToken = (req, res, next) => {
   const token = req.headers["authorization"]?.split(" ")[1];
   if (!token) return res.status(401).json({ error: "No token provided" });
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+  jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
       console.error("Token verification error:", err.message);
       return res.status(403).json({ error: "Invalid or expired token" });
     }
-    req.user = user; // Sets req.user.id from jwt.sign({ id: user._id })
+    req.user = user;
     next();
   });
 };
@@ -162,9 +152,132 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Health Check Endpoint
-app.get("/api/health", (req, res) => {
-  res.json({ status: "ok", message: "Server is running" });
+// Cover Letter Schema
+const CoverLetterSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  content: { type: String, required: true },
+  jobTitle: { type: String },
+  company: { type: String },
+  createdAt: { type: Date, default: Date.now },
+});
+
+const CoverLetter = mongoose.model("CoverLetter", CoverLetterSchema);
+
+// Save Cover Letter
+app.post("/api/cover-letter", authenticateToken, async (req, res) => {
+  try {
+    const { content, jobTitle, company } = req.body;
+    if (!content) return res.status(400).json({ error: "Content is required" });
+    const coverLetter = new CoverLetter({
+      userId: req.user.userId,
+      content,
+      jobTitle,
+      company,
+    });
+    await coverLetter.save();
+    res
+      .status(201)
+      .json({ message: "Cover letter saved", id: coverLetter._id });
+  } catch (error) {
+    console.error("Error saving cover letter:", error.message);
+    res.status(500).json({ error: "Failed to save cover letter" });
+  }
+});
+
+// Get Cover Letters
+app.get("/api/cover-letters", authenticateToken, async (req, res) => {
+  try {
+    const coverLetters = await CoverLetter.find({ userId: req.user.userId })
+      .sort({ createdAt: -1 })
+      .limit(10);
+    res.json(coverLetters);
+  } catch (error) {
+    console.error("Error fetching cover letters:", error.message);
+    res.status(500).json({ error: "Failed to fetch cover letters" });
+  }
+});
+
+// Save Job
+app.post("/api/jobs", authenticateToken, async (req, res) => {
+  try {
+    const { title, company, description, url, reminderDate } = req.body;
+    if (!title || !company)
+      return res.status(400).json({ error: "Title and company are required" });
+
+    const job = new Job({
+      userId: req.user.userId,
+      title,
+      company,
+      description,
+      url,
+      reminderDate: reminderDate ? new Date(reminderDate) : null,
+    });
+    await job.save();
+    res.status(201).json({ message: "Job saved", job });
+  } catch (error) {
+    console.error("Error saving job:", error.message);
+    res.status(500).json({ error: "Failed to save job" });
+  }
+});
+
+// Get Jobs
+app.get("/api/jobs", authenticateToken, async (req, res) => {
+  try {
+    const jobs = await Job.find({ userId: req.user.userId }).sort({
+      createdAt: -1,
+    });
+    res.json(jobs);
+  } catch (error) {
+    console.error("Error fetching jobs:", error.message);
+    res.status(500).json({ error: "Failed to fetch jobs" });
+  }
+});
+
+// Update User Industry
+app.post("/api/user/industry", authenticateToken, async (req, res) => {
+  try {
+    const { industry } = req.body;
+    console.log("Received industry update request:", { industry, userId: req.user.userId });
+    if (!industry) return res.status(400).json({ error: "Industry is required" });
+
+    const user = await User.findById(req.user.userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    user.industry = industry;
+    await user.save();
+    console.log("Industry updated successfully for user:", req.user.userId);
+    res.json({ message: "Industry updated", industry });
+  } catch (error) {
+    console.error("Error updating industry:", error.stack);
+    res.status(500).json({ error: "Failed to update industry", details: error.message });
+  }
+});
+
+// Cron Job for Reminders
+cron.schedule("0 9 * * *", async () => {
+  console.log("Running job reminder cron job at", new Date().toLocaleString());
+  try {
+    const jobs = await Job.find({
+      reminderDate: { $lte: new Date(), $exists: true },
+      $where: "this.reminderDate.getTime() <= new Date().getTime()",
+    });
+    for (const job of jobs) {
+      const user = await User.findById(job.userId);
+      if (!user) continue;
+
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: user.email,
+        subject: `Reminder: Job Application for ${job.title} at ${job.company}`,
+        text: `This is a reminder for your job application to ${job.title} at ${job.company}. Status: ${job.status}. Please follow up if needed.`,
+      };
+
+      await transporter.sendMail(mailOptions);
+      console.log(`Email reminder sent to ${user.email} for job ${job.title}`);
+    }
+  } catch (error) {
+    console.error("Error in cron job:", error.message);
+  }
 });
 
 // Signup Endpoint
@@ -173,7 +286,9 @@ app.post("/api/auth/signup", async (req, res) => {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
-    return res.status(400).json({ error: "Name, email, and password are required" });
+    return res
+      .status(400)
+      .json({ error: "Name, email, and password are required" });
   }
 
   try {
@@ -197,7 +312,7 @@ app.post("/api/auth/signup", async (req, res) => {
     });
 
     await user.save();
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
       expiresIn: "1h",
     });
 
@@ -215,7 +330,9 @@ app.post("/api/auth/signup", async (req, res) => {
     if (error.code === 11000) {
       return res.status(400).json({ error: "Email already exists" });
     }
-    res.status(500).json({ error: "Failed to create account. Please try again later." });
+    res
+      .status(500)
+      .json({ error: "Failed to create account. Please try again later." });
   }
 });
 
@@ -239,7 +356,7 @@ app.post("/api/auth/login", async (req, res) => {
       return res.status(400).json({ error: "Invalid email or password" });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
       expiresIn: "1h",
     });
 
@@ -254,188 +371,116 @@ app.post("/api/auth/login", async (req, res) => {
     });
   } catch (error) {
     console.error("Login error:", error.message);
-    res.status(500).json({ error: "Failed to log in. Please try again later." });
-  }
-});
-
-// Save Cover Letter
-app.post("/api/cover-letter", authenticateToken, async (req, res) => {
-  try {
-    const { content, jobTitle, company } = req.body;
-    if (!content) return res.status(400).json({ error: "Content is required" });
-    const coverLetter = new CoverLetter({
-      userId: req.user.id, // Fixed: Changed userId to id
-      content,
-      jobTitle,
-      company,
-    });
-    await coverLetter.save();
-    res.status(201).json({ message: "Cover letter saved", id: coverLetter._id });
-  } catch (error) {
-    console.error("Error saving cover letter:", error.message);
-    res.status(500).json({ error: "Failed to save cover letter" });
-  }
-});
-
-// Get Cover Letters
-app.get("/api/cover-letters", authenticateToken, async (req, res) => {
-  try {
-    const coverLetters = await CoverLetter.find({ userId: req.user.id }) // Fixed: Changed userId to id
-      .sort({ createdAt: -1 })
-      .limit(10);
-    res.json(coverLetters);
-  } catch (error) {
-    console.error("Error fetching cover letters:", error.message);
-    res.status(500).json({ error: "Failed to fetch cover letters" });
-  }
-});
-
-// Save Job
-app.post("/api/jobs", authenticateToken, async (req, res) => {
-  try {
-    const { title, company, description, url, reminderDate } = req.body;
-    if (!title || !company) {
-      return res.status(400).json({ error: "Title and company are required" });
-    }
-
-    const job = new Job({
-      userId: req.user.id, // Fixed: Changed userId to id
-      title,
-      company,
-      description,
-      url,
-      reminderDate: reminderDate ? new Date(reminderDate) : null,
-    });
-    await job.save();
-    res.status(201).json({ message: "Job saved", job });
-  } catch (error) {
-    console.error("Error saving job:", error.message);
-    res.status(500).json({ error: "Failed to save job" });
-  }
-});
-
-// Get Jobs
-app.get("/api/jobs", authenticateToken, async (req, res) => {
-  try {
-    const jobs = await Job.find({ userId: req.user.id }).sort({ createdAt: -1 }); // Fixed: Changed userId to id
-    res.json(jobs);
-  } catch (error) {
-    console.error("Error fetching jobs:", error.message);
-    res.status(500).json({ error: "Failed to fetch jobs" });
-  }
-});
-
-// Update User Industry
-app.post("/api/user/industry", authenticateToken, async (req, res) => {
-  try {
-    const { industry } = req.body;
-    console.log("Received industry update request:", { industry, userId: req.user.id });
-    if (!industry) return res.status(400).json({ error: "Industry is required" });
-
-    const user = await User.findById(req.user.id); // Fixed: Changed userId to id
-    if (!user) return res.status(404).json({ error: "User not found" });
-
-    user.industry = industry;
-    await user.save();
-    console.log("Industry updated successfully for user:", req.user.id);
-    res.json({ message: "Industry updated", industry });
-  } catch (error) {
-    console.error("Error updating industry:", error.stack);
-    res.status(500).json({ error: "Failed to update industry", details: error.message });
+    res
+      .status(500)
+      .json({ error: "Failed to log in. Please try again later." });
   }
 });
 
 // Resume Check Endpoint
-app.post("/api/resume/check", authenticateToken, upload.single("resume"), async (req, res) => { // Fixed: Changed /check-resume to /api/resume/check
-  console.log("Request Body:", req.body);
-  console.log("Uploaded Files:", req.file);
+app.post(
+  "/check-resume",
+  authenticateToken,
+  upload.single("resume"),
+  async (req, res) => {
+    console.log("Request Body:", req.body);
+    console.log("Uploaded Files:", req.file);
 
-  if (!req.file) {
-    return res.status(400).json({ error: "No file uploaded" });
-  }
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
 
-  const allowedTypes = [
-    "application/pdf",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    "image/jpeg",
-    "image/png",
-  ];
-  if (!allowedTypes.includes(req.file.mimetype)) {
-    if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-    return res.status(400).json({ error: "Only PDF, DOCX, JPG, and PNG files are allowed" });
-  }
+    const allowedTypes = [
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "image/jpeg",
+      "image/png",
+    ];
+    if (!allowedTypes.includes(req.file.mimetype)) {
+      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      return res
+        .status(400)
+        .json({ error: "Only PDF, DOCX, JPG, and PNG files are allowed" });
+    }
 
-  const jobDescription = req.body.jobDescription || "";
-  if (!jobDescription) {
-    if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-    return res.status(400).json({ error: "Job description is required" });
-  }
+    const jobDescription = req.body.jobDescription || "";
+    if (!jobDescription) {
+      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      return res.status(400).json({ error: "Job description is required" });
+    }
 
-  try {
-    let textContent = "";
-    if (req.file.mimetype.includes("pdf")) {
-      const pdfParser = new PDFParser();
-      pdfParser.on("pdfParser_dataError", (errData) => {
-        console.error("PDF Parsing Error:", errData.parserError);
-        if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-        performOCR(req.file.path, res, jobDescription, req.user.id); // Fixed: Changed userId to id
-      });
-
-      pdfParser.on("pdfParser_dataReady", async (pdfData) => {
-        textContent = pdfData.Pages.map((page) =>
-          page.Texts.map((text) => decodeURIComponent(text.R[0].T)).join(" ")
-        )
-          .join("\n")
-          .trim()
-          .replace(/\n\s*\n/g, "\n");
-        console.log("Extracted Text:", textContent);
-        if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-        const analysis = await analyzeWithGemini(textContent, jobDescription);
-        const resumeAnalysis = new ResumeAnalysis({
-          userId: req.user.id, // Fixed: Changed userId to id
-          jobDescription,
-          analysis,
-        });
-        await resumeAnalysis.save();
-        res.json(analysis);
-      });
-
-      pdfParser.loadPDF(req.file.path);
-    } else if (req.file.mimetype.includes("openxmlformats")) {
-      mammoth.extractRawText({ path: req.file.path })
-        .then(async (result) => {
-          textContent = result.value.trim().replace(/\n\s*\n/g, "\n");
-          console.log("Extracted DOCX Text:", textContent);
-          if (!textContent) {
-            performOCR(req.file.path, res, jobDescription, req.user.id); // Fixed: Changed userId to id
-          } else {
-            if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-            const analysis = await analyzeWithGemini(textContent, jobDescription);
-            const resumeAnalysis = new ResumeAnalysis({
-              userId: req.user.id, // Fixed: Changed userId to id
-              jobDescription,
-              analysis,
-            });
-            await resumeAnalysis.save();
-            res.json(analysis);
-          }
-        })
-        .catch((err) => {
-          console.error("DOCX Parsing Error:", err.message);
+    try {
+      let textContent = "";
+      if (req.file.mimetype.includes("pdf")) {
+        const pdfParser = new PDFParser();
+        pdfParser.on("pdfParser_dataError", (errData) => {
+          console.error("PDF Parsing Error:", errData.parserError);
           if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-          performOCR(req.file.path, res, jobDescription, req.user.id); // Fixed: Changed userId to id
+          performOCR(req.file.path, res, jobDescription, req.user.userId);
         });
-    } else if (req.file.mimetype.includes("image")) {
-      performOCR(req.file.path, res, jobDescription, req.user.id); // Fixed: Changed userId to id
+
+        pdfParser.on("pdfParser_dataReady", async (pdfData) => {
+          textContent = pdfData.Pages.map((page) =>
+            page.Texts.map((text) => decodeURIComponent(text.R[0].T)).join(" ")
+          )
+            .join("\n")
+            .trim()
+            .replace(/\n\s*\n/g, "\n");
+          console.log("Extracted Text:", textContent);
+          if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+          const analysis = await analyzeWithGemini(textContent, jobDescription);
+          const resumeAnalysis = new ResumeAnalysis({
+            userId: req.user.userId,
+            jobDescription,
+            analysis,
+          });
+          await resumeAnalysis.save();
+          res.json(analysis);
+        });
+
+        pdfParser.loadPDF(req.file.path);
+      } else if (req.file.mimetype.includes("openxmlformats")) {
+        mammoth
+          .extractRawText({ path: req.file.path })
+          .then(async (result) => {
+            textContent = result.value.trim().replace(/\n\s*\n/g, "\n");
+            console.log("Extracted DOCX Text:", textContent);
+            if (!textContent) {
+              performOCR(req.file.path, res, jobDescription, req.user.userId);
+            } else {
+              if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+              const analysis = await analyzeWithGemini(
+                textContent,
+                jobDescription
+              );
+              const resumeAnalysis = new ResumeAnalysis({
+                userId: req.user.userId,
+                jobDescription,
+                analysis,
+              });
+              await resumeAnalysis.save();
+              res.json(analysis);
+            }
+          })
+          .catch((err) => {
+            console.error("DOCX Parsing Error:", err.message);
+            if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+            performOCR(req.file.path, res, jobDescription, req.user.userId);
+          });
+      } else if (req.file.mimetype.includes("image")) {
+        performOCR(req.file.path, res, jobDescription, req.user.userId);
+      }
+    } catch (error) {
+      console.error("Unexpected Error:", error.message);
+      if (req.file && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+      res
+        .status(500)
+        .json({ error: "Unexpected error during resume processing" });
     }
-  } catch (error) {
-    console.error("Unexpected Error:", error.message);
-    if (req.file && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
-    }
-    res.status(500).json({ error: "Unexpected error during resume processing" });
   }
-});
+);
 
 // Save Chat History
 app.post("/api/chat/save", authenticateToken, async (req, res) => {
@@ -444,12 +489,12 @@ app.post("/api/chat/save", authenticateToken, async (req, res) => {
     if (!history || !Array.isArray(history)) {
       return res.status(400).json({ error: "Invalid chat history provided" });
     }
-    let chat = await Chat.findOne({ userId: req.user.id }); // Fixed: Changed userId to id
+    let chat = await Chat.findOne({ userId: req.user.userId });
     if (chat) {
       chat.history = history;
       await chat.save();
     } else {
-      chat = new Chat({ userId: req.user.id, history }); // Fixed: Changed userId to id
+      chat = new Chat({ userId: req.user.userId, history });
       await chat.save();
     }
     res.json({ message: "Chat history saved" });
@@ -462,7 +507,7 @@ app.post("/api/chat/save", authenticateToken, async (req, res) => {
 // Get Chat History
 app.get("/api/chat/history", authenticateToken, async (req, res) => {
   try {
-    const chat = await Chat.findOne({ userId: req.user.id }); // Fixed: Changed userId to id
+    const chat = await Chat.findOne({ userId: req.user.userId });
     res.json({ history: chat ? chat.history : [] });
   } catch (error) {
     console.error("Fetch chat history error:", error.message);
@@ -489,58 +534,69 @@ app.post("/api/chat", authenticateToken, async (req, res) => {
 });
 
 // Job Endpoints
-app.post("/api/jobs", authenticateToken, upload.single("file"), async (req, res) => {
-  try {
-    if (req.file) {
-      // Handle CSV import
-      const csvText = fs.readFileSync(req.file.path, "utf-8");
-      const jobs = csvText
-        .split("\n")
-        .slice(1) // Skip header
-        .map((line) => {
-          const [title, company, description, url, reminderDate] = line.split(",");
-          return {
-            userId: req.user.id, // Fixed: Changed userId to id
-            title,
-            company,
-            description,
-            url,
-            status: "Applied",
-            reminderDate: reminderDate ? new Date(reminderDate) : null,
-          };
-        })
-        .filter((job) => job.title && job.company);
-      await Job.insertMany(jobs);
-      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-      res.status(201).json({ message: "Jobs imported successfully" });
-    } else {
-      // Handle manual job addition
-      const { title, company, description, url, reminderDate } = req.body;
-      if (!title || !company) {
-        return res.status(400).json({ error: "Title and company are required" });
+app.post(
+  "/api/jobs",
+  authenticateToken,
+  upload.single("file"),
+  async (req, res) => {
+    try {
+      if (req.file) {
+        // Handle CSV import
+        const csvText = fs.readFileSync(req.file.path, "utf-8");
+        const jobs = csvText
+          .split("\n")
+          .slice(1) // Skip header
+          .map((line) => {
+            const [title, company, description, url, reminderDate] =
+              line.split(",");
+            return {
+              userId: req.user.userId,
+              title,
+              company,
+              description,
+              url,
+              status: "Applied",
+              reminderDate: reminderDate ? new Date(reminderDate) : null,
+            };
+          })
+          .filter((job) => job.title && job.company);
+        await Job.insertMany(jobs);
+        if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        res.status(201).json({ message: "Jobs imported successfully" });
+      } else {
+        // Handle manual job addition
+        const { title, company, description, url, reminderDate } = req.body;
+        if (!title || !company) {
+          return res
+            .status(400)
+            .json({ error: "Title and company are required" });
+        }
+        const job = new Job({
+          userId: req.user.userId,
+          title,
+          company,
+          description,
+          url,
+          status: "Applied",
+          reminderDate: reminderDate ? new Date(reminderDate) : null,
+        });
+        await job.save();
+        res.status(201).json({ message: "Job added successfully", job });
       }
-      const job = new Job({
-        userId: req.user.id, // Fixed: Changed userId to id
-        title,
-        company,
-        description,
-        url,
-        status: "Applied",
-        reminderDate: reminderDate ? new Date(reminderDate) : null,
-      });
-      await job.save();
-      res.status(201).json({ message: "Job added successfully", job });
+    } catch (error) {
+      console.error("Error adding jobs:", error.message);
+      if (req.file && fs.existsSync(req.file.path))
+        fs.unlinkSync(req.file.path);
+      res.status(500).json({ error: "Failed to add job" });
     }
-  } catch (error) {
-    console.error("Error adding jobs:", error.message);
-    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-    res.status(500).json({ error: "Failed to add job" });
   }
-});
+);
 
 app.get("/api/jobs", authenticateToken, async (req, res) => {
   try {
-    const jobs = await Job.find({ userId: req.user.id }).sort({ createdAt: -1 }); // Fixed: Changed userId to id
+    const jobs = await Job.find({ userId: req.user.userId }).sort({
+      createdAt: -1,
+    });
     res.json(jobs);
   } catch (error) {
     console.error("Error fetching jobs:", error.message);
@@ -552,7 +608,7 @@ app.put("/api/jobs/:id", authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
     const { status, reminderDate } = req.body;
-    const job = await Job.findOne({ _id: id, userId: req.user.id }); // Fixed: Changed userId to id
+    const job = await Job.findOne({ _id: id, userId: req.user.userId });
     if (!job) return res.status(404).json({ error: "Job not found" });
     if (status) job.status = status;
     if (reminderDate) job.reminderDate = new Date(reminderDate);
@@ -567,8 +623,9 @@ app.put("/api/jobs/:id", authenticateToken, async (req, res) => {
 app.delete("/api/jobs/:id", authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await Job.deleteOne({ _id: id, userId: req.user.id }); // Fixed: Changed userId to id
-    if (result.deletedCount === 0) return res.status(404).json({ error: "Job not found" });
+    const result = await Job.deleteOne({ _id: id, userId: req.user.userId });
+    if (result.deletedCount === 0)
+      return res.status(404).json({ error: "Job not found" });
     res.json({ message: "Job deleted successfully" });
   } catch (error) {
     console.error("Error deleting job:", error.message);
@@ -593,7 +650,17 @@ cron.schedule("0 9 * * *", async () => {
         from: process.env.EMAIL_USER,
         to: user.email,
         subject: `Reminder: Follow up on ${job.title} at ${job.company}`,
-        html: `<p>Dear ${user.name},</p><p>This is a reminder to follow up on your job application for ${job.title} at ${job.company}. Status: ${job.status}.${job.reminderDate ? ` Reminder set for: ${new Date(job.reminderDate).toLocaleString()}` : ""}</p><p><a href="${job.url || "#"}">View Job</a></p>`,
+        html: `<p>Dear ${
+          user.name
+        },</p><p>This is a reminder to follow up on your job application for ${
+          job.title
+        } at ${job.company}. Status: ${job.status}.${
+          job.reminderDate
+            ? ` Reminder set for: ${new Date(
+                job.reminderDate
+              ).toLocaleString()}`
+            : ""
+        }</p><p><a href="${job.url || "#"}">View Job</a></p>`,
       };
       await transporter.sendMail(email);
       console.log(`Email reminder sent to ${user.email} for job ${job.title}`);
@@ -608,48 +675,32 @@ function performOCR(filePath, res, jobDescription, userId) {
   const tempDir = "temp_images/";
   if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
 
-  // Check if tesseract and convert are available
-  const checkTesseract = spawn("tesseract", ["--version"]);
-  checkTesseract.on("error", (err) => {
-    console.error("Tesseract not found:", err.message);
-    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-    if (fs.existsSync(tempDir)) fs.rmdirSync(tempDir, { recursive: true });
-    return res.status(500).json({ error: "Tesseract OCR is not installed on the server" });
-  });
-
   if (filePath.endsWith(".pdf")) {
-    const checkConvert = spawn("convert", ["--version"]);
-    checkConvert.on("error", (err) => {
-      console.error("ImageMagick convert not found:", err.message);
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-      if (fs.existsSync(tempDir)) fs.rmdirSync(tempDir, { recursive: true });
-      return res.status(500).json({ error: "ImageMagick is not installed on the server" });
-    });
-
-    const pdf2img = spawn("convert", ["-density", "300", filePath, `${tempDir}page-%d.jpg`]);
-    pdf2img.on("error", (err) => {
-      console.error("PDF to image conversion error:", err.message);
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-      if (fs.existsSync(tempDir)) fs.rmdirSync(tempDir, { recursive: true });
-      return res.status(500).json({ error: "Failed to convert PDF to images" });
-    });
-
+    const pdf2img = spawn("convert", [
+      "-density",
+      "300",
+      filePath,
+      `${tempDir}page-%d.jpg`,
+    ]);
     pdf2img.on("close", async () => {
       fs.readdir(tempDir, async (err, files) => {
         if (err) {
           if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-          if (fs.existsSync(tempDir)) fs.rmdirSync(tempDir, { recursive: true });
+          if (fs.existsSync(tempDir))
+            fs.rmdirSync(tempDir, { recursive: true });
           return res.status(500).json({ error: "Error processing PDF images" });
         }
         let textContent = "";
         for (const file of files) {
           const imagePath = path.join(tempDir, file);
-          const process = spawn("tesseract", [imagePath, "stdout", "-l", "eng"]);
+          const process = spawn("tesseract", [
+            imagePath,
+            "stdout",
+            "-l",
+            "eng",
+          ]);
           process.stdout.on("data", (data) => {
             textContent += data.toString();
-          });
-          process.on("error", (err) => {
-            console.error("Tesseract error:", err.message);
           });
           process.on("close", () => {
             if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
@@ -657,19 +708,17 @@ function performOCR(filePath, res, jobDescription, userId) {
         }
         if (fs.existsSync(tempDir)) fs.rmdirSync(tempDir, { recursive: true });
         if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-        try {
-          const analysis = await analyzeWithGemini(textContent.trim(), jobDescription);
-          const resumeAnalysis = new ResumeAnalysis({
-            userId,
-            jobDescription,
-            analysis,
-          });
-          await resumeAnalysis.save();
-          res.json(analysis);
-        } catch (error) {
-          console.error("OCR analysis error:", error.message);
-          res.status(500).json({ error: "Failed to analyze resume after OCR" });
-        }
+        const analysis = await analyzeWithGemini(
+          textContent.trim(),
+          jobDescription
+        );
+        const resumeAnalysis = new ResumeAnalysis({
+          userId,
+          jobDescription,
+          analysis,
+        });
+        await resumeAnalysis.save();
+        res.json(analysis);
       });
     });
   } else if (filePath.endsWith(".docx")) {
@@ -694,26 +743,19 @@ print(text)
     process.stdout.on("data", async (data) => {
       textContent += data.toString();
     });
-    process.on("error", (err) => {
-      console.error("Python OCR error:", err.message);
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-      res.status(500).json({ error: "Failed to process DOCX with OCR" });
-    });
     process.on("close", async () => {
       if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-      try {
-        const analysis = await analyzeWithGemini(textContent.trim(), jobDescription);
-        const resumeAnalysis = new ResumeAnalysis({
-          userId,
-          jobDescription,
-          analysis,
-        });
-        await resumeAnalysis.save();
-        res.json(analysis);
-      } catch (error) {
-        console.error("OCR analysis error:", error.message);
-        res.status(500).json({ error: "Failed to analyze resume after OCR" });
-      }
+      const analysis = await analyzeWithGemini(
+        textContent.trim(),
+        jobDescription
+      );
+      const resumeAnalysis = new ResumeAnalysis({
+        userId,
+        jobDescription,
+        analysis,
+      });
+      await resumeAnalysis.save();
+      res.json(analysis);
     });
   } else if (filePath.endsWith(".jpg") || filePath.endsWith(".png")) {
     const process = spawn("tesseract", [filePath, "stdout", "-l", "eng"]);
@@ -721,26 +763,19 @@ print(text)
     process.stdout.on("data", async (data) => {
       textContent += data.toString();
     });
-    process.on("error", (err) => {
-      console.error("Tesseract error:", err.message);
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-      res.status(500).json({ error: "Failed to process image with OCR" });
-    });
     process.on("close", async () => {
       if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-      try {
-        const analysis = await analyzeWithGemini(textContent.trim(), jobDescription);
-        const resumeAnalysis = new ResumeAnalysis({
-          userId,
-          jobDescription,
-          analysis,
-        });
-        await resumeAnalysis.save();
-        res.json(analysis);
-      } catch (error) {
-        console.error("OCR analysis error:", error.message);
-        res.status(500).json({ error: "Failed to analyze resume after OCR" });
-      }
+      const analysis = await analyzeWithGemini(
+        textContent.trim(),
+        jobDescription
+      );
+      const resumeAnalysis = new ResumeAnalysis({
+        userId,
+        jobDescription,
+        analysis,
+      });
+      await resumeAnalysis.save();
+      res.json(analysis);
     });
   }
 }
