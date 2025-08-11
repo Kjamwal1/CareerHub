@@ -3,7 +3,7 @@ const multer = require("multer");
 const PDFParser = require("pdf2json");
 const mammoth = require("mammoth");
 const cors = require("cors");
-const fs = require("fs");
+const fs = require("fs").promises;
 const { spawn } = require("child_process");
 const path = require("path");
 const axios = require("axios");
@@ -19,39 +19,39 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: 'https://career-hub-25.vercel.app',
+    origin: ['https://career-hub-25.vercel.app',' http://localhost:3000' ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
   })
 );
 app.use(express.json());
 
+// Global Error Handling Middleware
+app.use((err, req, res, next) => {
+  console.error("Global error:", err.stack);
+  res.status(500).json({ error: "Something went wrong", details: err.message });
+});
+
+
 // Validate environment variables
-if (!process.env.MONGO_URI) {
-  console.error("Error: MONGO_URI is not defined in .env file");
-  process.exit(1);
+const requiredEnvVars = ['MONGO_URI', 'JWT_SECRET', 'GEMINI_API_KEY', 'EMAIL_USER', 'EMAIL_PASS'];
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    console.error(`Error: ${envVar} is not defined in .env file`);
+    process.exit(1);
+  }
 }
-if (!process.env.JWT_SECRET) {
-  console.error("Error: JWT_SECRET is not defined in .env file");
-  process.exit(1);
-}
-if (!process.env.GEMINI_API_KEY) {
-  console.error("Error: GEMINI_API_KEY is not defined in .env file");
-  process.exit(1);
-}
-if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-  console.error("Error: EMAIL_USER or EMAIL_PASS not defined in .env file");
-  process.exit(1);
-}
+
 
 // MongoDB Connection
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("MongoDB connected successfully"))
   .catch((err) => {
     console.error("MongoDB connection error:", err.message);
     process.exit(1);
   });
+
 
 // Health Check Endpoint
 app.get("/api/health", (req, res) => {
@@ -64,7 +64,7 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   profileImage: { type: String, default: "/default.jpg" },
-  plan: { type: String, default: "Free" },
+   industry: { type: String }, // Added for industry update
 });
 
 const User = mongoose.model("User", UserSchema);
@@ -119,7 +119,7 @@ const JobSchema = new mongoose.Schema({
 
 const Job = mongoose.model("Job", JobSchema);
 
-// Configure multer to store files in uploads/ directory with file size limit
+// Configure multer 
 const upload = multer({
   dest: "uploads/",
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
@@ -253,129 +253,6 @@ app.post("/api/user/industry", authenticateToken, async (req, res) => {
   }
 });
 
-// Cron Job for Reminders
-cron.schedule("0 9 * * *", async () => {
-  console.log("Running job reminder cron job at", new Date().toLocaleString());
-  try {
-    const jobs = await Job.find({
-      reminderDate: { $lte: new Date(), $exists: true },
-      $where: "this.reminderDate.getTime() <= new Date().getTime()",
-    });
-    for (const job of jobs) {
-      const user = await User.findById(job.userId);
-      if (!user) continue;
-
-      const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: user.email,
-        subject: `Reminder: Job Application for ${job.title} at ${job.company}`,
-        text: `This is a reminder for your job application to ${job.title} at ${job.company}. Status: ${job.status}. Please follow up if needed.`,
-      };
-
-      await transporter.sendMail(mailOptions);
-      console.log(`Email reminder sent to ${user.email} for job ${job.title}`);
-    }
-  } catch (error) {
-    console.error("Error in cron job:", error.message);
-  }
-});
-
-// Signup Endpoint
-app.post("/api/auth/signup", async (req, res) => {
-  console.log("Signup request received:", req.body);
-  const { name, email, password } = req.body;
-
-  if (!name || !email || !password) {
-    return res
-      .status(400)
-      .json({ error: "Name, email, and password are required" });
-  }
-
-  try {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ error: "Invalid email format" });
-    }
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ error: "Email already exists" });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({
-      name,
-      email,
-      password: hashedPassword,
-      profileImage: "/kanika.jpg",
-      plan: "Free",
-    });
-
-    await user.save();
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
-      expiresIn: "1h",
-    });
-
-    res.status(201).json({
-      user: {
-        name: user.name,
-        email: user.email,
-        profileImage: user.profileImage,
-        plan: user.plan,
-      },
-      token,
-    });
-  } catch (error) {
-    console.error("Signup error:", error.message);
-    if (error.code === 11000) {
-      return res.status(400).json({ error: "Email already exists" });
-    }
-    res
-      .status(500)
-      .json({ error: "Failed to create account. Please try again later." });
-  }
-});
-
-// Login Endpoint
-app.post("/api/auth/login", async (req, res) => {
-  console.log("Login request received:", req.body);
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ error: "Email and password are required" });
-  }
-
-  try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ error: "Invalid email or password" });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ error: "Invalid email or password" });
-    }
-
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
-      expiresIn: "1h",
-    });
-
-    res.json({
-      user: {
-        name: user.name,
-        email: user.email,
-        profileImage: user.profileImage,
-        plan: user.plan,
-      },
-      token,
-    });
-  } catch (error) {
-    console.error("Login error:", error.message);
-    res
-      .status(500)
-      .json({ error: "Failed to log in. Please try again later." });
-  }
-});
 
 // Resume Check Endpoint
 app.post(
@@ -620,6 +497,7 @@ app.put("/api/jobs/:id", authenticateToken, async (req, res) => {
   }
 });
 
+//Delete Job Endpoint 
 app.delete("/api/jobs/:id", authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
@@ -670,11 +548,111 @@ cron.schedule("0 9 * * *", async () => {
   }
 });
 
-// Function to perform OCR using pytesseract
-function performOCR(filePath, res, jobDescription, userId) {
-  const tempDir = "temp_images/";
-  if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
 
+// Signup Endpoint
+app.post("/api/auth/signup", async (req, res) => {
+  console.log("Signup request received:", req.body);
+  const { name, email, password } = req.body;
+
+  if (!name || !email || !password) {
+    return res
+      .status(400)
+      .json({ error: "Name, email, and password are required" });
+  }
+
+  try {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: "Invalid email format" });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: "Email already exists" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({
+      name,
+      email,
+      password: hashedPassword,
+      profileImage: "/kanika.jpg",
+      plan: "Free",
+    });
+
+    await user.save();
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    res.status(201).json({
+      user: {
+        name: user.name,
+        email: user.email,
+        profileImage: user.profileImage,
+        plan: user.plan,
+      },
+      token,
+    });
+  } catch (error) {
+    console.error("Signup error:", error.message);
+    if (error.code === 11000) {
+      return res.status(400).json({ error: "Email already exists" });
+    }
+    res
+      .status(500)
+      .json({ error: "Failed to create account. Please try again later." });
+  }
+});
+
+// Login Endpoint
+app.post("/api/auth/login", async (req, res) => {
+  console.log("Login request received:", req.body);
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: "Email and password are required" });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ error: "Invalid email or password" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: "Invalid email or password" });
+    }
+
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    res.json({
+      user: {
+        name: user.name,
+        email: user.email,
+        profileImage: user.profileImage,
+        plan: user.plan,
+      },
+      token,
+    });
+  } catch (error) {
+    console.error("Login error:", error.message);
+    res
+      .status(500)
+      .json({ error: "Failed to log in. Please try again later." });
+  }
+});
+
+// Function to perform OCR using pytesseract
+async function performOCR(filePath, res, jobDescription, userId) {
+  const tempDir = "temp_images/";
+  await fs.mkdir(tempDir, {recursive: true});
+
+  try{
+    let textContent = "";
   if (filePath.endsWith(".pdf")) {
     const pdf2img = spawn("convert", [
       "-density",
@@ -683,14 +661,8 @@ function performOCR(filePath, res, jobDescription, userId) {
       `${tempDir}page-%d.jpg`,
     ]);
     pdf2img.on("close", async () => {
-      fs.readdir(tempDir, async (err, files) => {
-        if (err) {
-          if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-          if (fs.existsSync(tempDir))
-            fs.rmdirSync(tempDir, { recursive: true });
-          return res.status(500).json({ error: "Error processing PDF images" });
-        }
-        let textContent = "";
+      try{
+        const files = await fs.readdir(tempDir);
         for (const file of files) {
           const imagePath = path.join(tempDir, file);
           const process = spawn("tesseract", [
@@ -702,12 +674,12 @@ function performOCR(filePath, res, jobDescription, userId) {
           process.stdout.on("data", (data) => {
             textContent += data.toString();
           });
-          process.on("close", () => {
-            if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+          process.on("close", async() => {
+            await fs.unlink(imagePath).catch(() => console.error("Failed to delete image"));
           });
         }
-        if (fs.existsSync(tempDir)) fs.rmdirSync(tempDir, { recursive: true });
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        await fs.rm(tempDir, { recursive: true, force: true });
+        await fs.unlink(filePath).catch(() => console.error("Failed to delete PDF"));
         const analysis = await analyzeWithGemini(
           textContent.trim(),
           jobDescription
@@ -719,18 +691,39 @@ function performOCR(filePath, res, jobDescription, userId) {
         });
         await resumeAnalysis.save();
         res.json(analysis);
-      });
+      }
+      catch (err) {
+        console.error("Error processing PDF images:", err.message);
+        res.status(500).json({ error: "Error processing PDF images" });
+      }
     });
-  } else if (filePath.endsWith(".docx")) {
+  } else if (filePath.endsWith(".jpg") || filePath.endsWith(".png")) {
+      const process = spawn("tesseract", [filePath, "stdout", "-l", "eng"]);
+      process.stdout.on("data", (data) => {
+        textContent += data.toString();
+      });
+      process.on("close", async () => {
+        await fs.unlink(filePath).catch(() => console.error("Failed to delete image"));
+        const analysis = await analyzeWithGemini(textContent.trim(), jobDescription);
+        const resumeAnalysis = new ResumeAnalysis({
+          userId,
+          jobDescription,
+          analysis,
+        });
+        await resumeAnalysis.save();
+        res.json(analysis);
+      });
+    }   else if (filePath.endsWith(".docx")) {
     const process = spawn("python", [
       "-c",
       `
 import mammoth, os
 from PIL import Image
-doc = mammoth.extract_raw_text({ path: "${filePath}" })
-text = doc.value
+with open("${filePath}", "rb") as f:
+    result = mammoth.extract_raw_text(f)
+    text = result.value
 if not text.strip():
-    images = mammoth.images.extract_images({ path: "${filePath}" })
+    images = mammoth.images.extract_images(f)
     text = ""
     for img in images:
         img.save("temp.jpg")
@@ -739,12 +732,11 @@ if not text.strip():
 print(text)
 `,
     ]);
-    let textContent = "";
     process.stdout.on("data", async (data) => {
       textContent += data.toString();
     });
     process.on("close", async () => {
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      await fs.unlink(filePath).catch(() => console.error("Failed to delete DOCX"));
       const analysis = await analyzeWithGemini(
         textContent.trim(),
         jobDescription
@@ -757,35 +749,20 @@ print(text)
       await resumeAnalysis.save();
       res.json(analysis);
     });
-  } else if (filePath.endsWith(".jpg") || filePath.endsWith(".png")) {
-    const process = spawn("tesseract", [filePath, "stdout", "-l", "eng"]);
-    let textContent = "";
-    process.stdout.on("data", async (data) => {
-      textContent += data.toString();
-    });
-    process.on("close", async () => {
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-      const analysis = await analyzeWithGemini(
-        textContent.trim(),
-        jobDescription
-      );
-      const resumeAnalysis = new ResumeAnalysis({
-        userId,
-        jobDescription,
-        analysis,
-      });
-      await resumeAnalysis.save();
-      res.json(analysis);
-    });
+  } catch (error) {
+    console.error("OCR Error:", error.message);
+    await fs.unlink(filePath).catch(() => console.error("Failed to delete file"));
+    await fs.rm(tempDir, { recursive: true, force: true });
+    res.status(500).json({ error: "Failed to process file with OCR" });
   }
 }
+
 
 // Function to analyze resume or profile with Gemini API
 async function analyzeWithGemini(textContent, jobDescription) {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error("Gemini API key not configured");
-  }
+  const models = ["gemini-1.5-flash", "gemini-2.0-flash"];
+
 
   const prompt = `
 Act as an HR manager with 20 years of experience. Analyze the provided LinkedIn profile against the given job description. Provide:
@@ -815,14 +792,11 @@ Return the response in JSON format:
 }
 `;
 
-  const models = ["gemini-1.5-flash", "gemini-2.0-flash"];
-  let errorMessage = "Failed to analyze with Gemini API";
-
   for (const model of models) {
     try {
       console.log(`Attempting analysis with model: ${model}`);
       const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        'https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent',
         {
           contents: [{ parts: [{ text: prompt }] }],
         },
@@ -836,7 +810,7 @@ Return the response in JSON format:
 
       const result = response.data.candidates[0].content.parts[0].text;
       console.log("API Response:", result);
-      return JSON.parse(result.replace(/```json\n|\n```/g, ""));
+      return JSON.parse(result.replace(/json\n|\n/g, ""));
     } catch (error) {
       console.error(
         `Gemini API Error with ${model}:`,
@@ -846,20 +820,15 @@ Return the response in JSON format:
         console.log(`Quota exceeded for ${model}, trying next model...`);
         continue;
       }
-      errorMessage = `Failed with ${model}: ${
-        error.response ? error.response.data.message : error.message
-      }`;
-      if (model === models[models.length - 1]) throw new Error(errorMessage);
+      if (model === models[models.length - 1]) throw new Error(`Failed to analyze with Gemini API: ${error.message}`);
     }
   }
+}
 }
 
 // Function to generate chatbot response with Gemini API
 async function analyzeWithGeminiForChat(history) {
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error("Gemini API key not configured");
-  }
 
   const prompt = history
     .map((msg) => `${msg.role === "user" ? "User" : "AI"}: ${msg.content}`)
@@ -874,8 +843,6 @@ Please provide your response as plain text.
 `;
 
   const models = ["gemini-1.5-flash", "gemini-2.0-flash"];
-  let errorMessage = "Failed to generate chatbot response";
-
   for (const model of models) {
     try {
       console.log(`Attempting chat response with model: ${model}`);
@@ -904,12 +871,11 @@ Please provide your response as plain text.
         console.log(`Quota exceeded for ${model}, trying next model...`);
         continue;
       }
-      errorMessage = `Failed with ${model}: ${
-        error.response ? error.response.data.message : error.message
-      }`;
-      if (model === models[models.length - 1]) throw new Error(errorMessage);
+
+      if (model === models[models.length - 1]) throw new Error(`Failed to generate chatbot response: ${error.message}`);
     }
   }
+}
 }
 
 const PORT = process.env.PORT || 5000;
