@@ -16,6 +16,10 @@ require("dotenv").config({ quiet: true });
 
 const app = express();
 
+app.get("/", (req, res) => {
+  res.json({ message: "Welcome to CareerHub API" });
+});
+
 // Middleware
 app.use(
   cors({
