@@ -253,32 +253,6 @@ app.post("/api/user/industry", authenticateToken, async (req, res) => {
   }
 });
 
-// Cron Job for Reminders
-cron.schedule("0 9 * * *", async () => {
-  console.log("Running job reminder cron job at", new Date().toLocaleString());
-  try {
-    const jobs = await Job.find({
-      reminderDate: { $lte: new Date(), $exists: true },
-      $where: "this.reminderDate.getTime() <= new Date().getTime()",
-    });
-    for (const job of jobs) {
-      const user = await User.findById(job.userId);
-      if (!user) continue;
-
-      const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: user.email,
-        subject: Reminder: Job Application for ${job.title} at ${job.company},
-        text: This is a reminder for your job application to ${job.title} at ${job.company}. Status: ${job.status}. Please follow up if needed.,
-      };
-
-      await transporter.sendMail(mailOptions);
-      console.log(`Email reminder sent to ${user.email} for job ${job.title}`);
-    }
-  } catch (error) {
-    console.error("Error in cron job:", error.message);
-  }
-});
 
 // Signup Endpoint
 app.post("/api/auth/signup", async (req, res) => {
@@ -649,7 +623,7 @@ cron.schedule("0 9 * * *", async () => {
       const email = {
         from: process.env.EMAIL_USER,
         to: user.email,
-        // Line 652
+       
         subject: `Reminder: Follow up on ${job.title} at ${job.company}`,
         html: `<p>Dear ${
           user.name
