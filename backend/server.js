@@ -803,9 +803,9 @@ Return the response in JSON format:
 
   for (const model of models) {
     try {
-      console.log(Attempting analysis with model: ${model});
+      console.log(`Attempting analysis with model: ${model}`);
       const response = await axios.post(
-        https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent,
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
         {
           contents: [{ parts: [{ text: prompt }] }],
         },
@@ -822,11 +822,11 @@ Return the response in JSON format:
       return JSON.parse(result.replace(/json\n|\n/g, ""));
     } catch (error) {
       console.error(
-        Gemini API Error with ${model}:,
+        `Gemini API Error with ${model}:`,
         error.response ? error.response.data : error.message
       );
       if (error.response && error.response.status === 429) {
-        console.log(Quota exceeded for ${model}, trying next model...);
+        console.log(`Quota exceeded for ${model}, trying next model...`);
         continue;
       }
       errorMessage = `Failed with ${model}: ${
@@ -845,7 +845,7 @@ async function analyzeWithGeminiForChat(history) {
   }
 
   const prompt = history
-    .map((msg) => ${msg.role === "user" ? "User" : "AI"}: ${msg.content})
+    .map((msg) => `${msg.role === "user" ? "User" : "AI"}: ${msg.content}`)
     .join("\n");
   const fullPrompt = `
 You are an AI career mentor with expertise in resume optimization, LinkedIn profiling, and job matching. Continue the conversation based on the following history and provide relevant career advice, job search strategies, or profile optimization tips. Respond naturally and contextually.
@@ -861,9 +861,9 @@ Please provide your response as plain text.
 
   for (const model of models) {
     try {
-      console.log(Attempting chat response with model: ${model});
+      console.log(`Attempting chat response with model: ${model}`);
       const response = await axios.post(
-        https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent,
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
         {
           contents: [{ parts: [{ text: fullPrompt }] }],
         },
@@ -880,11 +880,11 @@ Please provide your response as plain text.
       return result.trim();
     } catch (error) {
       console.error(
-        Gemini API Error with ${model}:,
+        `Gemini API Error with ${model}:`,
         error.response ? error.response.data : error.message
       );
       if (error.response && error.response.status === 429) {
-        console.log(Quota exceeded for ${model}, trying next model...);
+        console.log(`Quota exceeded for ${model}, trying next model...`);
         continue;
       }
       errorMessage = `Failed with ${model}: ${
@@ -896,4 +896,4 @@ Please provide your response as plain text.
 }
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(Server running on port ${PORT}));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
