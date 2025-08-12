@@ -64,7 +64,7 @@ const SignupModal = ({ onClose, switchToLogin, onSignupSuccess }) => {
         <div className="p-6">
           <div className="flex flex-col items-center mb-6 mt-2">
             <img
-              src="src/assets/logo.png"
+              src="/logo.png"
               alt="Logo"
               className="h-20 w-20 mb-2"
             />

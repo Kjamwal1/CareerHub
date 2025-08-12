@@ -20,6 +20,8 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to CareerHub API" });
 });
 
+// server.js
+app.get('/logo.png', (req, res) => res.status(204).end());
 // Middleware
 app.use(
   cors({
