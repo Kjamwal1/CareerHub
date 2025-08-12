@@ -23,11 +23,13 @@ const ResumeCheckerPage = () => {
   const handleFile = (file) => {
     if (!allowedTypes.includes(file.type)) {
       setError("Only PDF, DOCX, JPG, and PNG files are allowed.");
+      toast.error("Only PDF, DOCX, JPG, and PNG files are allowed.");
       setSelectedFile(null);
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
       setError("File must be under 2MB.");
+      toast.error("File must be under 2MB.");
       setSelectedFile(null);
       return;
     }
@@ -61,6 +63,7 @@ const ResumeCheckerPage = () => {
     if (!user) {
       setError("Please log in to check your resume.");
       toast.error("Please log in to check your resume.");
+      navigate("/login");
       return;
     }
     if (!selectedFile) {
@@ -84,6 +87,12 @@ const ResumeCheckerPage = () => {
 
     try {
       const token = localStorage.getItem("token");
+      if (!token) {
+        setError("No authentication token found. Please log in again.");
+        toast.error("No authentication token found. Please log in again.");
+        navigate("/login");
+        return;
+      }
       const response = await fetch("https://careerhub25.onrender.com/check-resume", {
         method: "POST",
         headers: {
@@ -91,18 +100,24 @@ const ResumeCheckerPage = () => {
         },
         body: formData,
       });
-
-      const data = await response.json();
-      if (!response.ok) {
-        setError(data.error || "Error analyzing resume.");
-        toast.error(data.error || "Error analyzing resume.");
-      } else {
-        setAnalysis(data);
+      const text = await response.text();
+      console.log("Raw response:", text);
+      let data;
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (parseError) {
+        console.error("JSON parsing error:", parseError, text);
+        throw new Error(`Invalid JSON response: ${text || "Empty response"}`);
       }
+      if (!response.ok) {
+        throw new Error(data.error || `Failed to analyze resume (Status: ${response.status})`);
+      }
+      setAnalysis(data);
+      toast.success("Resume analyzed successfully!");
     } catch (error) {
-      console.error("Fetch error:", error);
-      setError("Failed to connect to the server. Please try again.");
-      toast.error("Failed to connect to the server. Please try again.");
+      console.error("Fetch error:", error.message, error.stack);
+      setError(`Failed to analyze resume: ${error.message}`);
+      toast.error(`Failed to analyze resume: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -137,7 +152,7 @@ const ResumeCheckerPage = () => {
               placeholder="Paste or type the job description here..."
               className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600 text-black"
               rows="5"
-              style={{ color: "black" }}
+              disabled={loading}
             />
           </div>
 
@@ -167,6 +182,7 @@ const ResumeCheckerPage = () => {
               accept=".pdf,.docx,.jpg,.png"
               onChange={handleFileChange}
               className="hidden"
+              disabled={loading}
             />
             <p className="text-sm text-gray-500">Max file size: 2MB</p>
           </div>
@@ -190,7 +206,17 @@ const ResumeCheckerPage = () => {
                 : "bg-gray-400 cursor-not-allowed"
             }`}
           >
-            {loading ? "Analyzing..." : "Check Resume"}
+            {loading ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8h8a8 8 0 01-8 8 8 8 0 01-8-8z" />
+                </svg>
+                Analyzing...
+              </span>
+            ) : (
+              "Check Resume"
+            )}
           </button>
         </form>
 
@@ -237,7 +263,7 @@ const ResumeCheckerPage = () => {
                 💪 Strengths:
               </h4>
               <ul className="text-lg text-green-700 list-disc pl-5 space-y-2">
-                {analysis.strengths.map((strength, index) => (
+                {analysis.strengths?.map((strength, index) => (
                   <li key={index}>{strength}</li>
                 ))}
               </ul>
@@ -245,7 +271,7 @@ const ResumeCheckerPage = () => {
             <div className="mb-6">
               <h4 className="text-xl font-semibold text-gray-800">🧱 Gaps:</h4>
               <ul className="text-lg text-red-700 list-disc pl-5 space-y-2">
-                {analysis.gaps.map((gap, index) => (
+                {analysis.gaps?.map((gap, index) => (
                   <li key={index}>{gap}</li>
                 ))}
               </ul>
@@ -255,10 +281,63 @@ const ResumeCheckerPage = () => {
                 🛠 Improvements:
               </h4>
               <ul className="text-lg text-purple-700 list-disc pl-5 space-y-2">
-                {analysis.improvements.map((improvement, index) => (
+                {analysis.improvements?.map((improvement, index) => (
                   <li key={index}>{improvement}</li>
                 ))}
               </ul>
+            </div>
+            {analysis.optimizedSection && (
+              <div className="mb-6">
+                <h4 className="text-xl font-semibold text-gray-800">
+                  Optimized Section:
+                </h4>
+                <p className="text-lg text-gray-700 whitespace-pre-wrap">
+                  {analysis.optimizedSection}
+                </p>
+              </div>
+            )}
+            {analysis.beforeAfterComparison && (
+              <div className="mb-6">
+                <h4 className="text-xl font-semibold text-gray-800">
+                  Before vs. After:
+                </h4>
+                <p className="text-lg text-gray-700 whitespace-pre-wrap">
+                  {analysis.beforeAfterComparison}
+                </p>
+              </div>
+            )}
+            <div className="mb-6">
+              <h4 className="text-xl font-semibold text-gray-800">
+                Keyword Match Score:
+              </h4>
+              <p
+                className={`text-3xl font-bold ${
+                  getMatchLevel(analysis.keywordMatchScore).color
+                }`}
+              >
+                {analysis.keywordMatchScore}%
+              </p>
+              <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                <div
+                  className={`h-2.5 rounded-full ${
+                    getMatchLevel(analysis.keywordMatchScore).label === "Poor"
+                      ? "bg-red-600"
+                      : getMatchLevel(analysis.keywordMatchScore).label === "Fair"
+                      ? "bg-yellow-600"
+                      : getMatchLevel(analysis.keywordMatchScore).label === "Good"
+                      ? "bg-blue-600"
+                      : "bg-green-600"
+                  }`}
+                  style={{ width: `${analysis.keywordMatchScore}%` }}
+                ></div>
+              </div>
+              <p
+                className={`text-sm font-medium ${
+                  getMatchLevel(analysis.keywordMatchScore).color
+                } mt-1`}
+              >
+                Match Level: {getMatchLevel(analysis.keywordMatchScore).label}
+              </p>
             </div>
           </div>
         )}
@@ -276,14 +355,13 @@ const ResumeCheckerPage = () => {
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              {/* Modern chatbot icon placeholder - adjust based on your image */}
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
                 d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2-13h4v2h-4V7zm0 4h4v6h-4v-6z"
               />
-              <circle cx="12" cy="10" r="2" fill="#3B82F6" /> {/* Blue head */}
+              <circle cx="12" cy="10" r="2" fill="#3B82F6" />
               <line
                 x1="12"
                 y1="10"
@@ -291,8 +369,7 @@ const ResumeCheckerPage = () => {
                 y2="6"
                 stroke="#3B82F6"
                 strokeWidth={1}
-              />{" "}
-              {/* Antenna */}
+              />
             </svg>
           </div>
         )}
