@@ -136,9 +136,35 @@ const ResumeCheckerPage = () => {
     }
   };
 
+  const handleExit = () => {
+    navigate("/home"); // Navigate back to the home page
+  };
+
   return (
     <div className="min-h-screen p-6 bg-gradient-to-b from-[#0a0a23] to-[#12123a] font-poppins flex items-center justify-center relative">
-      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-xl w-full border border-gray-200">
+      {/* Exit Button */}
+      <button
+        onClick={handleExit}
+        className="absolute top-4 right-4 bg-red-600 text-white rounded-full p-2 hover:bg-red-700 transition-colors z-10"
+        aria-label="Exit"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+
+      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-xl w-full border border-gray-200 relative z-0">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
           Upload Resume for ATS Check
         </h2>
