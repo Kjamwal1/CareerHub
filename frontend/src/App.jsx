@@ -10,6 +10,7 @@ import "aos/dist/aos.css";
 import Landing from "./components/Landing";
 import Home from "./components/Home";
 import ResumeCheckerPage from "./pages/ResumeCheckerPage";
+import MyDocumentsPage from "./components/MyDocumentsPage";
 import ResumeHistoryPage from "./components/ResumeHistoryPage";
 import LinkedInOptimizer from "./pages/LinkedInOptimizer";
 import Chatbot from "./pages/Chatbot";
@@ -172,9 +173,18 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/" element={<Home />} />
-        <Route path="/linkedin-headline-generator" element={<LinkedInHeadlineGenerator />} />
-        {/* Other routes */}
+          <Route
+            path="/my-documents"
+            element={
+              <ProtectedRoute>
+                <MyDocumentsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/linkedin-headline-generator"
+            element={<LinkedInHeadlineGenerator />}
+          />
         </Routes>
       </ErrorBoundary>
     </main>
