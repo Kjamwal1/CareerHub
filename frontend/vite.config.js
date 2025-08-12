@@ -20,4 +20,9 @@ export default defineConfig({
       '@': '/src', // Maps @ to the src directory
     },
   },
+  build: {
+    rollupOptions: {
+      external: [], // Explicitly include all dependencies (optional, should not be needed)
+    },
+  },
 });
