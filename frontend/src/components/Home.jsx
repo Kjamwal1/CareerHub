@@ -5,11 +5,8 @@ import {
   DocumentIcon,
   PresentationChartLineIcon,
   ChatBubbleLeftRightIcon,
-  ClockIcon,
   ArrowUpRightIcon,
   UserCircleIcon,
-  CogIcon,
-  ArrowRightOnRectangleIcon,
   Bars3Icon,
   ChatBubbleLeftIcon,
 } from "@heroicons/react/24/solid";
@@ -17,20 +14,11 @@ import {
 const Home = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-
-  // Mock data for Resume History (replace with API call if needed)
-  const [resumeHistory, setResumeHistory] = useState([
-    { id: 1, name: "Resume_2023.pdf", date: "2025-08-04", score: 85 },
-    { id: 2, name: "JobApp_Resume.docx", date: "2025-08-03", score: 65 },
-    { id: 3, name: "TechResume.png", date: "2025-08-02", score: 45 },
-  ]);
   const [showDashboardDropdown, setShowDashboardDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
   useEffect(() => {
     document.title = `Welcome, ${user?.name || "Kanika"}`;
-    // Simulate fetching resume history from an API
-    // Replace with actual fetch call: e.g., fetch('/api/resume-history')
   }, [user]);
 
   const handleFeatureClick = (title) => {
@@ -57,7 +45,6 @@ const Home = () => {
         destination = "/home";
         break;
     }
-    // Check if user has an industry; if not, redirect to industry selection with 'from' state
     if (!user?.industry) {
       navigate("/industry-selection", { state: { from: destination } });
     } else {
@@ -88,7 +75,6 @@ const Home = () => {
         navigate("/linkedin-headline-generator");
       }
     }
-    // Add similar logic for other tools if needed
   };
 
   return (
@@ -104,7 +90,7 @@ const Home = () => {
         <div className="relative">
           <button
             onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-            className="flex items-center text-gray-600 hover:text-gray-900 w-full"
+            className="flex items-center text-gray-600 hover:text-gray-900"
           >
             <UserCircleIcon className="h-8 w-8 mr-2" />
             <span>
@@ -112,7 +98,7 @@ const Home = () => {
             </span>
           </button>
           {showProfileDropdown && (
-            <div className="absolute right-full top-0 mt-10 mr-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+            <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-[100] max-w-[90vw]">
               <p className="px-4 py-2 text-sm text-gray-700">
                 Plan: <span className="font-medium">{user?.plan || "Free"}</span>
               </p>
@@ -141,7 +127,7 @@ const Home = () => {
             <Bars3Icon className="h-5 w-5" />
           </button>
           {showDashboardDropdown && (
-            <div className="ml-4 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+            <div className="ml-4 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-[50]">
               <button
                 onClick={() => handleFeatureClick("Resume Analyse History")}
                 className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -211,7 +197,7 @@ const Home = () => {
           ].map(({ title, desc, icon: Icon, bg }) => (
             <div
               key={title}
-              className={`rounded-xl p-6 text-white shadow-lg transition transform hover:scale-[1.03] cursor-pointer ${bg} hover:opacity-90 z-10`}
+              className={`rounded-xl p-6 text-white shadow-lg transition transform hover:scale-[1.03] cursor-pointer ${bg} hover:opacity-90 z-[10]`}
               onClick={() => handleFeatureClick(title)}
               data-aos="fade-up"
             >
@@ -238,7 +224,7 @@ const Home = () => {
             ].map((tool) => (
               <div
                 key={tool.name}
-                className="bg-white rounded-xl p-5 border hover:shadow-lg transition"
+                className="bg-white rounded-xl p-5 border hover:shadow-lg transition z-[10]"
                 data-aos="fade-up"
                 onClick={() => handleToolClick(tool.name)}
               >
@@ -257,7 +243,7 @@ const Home = () => {
 
       {/* Floating AI Chatbot Icon */}
       <div
-        className="fixed bottom-6 right-6 bg-blue-600 text-white rounded-full p-4 cursor-pointer shadow-lg hover:bg-blue-700 transition"
+        className="fixed bottom-6 right-6 bg-blue-600 text-white rounded-full p-4 cursor-pointer shadow-lg hover:bg-blue-700 transition z-[1000]"
         onClick={handleChatbotClick}
         style={{ zIndex: 1000 }}
       >

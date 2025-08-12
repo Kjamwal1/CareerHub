@@ -66,6 +66,7 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true },
   profileImage: { type: String, default: "/default.jpg" },
   plan: { type: String, default: "Free" },
+  industry: { type: String }, // Added for industry selection
 });
 
 const User = mongoose.model("User", UserSchema);
@@ -123,7 +124,7 @@ const Job = mongoose.model("Job", JobSchema);
 // Configure multer to store files in uploads/ directory with file size limit
 const upload = multer({
   dest: "uploads/",
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit to match frontend
 });
 
 // JWT Secret
@@ -607,41 +608,16 @@ app.delete("/api/jobs/:id", authenticateToken, async (req, res) => {
   }
 });
 
-// Cron Job for Email Reminders
-cron.schedule("0 9 * * *", async () => {
-  console.log("Running job reminder cron job at", new Date().toLocaleString());
+// Resume Analyses Endpoint
+app.get("/api/resume-analyses", authenticateToken, async (req, res) => {
   try {
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(now.getDate() + 1);
-    const jobs = await Job.find({
-      reminderDate: { $gte: now, $lte: tomorrow },
-      status: { $in: ["Applied", "Interview Scheduled"] },
-    }).populate("userId");
-    for (const job of jobs) {
-      const user = job.userId;
-      const email = {
-        from: process.env.EMAIL_USER,
-        to: user.email,
-
-        subject: `Reminder: Follow up on ${job.title} at ${job.company}`,
-        html: `<p>Dear ${
-          user.name
-        },</p><p>This is a reminder to follow up on your job application for ${
-          job.title
-        } at ${job.company}. Status: ${job.status}.${
-          job.reminderDate
-            ? ` Reminder set for: ${new Date(
-                job.reminderDate
-              ).toLocaleString()}`
-            : ""
-        }</p><p><a href="${job.url || "#"}">View Job</a></p>`,
-      };
-      await transporter.sendMail(email);
-      console.log(`Email reminder sent to ${user.email} for job ${job.title}`);
-    }
+    const analyses = await ResumeAnalysis.find({ userId: req.user.userId })
+      .sort({ createdAt: -1 })
+      .limit(10);
+    res.json(analyses);
   } catch (error) {
-    console.error("Cron job error:", error.message);
+    console.error("Error fetching resume analyses:", error.message);
+    res.status(500).json({ error: "Failed to fetch resume analyses" });
   }
 });
 
@@ -651,20 +627,12 @@ function performOCR(filePath, res, jobDescription, userId) {
   if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
 
   if (filePath.endsWith(".pdf")) {
-    const tempDir = "temp_images/";
-    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
-
-    if (filePath.endsWith(".pdf")) {
-      const pdf2img = spawn("convert", [
-        "-density",
-        "300",
-        filePath,
-        `${tempDir}page-%d.jpg`,
-      ]);
-      pdf2img.on("close", async () => {
-        // ...
-      });
-    }
+    const pdf2img = spawn("convert", [
+      "-density",
+      "300",
+      filePath,
+      `${tempDir}page-%d.jpg`,
+    ]);
     pdf2img.on("close", async () => {
       fs.readdir(tempDir, async (err, files) => {
         if (err) {
@@ -763,7 +731,7 @@ print(text)
   }
 }
 
-// Function to analyze resume or profile with Gemini API
+// Function to analyze resume with Gemini API
 async function analyzeWithGemini(textContent, jobDescription) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -879,7 +847,7 @@ ${prompt}
 Please provide your response as plain text.
 `;
 
-  const models = ["gemini-1.5-flash", "gemini-2.0-flash"];
+  const models = ["gemini-1.5-flash", "gemini-1.5-pro"];
   let errorMessage = "Failed to generate chatbot response";
 
   for (const model of models) {
@@ -917,6 +885,43 @@ Please provide your response as plain text.
     }
   }
 }
+
+// Cron Job for Email Reminders
+cron.schedule("0 9 * * *", async () => {
+  console.log("Running job reminder cron job at", new Date().toLocaleString());
+  try {
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
+    const jobs = await Job.find({
+      reminderDate: { $gte: now, $lte: tomorrow },
+      status: { $in: ["Applied", "Interview Scheduled"] },
+    }).populate("userId");
+    for (const job of jobs) {
+      const user = job.userId;
+      const email = {
+        from: process.env.EMAIL_USER,
+        to: user.email,
+        subject: `Reminder: Follow up on ${job.title} at ${job.company}`,
+        html: `<p>Dear ${
+          user.name
+        },</p><p>This is a reminder to follow up on your job application for ${
+          job.title
+        } at ${job.company}. Status: ${job.status}.${
+          job.reminderDate
+            ? ` Reminder set for: ${new Date(
+                job.reminderDate
+              ).toLocaleString()}`
+            : ""
+        }</p><p><a href="${job.url || "#"}">View Job</a></p>`,
+      };
+      await transporter.sendMail(email);
+      console.log(`Email reminder sent to ${user.email} for job ${job.title}`);
+    }
+  } catch (error) {
+    console.error("Cron job error:", error.message);
+  }
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

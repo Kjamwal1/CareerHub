@@ -14,6 +14,9 @@ const ResumeHistoryPage = () => {
       setLoading(true);
       try {
         const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("No authentication token found. Please log in again.");
+        }
         const response = await fetch("https://careerhub25.onrender.com/api/resume-analyses", {
           method: "GET",
           headers: {
@@ -21,14 +24,22 @@ const ResumeHistoryPage = () => {
             "Content-Type": "application/json",
           },
         });
-        const data = await response.json();
+        const text = await response.text();
+        console.log("Raw response:", text);
+        let data;
+        try {
+          data = text ? JSON.parse(text) : [];
+        } catch (parseError) {
+          console.error("JSON parsing error:", parseError, text);
+          throw new Error("Invalid response from server");
+        }
         if (!response.ok) {
-          throw new Error(data.error || "Error fetching analyses");
+          throw new Error(data.error || `Error fetching analyses (Status: ${response.status})`);
         }
         setAnalyses(data);
       } catch (error) {
-        console.error("Fetch error:", error);
-        toast.error("Failed to load analysis history.");
+        console.error("Fetch error:", error.message);
+        toast.error(`Failed to load analysis history: ${error.message}`);
       } finally {
         setLoading(false);
       }
@@ -52,7 +63,16 @@ const ResumeHistoryPage = () => {
         </h2>
 
         {loading && (
-          <div className="text-center text-gray-600">Loading analyses...</div>
+          <div className="text-center text-gray-600">
+            <svg
+              className="animate-spin h-8 w-8 mx-auto text-purple-600"
+              viewBox="0 0 24 24"
+            >
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8h8a8 8 0 01-8 8 8 8 0 01-8-8z" />
+            </svg>
+            <p className="mt-2">Loading analyses...</p>
+          </div>
         )}
 
         {!loading && analyses.length === 0 && (
@@ -65,7 +85,7 @@ const ResumeHistoryPage = () => {
           <div className="space-y-6">
             {analyses.map((analysis, index) => (
               <div
-                key={index}
+                key={analysis._id || index}
                 className="p-4 bg-gray-50 rounded-xl border border-gray-200"
               >
                 <p className="text-sm text-gray-500 mb-2">
@@ -105,6 +125,31 @@ const ResumeHistoryPage = () => {
                 </div>
                 <div className="mb-4">
                   <h4 className="text-lg font-semibold text-gray-800">
+                    Keyword Match Score:
+                  </h4>
+                  <p className={`text-2xl font-bold ${getMatchLevel(analysis.analysis.keywordMatchScore).color}`}>
+                    {analysis.analysis.keywordMatchScore}%
+                  </p>
+                  <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                    <div
+                      className={`h-2.5 rounded-full ${
+                        getMatchLevel(analysis.analysis.keywordMatchScore).label === "Poor"
+                          ? "bg-red-600"
+                          : getMatchLevel(analysis.analysis.keywordMatchScore).label === "Fair"
+                          ? "bg-yellow-600"
+                          : getMatchLevel(analysis.analysis.keywordMatchScore).label === "Good"
+                          ? "bg-blue-600"
+                          : "bg-green-600"
+                      }`}
+                      style={{ width: `${analysis.analysis.keywordMatchScore}%` }}
+                    ></div>
+                  </div>
+                  <p className={`text-sm font-medium ${getMatchLevel(analysis.analysis.keywordMatchScore).color} mt-1`}>
+                    Match Level: {getMatchLevel(analysis.analysis.keywordMatchScore).label}
+                  </p>
+                </div>
+                <div className="mb-4">
+                  <h4 className="text-lg font-semibold text-gray-800">
                     💪 Strengths:
                   </h4>
                   <ul className="text-md text-green-700 list-disc pl-5 space-y-1">
@@ -123,7 +168,7 @@ const ResumeHistoryPage = () => {
                     ))}
                   </ul>
                 </div>
-                <div>
+                <div className="mb-4">
                   <h4 className="text-lg font-semibold text-gray-800">
                     🛠 Improvements:
                   </h4>
@@ -133,6 +178,26 @@ const ResumeHistoryPage = () => {
                     ))}
                   </ul>
                 </div>
+                {analysis.analysis.optimizedSection && (
+                  <div className="mb-4">
+                    <h4 className="text-lg font-semibold text-gray-800">
+                      Optimized Section:
+                    </h4>
+                    <p className="text-sm text-gray-600 whitespace-pre-wrap">
+                      {analysis.analysis.optimizedSection}
+                    </p>
+                  </div>
+                )}
+                {analysis.analysis.beforeAfterComparison && (
+                  <div className="mb-4">
+                    <h4 className="text-lg font-semibold text-gray-800">
+                      Before vs. After:
+                    </h4>
+                    <p className="text-sm text-gray-600 whitespace-pre-wrap">
+                      {analysis.analysis.beforeAfterComparison}
+                    </p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
