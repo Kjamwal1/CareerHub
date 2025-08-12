@@ -81,9 +81,9 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white font-poppins text-gray-800 flex flex-col">
+    <div className="min-h-screen bg-white font-poppins text-gray-800 flex flex-col relative">
       {/* Navbar */}
-      <div className="w-full bg-gray-100 p-4 shadow-md flex justify-between items-center fixed top-0 z-10">
+      <div className="w-full bg-gray-100 p-4 shadow-md flex justify-between items-center fixed top-0 z-20">
         <h1
           className="text-4xl font-bold"
           style={{ fontFamily: "'Lobster', cursive" }}
@@ -101,7 +101,7 @@ const Home = () => {
             </span>
           </button>
           {showProfileDropdown && (
-            <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-[100] max-w-[90vw]">
+            <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-[100]">
               <p className="px-4 py-2 text-sm text-gray-700">
                 Plan: <span className="font-medium">{user?.plan || "Free"}</span>
               </p>
@@ -120,7 +120,7 @@ const Home = () => {
       </div>
 
       {/* Left Sidebar */}
-      <div className="w-[13rem] bg-gray-100 p-6 shadow-md h-screen overflow-y-auto fixed top-[4rem] bottom-0">
+      <div className="w-[13rem] bg-gray-100 p-6 shadow-md h-screen overflow-y-auto fixed top-[4rem] bottom-0 z-10">
         <nav className="space-y-2 flex-1">
           <button
             onClick={() => setShowDashboardDropdown(!showDashboardDropdown)}
@@ -170,8 +170,8 @@ const Home = () => {
       </div>
 
       {/* Main Content */}
-      <div className="ml-[13rem] mt-[4rem] p-6 flex-1">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+      <div className="ml-[13rem] pt-[4rem] p-6 flex-1 relative z-0">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6 sticky top-[4rem] bg-white z-10">
           Welcome back, {user?.name || "Kanika"}!
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
@@ -203,7 +203,7 @@ const Home = () => {
           ].map(({ title, desc, icon: Icon, bg }) => (
             <div
               key={title}
-              className={`rounded-xl p-6 text-white shadow-lg transition transform hover:scale-[1.03] cursor-pointer ${bg} hover:opacity-90 z-[10]`}
+              className={`rounded-xl p-6 text-white shadow-lg transition transform hover:scale-[1.03] cursor-pointer ${bg} hover:opacity-90`}
               onClick={() => handleFeatureClick(title)}
               data-aos="fade-up"
             >
