@@ -35,25 +35,33 @@ const Home = () => {
 
   const handleFeatureClick = (title) => {
     console.log("Navigating to:", title);
+    let destination;
     switch (title) {
       case "Resume Checker":
-        navigate("/resume-checker");
+        destination = "/resume-checker";
         break;
       case "LinkedIn Optimizer":
-        navigate("/linkedin-optimizer");
+        destination = "/linkedin-optimizer";
         break;
       case "AI Mentor":
-        navigate("/chatbot");
+        destination = "/chatbot";
         break;
       case "Job Tracker": // Match card title
       case "Application Track": // Match sidebar title
-        navigate("/job-tracker");
+        destination = "/job-tracker";
         break;
       case "Resume Analyse History":
-        navigate("/resume-history");
+        destination = "/resume-history";
         break;
       default:
+        destination = "/home";
         break;
+    }
+    // Check if user has an industry; if not, redirect to industry selection with 'from' state
+    if (!user?.industry) {
+      navigate("/industry-selection", { state: { from: destination } });
+    } else {
+      navigate(destination);
     }
     setShowDashboardDropdown(false);
   };
@@ -65,7 +73,22 @@ const Home = () => {
   };
 
   const handleChatbotClick = () => {
-    navigate("/chatbot");
+    if (!user?.industry) {
+      navigate("/industry-selection", { state: { from: "/chatbot" } });
+    } else {
+      navigate("/chatbot");
+    }
+  };
+
+  const handleToolClick = (toolName) => {
+    if (toolName === "LinkedIn Headline Generator") {
+      if (!user?.industry) {
+        navigate("/industry-selection", { state: { from: "/linkedin-headline-generator" } });
+      } else {
+        navigate("/linkedin-headline-generator");
+      }
+    }
+    // Add similar logic for other tools if needed
   };
 
   return (
@@ -78,7 +101,7 @@ const Home = () => {
         >
           CareerHub
         </h1>
-        <div className="relative" inline-block>
+        <div className="relative">
           <button
             onClick={() => setShowProfileDropdown(!showProfileDropdown)}
             className="flex items-center text-gray-600 hover:text-gray-900 w-full"
@@ -91,8 +114,7 @@ const Home = () => {
           {showProfileDropdown && (
             <div className="absolute right-full top-0 mt-10 mr-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
               <p className="px-4 py-2 text-sm text-gray-700">
-                Plan:{" "}
-                <span className="font-medium">{user?.plan || "Free"}</span>
+                Plan: <span className="font-medium">{user?.plan || "Free"}</span>
               </p>
               <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                 Edit Profile
@@ -190,10 +212,7 @@ const Home = () => {
             <div
               key={title}
               className={`rounded-xl p-6 text-white shadow-lg transition transform hover:scale-[1.03] cursor-pointer ${bg} hover:opacity-90 z-10`}
-              onClick={() => {
-                console.log("Clicked card:", title);
-                handleFeatureClick(title);
-              }}
+              onClick={() => handleFeatureClick(title)}
               data-aos="fade-up"
             >
               <Icon className="h-8 w-8 mb-4" />
@@ -208,28 +227,20 @@ const Home = () => {
           <h2 className="text-2xl font-bold text-gray-900 mb-4">More Tools</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              {
-                name: "LinkedIn Headline Generator",
-                icon: "/icons/linkedin.svg",
-              },
+              { name: "LinkedIn Headline Generator", icon: "/icons/linkedin.svg" },
               { name: "Linkedin About", icon: "/icons/pdf.svg" },
-               { name: "Linkedin Post", icon: "/icons/website.svg" },
+              { name: "Linkedin Post", icon: "/icons/website.svg" },
               { name: "Cover Letter Builder", icon: "/icons/coverletter.svg" },
               { name: "Interview Prep", icon: "/icons/interview.svg" },
               { name: "Resume Templates", icon: "/icons/examples.svg" },
               { name: "Proofreading", icon: "/icons/proofreading.svg" },
-            
               { name: "Chrome Extension", icon: "/icons/extension.svg" },
             ].map((tool) => (
               <div
                 key={tool.name}
                 className="bg-white rounded-xl p-5 border hover:shadow-lg transition"
                 data-aos="fade-up"
-                onClick={() => {
-                  if (tool.name === "LinkedIn Headline Generator") {
-                    navigate("/linkedin-headline-generator");
-                  }
-                }}
+                onClick={() => handleToolClick(tool.name)}
               >
                 <img src={tool.icon} alt={tool.name} className="h-8 w-8 mb-3" />
                 <h4 className="text-gray-800 font-medium text-lg mb-1">

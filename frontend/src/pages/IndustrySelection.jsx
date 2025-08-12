@@ -1,18 +1,22 @@
 import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const IndustrySelection = () => {
   const { user, login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
   const [industry, setIndustry] = useState(user?.industry || "");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (user?.industry) {
-      navigate("/home");
+      // Redirect to origin page or /home if no origin
+      const redirectTo = location.state?.from || "/home";
+      navigate(redirectTo, { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, navigate, location]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,9 +24,15 @@ const IndustrySelection = () => {
       setError("Please select an industry");
       return;
     }
-    setError(""); // Clear previous errors
+    setError("");
+    setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
+      if (!token) {
+        setError("No authentication token found. Please log in again.");
+        navigate("/login");
+        return;
+      }
       console.log("Token used:", token ? "Present" : "Missing", token);
       const response = await fetch('https://careerhub25.onrender.com/api/user/industry', {
         method: "POST",
@@ -37,20 +47,24 @@ const IndustrySelection = () => {
       console.log("Raw response:", text);
       let data;
       try {
-        data = JSON.parse(text);
+        data = text ? JSON.parse(text) : {};
       } catch (parseError) {
-        throw new Error("Invalid JSON response: " + text);
+        throw new Error(`Invalid JSON response: ${text || "Empty response"}`);
       }
       if (!response.ok) {
-        throw new Error(data.error || "Failed to update industry");
+        throw new Error(data.error || `Failed to update industry (Status: ${response.status})`);
       }
       console.log("Parsed response data:", data);
       const updatedUser = { ...user, industry };
       login(updatedUser, token);
-      navigate("/home");
+      // Redirect to origin page or /home if no origin
+      const redirectTo = location.state?.from || "/home";
+      navigate(redirectTo, { replace: true });
     } catch (err) {
       console.error("Error in handleSubmit:", err.message, err.stack);
       setError(`Failed to save industry: ${err.message}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -80,6 +94,7 @@ const IndustrySelection = () => {
             onChange={(e) => setIndustry(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
+            disabled={isLoading}
           >
             <option value="">Select an industry</option>
             {industries.map((ind) => (
@@ -90,9 +105,12 @@ const IndustrySelection = () => {
           </select>
           <button
             type="submit"
-            className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200"
+            className={`w-full px-6 py-3 rounded-lg transition-all duration-200 ${
+              isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+            } text-white`}
+            disabled={isLoading}
           >
-            Save and Continue
+            {isLoading ? 'Saving...' : 'Save and Continue'}
           </button>
         </form>
       </div>
