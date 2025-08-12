@@ -14,7 +14,6 @@ const Chatbot = () => {
   const [pastChats, setPastChats] = useState([]);
   const chatEndRef = useRef(null);
 
-  // Initialize chat with analysis and industry context
   useEffect(() => {
     if (state?.analysis) {
       const initialContext = [
@@ -25,23 +24,26 @@ const Chatbot = () => {
         },
       ];
       setChatHistory(initialContext);
-      saveChatHistory(initialContext); // Save initial context
+      saveChatHistory(initialContext);
     }
   }, [state]);
 
-  // Fetch past chat history
   useEffect(() => {
     const fetchHistory = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found");
-        const response = await fetch("https://careerhub25.onrender.com/api/chat/history", {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const response = await fetch(
+          "https://careerhub25.onrender.com/api/chat/history",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (!response.ok)
+          throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         setPastChats(data.history || []);
       } catch (error) {
@@ -51,25 +53,27 @@ const Chatbot = () => {
     if (user) fetchHistory();
   }, [user]);
 
-  // Scroll to the latest message
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory]);
 
-  // Save chat history to database
   const saveChatHistory = async (history) => {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found");
-      const response = await fetch("https://careerhub25.onrender.com/api/chat/save", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ history }),
-      });
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const response = await fetch(
+        "https://careerhub25.onrender.com/api/chat/save",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ history }),
+        }
+      );
+      if (!response.ok)
+        throw new Error(`HTTP error! status: ${response.status}`);
     } catch (error) {
       console.error("Save chat history error:", error.message);
     }
@@ -78,7 +82,10 @@ const Chatbot = () => {
   const handleSend = async () => {
     if (!message.trim() || isLoading) return;
 
-    const newHistory = [...chatHistory, { role: "user", content: message, timestamp: new Date() }];
+    const newHistory = [
+      ...chatHistory,
+      { role: "user", content: message, timestamp: new Date() },
+    ];
     setChatHistory(newHistory);
     setMessage("");
     setIsLoading(true);
@@ -86,72 +93,90 @@ const Chatbot = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found");
-      const response = await fetch("https://careerhub25.onrender.com/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ history: newHistory }),
-      });
+      const response = await fetch(
+        "https://careerhub25.onrender.com/api/chat",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ history: newHistory }),
+        }
+      );
 
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      if (!response.ok)
+        throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
-      const updatedHistory = [...newHistory, { role: "system", content: data.response, timestamp: new Date() }];
+      const updatedHistory = [
+        ...newHistory,
+        {
+          role: "system",
+          content: data.response,
+          timestamp: new Date(),
+        },
+      ];
       setChatHistory(updatedHistory);
-      setPastChats(updatedHistory); // Update past chats for display
-      await saveChatHistory(updatedHistory); // Save to database
+      setPastChats(updatedHistory);
+      await saveChatHistory(updatedHistory);
     } catch (error) {
       console.error("Chatbot Error:", error.message);
-      setChatHistory((prev) => [...prev, { role: "system", content: `Error: ${error.message}`, timestamp: new Date() }]);
+      setChatHistory((prev) => [
+        ...prev,
+        {
+          role: "system",
+          content: `Error: ${error.message}`,
+          timestamp: new Date(),
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleClose = () => {
-    navigate("/home"); // Navigate back to the home page
+    navigate("/home");
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen relative">
-      {/* Close Button */}
-      <button
-        onClick={handleClose}
-        className="absolute top-4 right-4 bg-gray-600 text-white rounded-full p-2 hover:bg-gray-700 transition-colors z-10"
-        aria-label="Close"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M6 18L18 6M6 6l12 12"
-          />
-        </svg>
-      </button>
-
       <div className="p-6 w-screen h-screen bg-white rounded-none shadow-2xl border border-gray-200 relative">
+        {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-bold text-gray-800 flex items-center">
             <Bot className="mr-2 text-blue-500" size={24} />
             AI Mentor Chat
           </h2>
-          <div className="flex space-x-2">
+          <div className="flex items-center space-x-2">
             <button
               onClick={() => setShowHistory(!showHistory)}
               className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-all"
             >
               <History className="text-gray-600" size={24} />
             </button>
+            <button
+              onClick={handleClose}
+              className="p-2 bg-gray-600 text-white rounded-full hover:bg-gray-700 transition-colors"
+              aria-label="Close"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
           </div>
         </div>
+
         {showHistory && (
           <div className="absolute top-16 right-6 w-80 bg-white border border-gray-200 rounded-lg shadow-lg p-4 max-h-96 overflow-y-auto z-10">
             <h3 className="text-lg font-semibold mb-2">Chat History</h3>
@@ -162,11 +187,15 @@ const Chatbot = () => {
                 <div
                   key={index}
                   className={`p-2 mb-2 rounded-lg ${
-                    msg.role === "user" ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
+                    msg.role === "user"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-blue-100 text-blue-800"
                   }`}
                 >
                   <div className="text-xs text-gray-500">
-                    {msg.timestamp ? new Date(msg.timestamp).toLocaleString() : "No timestamp"}
+                    {msg.timestamp
+                      ? new Date(msg.timestamp).toLocaleString()
+                      : "No timestamp"}
                   </div>
                   <div>{msg.content}</div>
                 </div>
@@ -174,17 +203,27 @@ const Chatbot = () => {
             )}
           </div>
         )}
+
+        {/* Chat Messages */}
         <div className="mb-6 h-[calc(100%-140px)] overflow-y-auto bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-4">
           {chatHistory.map((msg, index) => (
             <div
               key={index}
-              className={`flex items-start ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+              className={`flex items-start ${
+                msg.role === "user" ? "justify-end" : "justify-start"
+              }`}
             >
               {msg.role === "system" && (
-                <Bot className="mr-2 text-blue-500 flex-shrink-0" size={20} />
+                <Bot
+                  className="mr-2 text-blue-500 flex-shrink-0"
+                  size={20}
+                />
               )}
               {msg.role === "user" && (
-                <User className="ml-2 text-green-500 flex-shrink-0" size={20} />
+                <User
+                  className="ml-2 text-green-500 flex-shrink-0"
+                  size={20}
+                />
               )}
               <div
                 className={`p-3 rounded-lg max-w-[80%] ${
@@ -199,6 +238,8 @@ const Chatbot = () => {
           ))}
           <div ref={chatEndRef} />
         </div>
+
+        {/* Message Input */}
         <div className="flex gap-3">
           <input
             value={message}
