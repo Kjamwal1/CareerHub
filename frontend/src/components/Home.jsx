@@ -170,7 +170,7 @@ const Home = () => {
       </div>
 
       {/* Main Content */}
-      <div className="ml-[13rem] pt-[4rem] p-6 flex-1 relative z-0">
+      <div className="ml-[13rem] pt-[6rem] p-6 flex-1 relative z-0">
         <h2 className="text-2xl font-bold text-gray-900 mb-6 sticky top-[4rem] bg-white z-10">
           Welcome back, {user?.name || "Kanika"}!
         </h2>
