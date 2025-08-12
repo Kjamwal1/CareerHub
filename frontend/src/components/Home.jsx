@@ -34,12 +34,15 @@ const Home = () => {
       case "AI Mentor":
         destination = "/chatbot";
         break;
-      case "Job Tracker": // Match card title
-      case "Application Track": // Match sidebar title
+      case "Job Tracker":
+      case "Application Track":
         destination = "/job-tracker";
         break;
       case "Resume Analyse History":
         destination = "/resume-history";
+        break;
+      case "My Documents":
+        destination = "/my-documents";
         break;
       default:
         destination = "/home";
@@ -98,16 +101,16 @@ const Home = () => {
             </span>
           </button>
           {showProfileDropdown && (
-            <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 min-w-[10rem] max-w-[20rem] bg-white border border-gray-200 rounded-lg shadow-lg z-[150] overflow-auto p-2 sm:mt-4 sm:right-0 sm:left-auto sm:translate-x-0">
+            <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-[100] max-w-[90vw]">
               <p className="px-4 py-2 text-sm text-gray-700">
                 Plan: <span className="font-medium">{user?.plan || "Free"}</span>
               </p>
-              <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded">
+              <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                 Edit Profile
               </button>
               <button
                 onClick={handleLogout}
-                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded"
+                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
               >
                 Log Out
               </button>
@@ -143,13 +146,7 @@ const Home = () => {
             </div>
           )}
           <button
-            onClick={() => {
-              if (!user?.industry) {
-                navigate("/industry-selection", { state: { from: "/my-documents" } });
-              } else {
-                navigate("/my-documents");
-              }
-            }}
+            onClick={() => handleFeatureClick("My Documents")}
             className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-200"
           >
             My Documents

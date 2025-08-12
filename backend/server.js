@@ -27,9 +27,6 @@ app.use(
 );
 app.use(express.json());
 
-// Serve static files from the React build folder
-app.use(express.static(path.join(__dirname, "build")));
-
 // Validate environment variables
 if (!process.env.MONGO_URI) {
   console.error("Error: MONGO_URI is not defined in .env file");
@@ -56,22 +53,6 @@ mongoose
     console.error("MongoDB connection error:", err.message);
     process.exit(1);
   });
-
-// API endpoint for MyDocumentsPage
-app.get("/api/my-documents", (req, res) => {
-  res.json({
-    message: "Welcome to My Documents Page",
-    documents: [
-      { id: 1, title: "Document 1", content: "Sample content" },
-      { id: 2, title: "Document 2", content: "More content" },
-    ],
-  });
-});
-
-// Serve the React app for all other routes
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "build", "index.html"));
-});
 
 // Health Check Endpoint
 app.get("/api/health", (req, res) => {
@@ -140,10 +121,45 @@ const JobSchema = new mongoose.Schema({
 
 const Job = mongoose.model("Job", JobSchema);
 
+// Document Schema
+const DocumentSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  filename: { type: String, required: true },
+  path: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
+});
+
+const Document = mongoose.model("Document", DocumentSchema);
+
+// Configure multer to store files in uploads/ directory with file size limit
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = "uploads/";
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
 // Configure multer to store files in uploads/ directory with file size limit
 const upload = multer({
-  dest: "uploads/",
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit to match frontend
+  storage,
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "text/plain",
+    ];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only PDF, JPG, PNG, and TXT files are allowed"));
+    }
+  },
 });
 
 // JWT Secret
@@ -442,12 +458,10 @@ app.post(
             res.json(analysis);
           } catch (error) {
             console.error("Analysis Error:", error.message);
-            res
-              .status(500)
-              .json({
-                error: "Failed to analyze resume",
-                details: error.message,
-              });
+            res.status(500).json({
+              error: "Failed to analyze resume",
+              details: error.message,
+            });
           }
         });
 
@@ -477,12 +491,10 @@ app.post(
       if (req.file && fs.existsSync(req.file.path)) {
         fs.unlinkSync(req.file.path);
       }
-      res
-        .status(500)
-        .json({
-          error: "Unexpected error during resume processing",
-          details: error.message,
-        });
+      res.status(500).json({
+        error: "Unexpected error during resume processing",
+        details: error.message,
+      });
     }
   }
 );
@@ -648,6 +660,60 @@ app.get("/api/resume-analyses", authenticateToken, async (req, res) => {
   } catch (error) {
     console.error("Error fetching resume analyses:", error.message);
     res.status(500).json({ error: "Failed to fetch resume analyses" });
+  }
+});
+
+// Documents Endpoint
+app.post(
+  "/api/documents",
+  authenticateToken,
+  upload.array("files", 5),
+  async (req, res) => {
+    try {
+      if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ error: "No files uploaded" });
+      }
+
+      const savedDocuments = [];
+      for (const file of req.files) {
+        const document = new Document({
+          userId: req.user.userId,
+          filename: file.filename,
+          path: file.path,
+        });
+        await document.save();
+        savedDocuments.push({
+          _id: document._id,
+          filename: document.filename,
+          url: `/uploads/${document.filename}`,
+          createdAt: document.createdAt,
+        });
+      }
+      res.status(201).json(savedDocuments);
+    } catch (error) {
+      console.error("Error uploading documents:", error.message);
+      req.files.forEach((file) => fs.unlinkSync(file.path));
+      res.status(500).json({ error: "Failed to upload documents" });
+    }
+  }
+);
+
+app.get("/api/documents", authenticateToken, async (req, res) => {
+  try {
+    const documents = await Document.find({ userId: req.user.userId }).sort({
+      createdAt: -1,
+    });
+    res.json(
+      documents.map((doc) => ({
+        _id: doc._id,
+        filename: doc.filename,
+        url: `/uploads/${doc.filename}`,
+        createdAt: doc.createdAt,
+      }))
+    );
+  } catch (error) {
+    console.error("Error fetching documents:", error.message);
+    res.status(500).json({ error: "Failed to fetch documents" });
   }
 });
 
