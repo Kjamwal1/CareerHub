@@ -10,11 +10,18 @@ const MyDocumentsPage = () => {
 
   useEffect(() => {
     const fetchDocuments = async () => {
-      if (!user) return;
+      if (!user) {
+        console.log("User is not authenticated");
+        return;
+      }
 
       setLoading(true);
       try {
         const token = localStorage.getItem("token");
+        if (!token) {
+          console.log("No token found in localStorage");
+          throw new Error("Authentication token missing");
+        }
         const response = await fetch("https://careerhub25.onrender.com/api/documents", {
           method: "GET",
           headers: {
@@ -23,12 +30,13 @@ const MyDocumentsPage = () => {
           },
         });
         if (!response.ok) {
-          throw new Error("Failed to fetch documents");
+          throw new Error(`Failed to fetch documents: ${response.status}`);
         }
         const data = await response.json();
+        console.log("Fetched documents:", data);
         setDocuments(data);
       } catch (error) {
-        console.error("Error fetching documents:", error);
+        console.error("Error fetching documents:", error.message);
         toast.error("Failed to load documents.");
       } finally {
         setLoading(false);
@@ -39,6 +47,11 @@ const MyDocumentsPage = () => {
   }, [user]);
 
   const onDrop = async (acceptedFiles) => {
+    if (!user) {
+      toast.error("Please log in to upload documents.");
+      return;
+    }
+
     setLoading(true);
     const formData = new FormData();
     acceptedFiles.forEach((file) => {
@@ -47,6 +60,9 @@ const MyDocumentsPage = () => {
 
     try {
       const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("Authentication token missing");
+      }
       const response = await fetch("https://careerhub25.onrender.com/api/documents", {
         method: "POST",
         headers: {
@@ -55,13 +71,13 @@ const MyDocumentsPage = () => {
         body: formData,
       });
       if (!response.ok) {
-        throw new Error("Failed to upload documents");
+        throw new Error(`Failed to upload documents: ${response.status}`);
       }
       const newDocuments = await response.json();
       setDocuments((prev) => [...prev, ...newDocuments]);
       toast.success("Documents uploaded successfully!");
     } catch (error) {
-      console.error("Upload error:", error);
+      console.error("Upload error:", error.message);
       toast.error("Failed to upload documents.");
     } finally {
       setLoading(false);
@@ -79,6 +95,14 @@ const MyDocumentsPage = () => {
     maxFiles: 5,
     maxSize: 2 * 1024 * 1024, // 2MB limit
   });
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-white font-poppins p-6 text-center">
+        <p className="text-gray-600">Please log in to view your documents.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white font-poppins p-6">
