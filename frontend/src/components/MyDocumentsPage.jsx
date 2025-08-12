@@ -81,11 +81,23 @@ const MyDocumentsPage = () => {
   });
 
   return (
-    <div className="min-h-screen p-6 bg-gradient-to-b from-[#0a0a23] to-[#12123a] font-poppins flex items-center justify-center">
-      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-3xl w-full border border-gray-200">
+    <div className="min-h-screen bg-white font-poppins p-6">
+      <div className="max-w-4xl mx-auto">
         <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
           My Documents
         </h2>
+
+        <div className="mb-6">
+          <div
+            {...getRootProps()}
+            className="border-2 border-dashed border-gray-300 p-6 text-center rounded-lg hover:border-purple-500 transition-colors cursor-pointer"
+          >
+            <input {...getInputProps()} />
+            <p className="text-gray-600">
+              <span className="font-medium text-purple-600">Add Documents</span> - Drag and drop files here, or click to select (PDF, JPG, PNG, TXT, up to 2MB each)
+            </p>
+          </div>
+        </div>
 
         {loading && (
           <div className="text-center text-gray-600">
@@ -113,45 +125,33 @@ const MyDocumentsPage = () => {
         )}
 
         {!loading && (
-          <>
-            <div
-              {...getRootProps()}
-              className="border-2 border-dashed border-gray-300 p-6 mb-6 text-center rounded-lg hover:border-purple-500 transition-colors"
-            >
-              <input {...getInputProps()} />
-              <p className="text-gray-600">
-                Drag and drop files here, or click to select files (PDF, JPG, PNG, TXT, up to 2MB each)
-              </p>
-            </div>
-
+          <div className="space-y-4">
             {documents.length === 0 ? (
               <p className="text-center text-gray-600">No documents uploaded yet.</p>
             ) : (
-              <div className="space-y-4">
-                {documents.map((doc, index) => (
-                  <div
-                    key={doc._id || index}
-                    className="p-4 bg-gray-50 rounded-xl border border-gray-200 flex justify-between items-center"
-                  >
-                    <div>
-                      <p className="text-gray-800 font-medium">{doc.filename}</p>
-                      <p className="text-sm text-gray-500">
-                        {new Date(doc.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <a
-                      href={doc.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      View
-                    </a>
+              documents.map((doc, index) => (
+                <div
+                  key={doc._id || index}
+                  className="p-4 bg-gray-50 rounded-xl border border-gray-200 flex justify-between items-center"
+                >
+                  <div>
+                    <p className="text-gray-800 font-medium">{doc.filename}</p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(doc.createdAt).toLocaleDateString()}
+                    </p>
                   </div>
-                ))}
-              </div>
+                  <a
+                    href={doc.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    View
+                  </a>
+                </div>
+              ))
             )}
-          </>
+          </div>
         )}
       </div>
     </div>
