@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { User, Bot, History } from "lucide-react";
 
 const Chatbot = () => {
   const { state } = useLocation();
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [chatHistory, setChatHistory] = useState([]);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -117,7 +118,7 @@ const Chatbot = () => {
       {/* Close Button */}
       <button
         onClick={handleClose}
-        className="absolute top-4 left-4 bg-gray-600 text-white rounded-full p-2 hover:bg-gray-700 transition-colors z-10"
+        className="absolute top-4 right-4 bg-gray-600 text-white rounded-full p-2 hover:bg-gray-700 transition-colors z-10"
         aria-label="Close"
       >
         <svg
@@ -142,12 +143,14 @@ const Chatbot = () => {
             <Bot className="mr-2 text-blue-500" size={24} />
             AI Mentor Chat
           </h2>
-          <button
-            onClick={() => setShowHistory(!showHistory)}
-            className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-all"
-          >
-            <History className="text-gray-600" size={24} />
-          </button>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-all"
+            >
+              <History className="text-gray-600" size={24} />
+            </button>
+          </div>
         </div>
         {showHistory && (
           <div className="absolute top-16 right-6 w-80 bg-white border border-gray-200 rounded-lg shadow-lg p-4 max-h-96 overflow-y-auto z-10">
