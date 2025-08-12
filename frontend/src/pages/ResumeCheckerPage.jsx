@@ -171,7 +171,7 @@ const ResumeCheckerPage = () => {
       {/* Exit Button */}
       <button
         onClick={handleExit}
-        className="absolute top-4 right-4 bg-red-600 text-white rounded-full p-2 hover:bg-red-700 transition-colors z-10"
+        className="absolute top-4 right-4 bg-gray-600 text-white rounded-full p-2 hover:bg-red-700 transition-colors z-10"
         aria-label="Exit"
       >
         <svg

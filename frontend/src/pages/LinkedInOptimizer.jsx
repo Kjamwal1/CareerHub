@@ -115,11 +115,37 @@ const LinkedInOptimizer = () => {
     }
   };
 
+  const handleClose = () => {
+    navigate("/home"); // Navigate back to the home page
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a0a23] to-[#12123a] text-white px-6 py-12 font-poppins">
-      <div className="max-w-2xl mx-auto grid grid-cols-1 gap-12">
-        {/* PDF Upload Section */}
-        <div className="bg-[#10102b] rounded-2xl p-6 shadow-lg border border-[#2d2d51] flex flex-col justify-between">
+    <div className="min-h-screen bg-gradient-to-b from-[#0a0a23] to-[#12123a] text-white px-6 py-12 font-poppins relative flex items-center justify-center">
+      {/* Close Button */}
+      <button
+        onClick={handleClose}
+        className="absolute top-4 left-4 bg-gray-600 text-white rounded-full p-2 hover:bg-gray-700 transition-colors z-10"
+        aria-label="Close"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+
+      <div className="max-w-6xl w-full grid grid-cols-2 gap-8">
+        {/* LinkedIn Upload Section (Left) */}
+        <div className="bg-[#10102b] rounded-2xl p-6 shadow-lg border border-[#2d2d51] flex flex-col justify-between h-full">
           <div>
             <h2 className="text-2xl font-bold mb-4">
               Upload your LinkedIn Profile PDF
@@ -196,6 +222,20 @@ const LinkedInOptimizer = () => {
           >
             {loading ? "Analyzing..." : "Analyze PDF"}
           </button>
+        </div>
+
+        {/* Video Section (Right) */}
+        <div className="bg-[#10102b] rounded-2xl p-6 shadow-lg border border-[#2d2d51] flex items-center justify-center h-full">
+          <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
+            <iframe
+              className="absolute top-0 left-0 w-full h-full rounded-lg"
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ" // Placeholder video (Rickroll) - Replace with your video URL
+              title="LinkedIn Optimization Tutorial"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
         </div>
       </div>
 

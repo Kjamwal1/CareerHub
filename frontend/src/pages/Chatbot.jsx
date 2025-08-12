@@ -19,7 +19,7 @@ const Chatbot = () => {
       const initialContext = [
         {
           role: "system",
-          content: `You are an AI career mentor with expertise in resume optimization, LinkedIn profiling, and job matching. Use the following resume analysis to provide context: Match Score ${state.analysis.matchScore}%, Strengths: ${state.analysis.strengths.join(", ")}, Gaps: ${state.analysis.gaps.join(", ")}, Keyword Match Score: ${state.analysis.keywordMatchScore}%, Optimized Section: "${state.analysis.optimizedSection}". Provide career advice, job search strategies, or profile optimization tips based on this data and the user's queries. Incorporate industry-specific keywords from the job description: ${state.analysis.jobDescription}.`,
+          content: `You are an AI career mentor with expertise in resume optimization, LinkedIn profiling, and job matching. Use the following resume analysis to provide context: Match Score ${state.analysis.matchScore}%, Strengths: ${state.analysis.strengths.join(", ")}, Gaps: ${state.analysis.gaps.join(", ")}, Keyword Match Score: ${state.analysis.keywordMatchScore}%, Optimized Section: "${state.analysis.optimizedSection}". Provide career advice, job search strategies, or profile optimization tips based on this data and the user's queries. Incorporate industry-specific keywords from the job description: ${state.analysis.jobDescription}. Unless specified, limit responses to 1-2 lines. If the user requests a specific number of lines, adjust the answer accordingly to fit that length.`,
           timestamp: new Date(),
         },
       ];
@@ -108,8 +108,34 @@ const Chatbot = () => {
     }
   };
 
+  const handleClose = () => {
+    navigate("/home"); // Navigate back to the home page
+  };
+
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center min-h-screen relative">
+      {/* Close Button */}
+      <button
+        onClick={handleClose}
+        className="absolute top-4 left-4 bg-gray-600 text-white rounded-full p-2 hover:bg-gray-700 transition-colors z-10"
+        aria-label="Close"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+
       <div className="p-6 w-screen h-screen bg-white rounded-none shadow-2xl border border-gray-200 relative">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-bold text-gray-800 flex items-center">
