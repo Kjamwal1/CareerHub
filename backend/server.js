@@ -16,12 +16,6 @@ require("dotenv").config({ quiet: true });
 
 const app = express();
 
-app.get("/", (req, res) => {
-  res.json({ message: "Welcome to CareerHub API" });
-});
-
-// server.js
-app.get('/logo.png', (req, res) => res.status(204).end());
 // Middleware
 app.use(
   cors({
@@ -902,4 +896,4 @@ Please provide your response as plain text.
 }
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT})`);
