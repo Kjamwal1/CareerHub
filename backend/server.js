@@ -27,6 +27,9 @@ app.use(
 );
 app.use(express.json());
 
+// Serve static files from the React build folder
+app.use(express.static(path.join(__dirname, "build")));
+
 // Validate environment variables
 if (!process.env.MONGO_URI) {
   console.error("Error: MONGO_URI is not defined in .env file");
@@ -53,6 +56,22 @@ mongoose
     console.error("MongoDB connection error:", err.message);
     process.exit(1);
   });
+
+// API endpoint for MyDocumentsPage
+app.get("/api/my-documents", (req, res) => {
+  res.json({
+    message: "Welcome to My Documents Page",
+    documents: [
+      { id: 1, title: "Document 1", content: "Sample content" },
+      { id: 2, title: "Document 2", content: "More content" },
+    ],
+  });
+});
+
+// Serve the React app for all other routes
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
 
 // Health Check Endpoint
 app.get("/api/health", (req, res) => {
@@ -410,7 +429,10 @@ app.post(
           console.log("Extracted PDF Text:", textContent);
           if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
           try {
-            const analysis = await analyzeWithGemini(textContent, jobDescription);
+            const analysis = await analyzeWithGemini(
+              textContent,
+              jobDescription
+            );
             const resumeAnalysis = new ResumeAnalysis({
               userId: req.user.userId,
               jobDescription,
@@ -420,7 +442,12 @@ app.post(
             res.json(analysis);
           } catch (error) {
             console.error("Analysis Error:", error.message);
-            res.status(500).json({ error: "Failed to analyze resume", details: error.message });
+            res
+              .status(500)
+              .json({
+                error: "Failed to analyze resume",
+                details: error.message,
+              });
           }
         });
 
@@ -452,7 +479,10 @@ app.post(
       }
       res
         .status(500)
-        .json({ error: "Unexpected error during resume processing", details: error.message });
+        .json({
+          error: "Unexpected error during resume processing",
+          details: error.message,
+        });
     }
   }
 );
@@ -802,13 +832,20 @@ Return the response in JSON format:
           matchScore: Number(data.matchScore) || 0,
           strengths: Array.isArray(data.strengths) ? data.strengths : [],
           gaps: Array.isArray(data.gaps) ? data.gaps : [],
-          improvements: Array.isArray(data.improvements) ? data.improvements : [],
+          improvements: Array.isArray(data.improvements)
+            ? data.improvements
+            : [],
           optimizedSection: data.optimizedSection || "",
           beforeAfterComparison: data.beforeAfterComparison || "",
           keywordMatchScore: Number(data.keywordMatchScore) || 0,
         };
       } catch (parseError) {
-        console.error("JSON Parsing Error:", parseError.message, "Raw Response:", result);
+        console.error(
+          "JSON Parsing Error:",
+          parseError.message,
+          "Raw Response:",
+          result
+        );
         throw new Error(`Invalid JSON response from ${model}`);
       }
     } catch (error) {

@@ -142,7 +142,16 @@ const Home = () => {
               </button>
             </div>
           )}
-          <button className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-200">
+          <button
+            onClick={() => {
+              if (!user?.industry) {
+                navigate("/industry-selection", { state: { from: "/my-documents" } });
+              } else {
+                navigate("/my-documents");
+              }
+            }}
+            className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-200"
+          >
             My Documents
           </button>
           <button className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-200">
