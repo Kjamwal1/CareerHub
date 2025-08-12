@@ -143,13 +143,14 @@ const storage = multer.diskStorage({
   },
 });
 
-// Configure multer to store files in uploads/ directory with file size limit
+// Configure multer to support all required file types
 const upload = multer({
   storage,
   limits: { fileSize: 2 * 1024 * 1024 }, // 2MB limit
   fileFilter: (req, file, cb) => {
     const allowedTypes = [
       "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // Added .docx support
       "image/jpeg",
       "image/png",
       "text/plain",
@@ -157,7 +158,7 @@ const upload = multer({
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error("Only PDF, JPG, PNG, and TXT files are allowed"));
+      cb(new Error("Only PDF, DOCX, JPG, PNG, and TXT files are allowed"));
     }
   },
 });
@@ -260,7 +261,7 @@ app.post("/api/jobs", authenticateToken, async (req, res) => {
 // Get Jobs
 app.get("/api/jobs", authenticateToken, async (req, res) => {
   try {
-    const jobs = await Job.find({ userId: req.user.userId }).sort({
+    const jobs = await Job.find({ userId: req.user.userId}).sort({
       createdAt: -1,
     });
     res.json(jobs);
