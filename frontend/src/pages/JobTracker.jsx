@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { Briefcase, Upload, Trash2, Plus } from "lucide-react";
 
 const JobTracker = () => {
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [formData, setFormData] = useState({
     title: "",
@@ -138,7 +140,7 @@ const JobTracker = () => {
       {/* Close Button */}
       <button
         onClick={handleClose}
-        className="absolute top-4 left-4 bg-gray-600 text-white rounded-full p-2 hover:bg-gray-700 transition-colors z-10"
+        className="absolute top-4 right-4 bg-gray-600 text-white rounded-full p-2 hover:bg-gray-700 transition-colors z-10"
         aria-label="Close"
       >
         <svg
