@@ -84,17 +84,23 @@ const MyDocumentsPage = () => {
     }
   };
 
-  const { getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps, fileRejections } = useDropzone({
     onDrop,
-    accept: {
-      "application/pdf": [".pdf"],
-      "image/jpeg": [".jpg", ".jpeg"],
-      "image/png": [".png"],
-      "text/plain": [".txt"],
-    },
+    minSize: 1024, // 1KB minimum
+    maxSize: 2 * 1024 * 1024, // 2MB maximum
     maxFiles: 5,
-    maxSize: 2 * 1024 * 1024, // 2MB limit
   });
+
+  // Handle file rejections
+  useEffect(() => {
+    fileRejections.forEach((file) => {
+      if (file.file.size < 1024) {
+        toast.error(`${file.file.name} is too small (minimum 1KB).`);
+      } else if (file.file.size > 2 * 1024 * 1024) {
+        toast.error(`${file.file.name} is too large (maximum 2MB).`);
+      }
+    });
+  }, [fileRejections]);
 
   if (!user) {
     return (
@@ -118,7 +124,7 @@ const MyDocumentsPage = () => {
           >
             <input {...getInputProps()} />
             <p className="text-gray-600">
-              <span className="font-medium text-purple-600">Add Documents</span> - Drag and drop files here, or click to select (PDF, JPG, PNG, TXT, up to 2MB each)
+              <span className="font-medium text-purple-600">Add Documents</span> - Drag and drop files here, or click to select (any type, 1KB to 2MB each)
             </p>
           </div>
         </div>
