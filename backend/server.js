@@ -21,6 +21,7 @@ app.use(
   cors({
     origin: 'https://career-hub-25.vercel.app',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   })
 );
