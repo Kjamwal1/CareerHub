@@ -98,16 +98,16 @@ const Home = () => {
             </span>
           </button>
           {showProfileDropdown && (
-            <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-[100] max-w-[90vw]">
+            <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 min-w-[10rem] max-w-[20rem] bg-white border border-gray-200 rounded-lg shadow-lg z-[150] overflow-auto p-2 sm:mt-4 sm:right-0 sm:left-auto sm:translate-x-0">
               <p className="px-4 py-2 text-sm text-gray-700">
                 Plan: <span className="font-medium">{user?.plan || "Free"}</span>
               </p>
-              <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded">
                 Edit Profile
               </button>
               <button
                 onClick={handleLogout}
-                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded"
               >
                 Log Out
               </button>
