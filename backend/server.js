@@ -66,7 +66,7 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true },
   profileImage: { type: String, default: "/default.jpg" },
   plan: { type: String, default: "Free" },
-  industry: { type: String }, // Added for industry selection
+  industry: { type: String },
 });
 
 const User = mongoose.model("User", UserSchema);
@@ -150,7 +150,7 @@ const upload = multer({
   fileFilter: (req, file, cb) => {
     const allowedTypes = [
       "application/pdf",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // Added .docx support
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       "image/jpeg",
       "image/png",
       "text/plain",
@@ -169,11 +169,12 @@ const JWT_SECRET = process.env.JWT_SECRET;
 // Authentication Middleware
 const authenticateToken = (req, res, next) => {
   const token = req.headers["authorization"]?.split(" ")[1];
+  console.log("Received token:", token ? "Present" : "Missing"); // Log token presence
   if (!token) return res.status(401).json({ error: "No token provided" });
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
     if (err) {
-      console.error("Token verification error:", err.message);
+      console.error("Token verification error:", err.message, "Token:", token); // Log error details
       return res.status(403).json({ error: "Invalid or expired token" });
     }
     req.user = user;
@@ -261,7 +262,7 @@ app.post("/api/jobs", authenticateToken, async (req, res) => {
 // Get Jobs
 app.get("/api/jobs", authenticateToken, async (req, res) => {
   try {
-    const jobs = await Job.find({ userId: req.user.userId}).sort({
+    const jobs = await Job.find({ userId: req.user.userId }).sort({
       createdAt: -1,
     });
     res.json(jobs);
@@ -827,6 +828,7 @@ print(text)
     });
   }
 }
+
 
 // Function to analyze resume with Gemini API
 async function analyzeWithGemini(textContent, jobDescription) {

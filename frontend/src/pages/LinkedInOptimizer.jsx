@@ -240,7 +240,7 @@ const LinkedInOptimizer = () => {
               <video
                 className="absolute top-0 left-0 w-full h-full rounded-lg"
                 src="/linkedin_vid.mp4" // Replace with your video filename in the public/videos folder
-                title="LinkedIn Optimization Tutorial"
+                title="LinkedIn's Profile Pdf Download Tutorial"
                 controls
                 autoPlay
                 muted

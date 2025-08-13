@@ -1,21 +1,35 @@
 import { createContext, useState, useEffect, useContext } from "react";
+import jwtDecode from "jwt-decode"; // Add this dependency: npm install jwt-decode
 
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [industry, setIndustry] = useState(null); // New industry state
+  const [industry, setIndustry] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userData = localStorage.getItem("user");
     const storedIndustry = localStorage.getItem("industry");
+
     if (token && userData) {
       try {
+        const decodedToken = jwtDecode(token);
+        const currentTime = Date.now() / 1000; // Convert to seconds
+        if (decodedToken.exp < currentTime) {
+          // Token expired
+          localStorage.removeItem("user");
+          localStorage.removeItem("token");
+          localStorage.removeItem("industry");
+          setUser(null);
+          setIndustry(null);
+          console.warn("Token expired, please log in again");
+          return;
+        }
         setUser(JSON.parse(userData));
         if (storedIndustry) setIndustry(storedIndustry);
       } catch (error) {
-        console.error("Error parsing user data from localStorage:", error.message);
+        console.error("Error parsing user data or token:", error.message);
         localStorage.removeItem("user");
         localStorage.removeItem("token");
         localStorage.removeItem("industry");

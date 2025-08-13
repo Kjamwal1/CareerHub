@@ -5,7 +5,7 @@ import { User, Bot, History } from "lucide-react";
 
 const Chatbot = () => {
   const { state } = useLocation();
-  const { user } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [chatHistory, setChatHistory] = useState([]);
   const [message, setMessage] = useState("");
@@ -105,8 +105,15 @@ const Chatbot = () => {
         }
       );
 
-      if (!response.ok)
+      if (!response.ok) {
+        if (response.status === 403) {
+          alert("Session expired. Please log in again.");
+          logout();
+          navigate("/login");
+          return;
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
       const updatedHistory = [
         ...newHistory,
@@ -144,7 +151,7 @@ const Chatbot = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-2 sm:mb-4">
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 flex items-center">
-            <Bot className="mr-1 sm:mr-2 text-blue-500" size={20} sm:size={24} />
+            <Bot className="mr-1 sm:mr-2 text-blue-500" size={20} sm={24} />
             AI Mentor Chat
           </h2>
           <div className="flex items-center space-x-1 sm:space-x-2">
@@ -152,7 +159,7 @@ const Chatbot = () => {
               onClick={() => setShowHistory(!showHistory)}
               className="p-1 sm:p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-all"
             >
-              <History className="text-gray-600" size={20} sm:size={24} />
+              <History className="text-gray-600" size={20} sm={24} />
             </button>
             <button
               onClick={handleClose}
@@ -216,13 +223,13 @@ const Chatbot = () => {
               {msg.role === "system" && (
                 <Bot
                   className="mr-1 sm:mr-2 text-blue-500 flex-shrink-0"
-                  size={16} sm:size={20}
+                  size={16} sm={20}
                 />
               )}
               {msg.role === "user" && (
                 <User
                   className="ml-1 sm:ml-2 text-green-500 flex-shrink-0"
-                  size={16} sm:size={20}
+                  size={16} sm={20}
                 />
               )}
               <div
