@@ -84,7 +84,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
 
       {/* 👇 Resume Checker Section */}
       <section
-        className="min-h-screen bg-gray-100 text-black flex items-center justify-center px-4 sm:px-6 lg:px-20 py-16"
+        className="bg-gray-100 text-black flex items-center justify-center px-4 sm:px-6 lg:px-20 py-12 sm:py-16"
         data-aos="fade-up"
         data-aos-duration="1000"
       >
@@ -199,7 +199,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
 
       {/* 👇 LinkedIn Checker Section */}
       <section
-        className="relative min-h-screen text-white flex items-center justify-center px-4 sm:px-6 lg:px-20 py-16 backdrop-blur-xl transition-all duration-700 z-0"
+        className="relative text-white flex items-center justify-center px-4 sm:px-6 lg:px-20 py-12 sm:py-16"
         data-aos="fade-up"
         data-aos-duration="1000"
       >
@@ -289,7 +289,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
 
       {/* 👇 Job Application Tracker Section */}
       <section
-        className="min-h-screen bg-white text-black flex items-center justify-center px-4 sm:px-6 lg:px-20 py-16"
+        className="bg-white text-black flex items-center justify-center px-4 sm:px-6 lg:px-20 py-12 sm:py-16"
         data-aos="fade-up"
         data-aos-duration="1000"
       >
@@ -341,7 +341,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
 
       {/* 👇 AI Mentor Chatbot Section */}
       <section
-        className="relative min-h-screen text-white flex items-center justify-center px-4 sm:px-6 lg:px-20 py-16 backdrop-blur-xl transition-all duration-700 z-0"
+        className="relative text-white flex items-center justify-center px-4 sm:px-6 lg:px-20 py-12 sm:py-16"
         data-aos="fade-up"
         data-aos-duration="1000"
       >
@@ -445,7 +445,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
       {/* More Features */}
       <section
         id="more-features"
-        className="bg-white py-12 sm:py-16 px-4 sm:px-8 lg:px-20 relative"
+        className="bg-white py-12 sm:py-16 px-4 sm:px-8 lg:px-20"
       >
         <div className="max-w-7xl mx-auto text-center mb-6 sm:mb-12" data-aos="fade-up">
           <h2 className="text-3xl sm:text-4xl font-bold mb-2 sm:mb-4 text-gray-900">
