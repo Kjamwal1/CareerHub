@@ -1,18 +1,8 @@
-{
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
-  
-      "builds": [
+ {
+      "rewrites": [
         {
-          "src": "package.json",
-          "use": "@vercel/node",
-          "config": { "includeFiles": ["package.json"] }
+          "source": "/(.*)",
+          "destination": "/index.html"
         }
-      ],
-      "installCommand": "npm install --force",
-      "buildCommand": "npm run build"
-}
+      ]
+    }
