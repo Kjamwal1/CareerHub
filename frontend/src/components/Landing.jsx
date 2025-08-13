@@ -6,6 +6,7 @@ import Spline from "@splinetool/react-spline";
 const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
   const fileInputRef = useRef(null);
   const [jobDescription, setJobDescription] = useState("");
+  const [linkedinUrl, setLinkedinUrl] = useState("");
   const [analysisResult, setAnalysisResult] = useState(null);
   const [error, setError] = useState(null);
 
@@ -39,7 +40,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
       formData.append("resume", file);
       formData.append("jobDescription", jobDescription);
 
-      const token = localStorage.getItem("token"); // Assuming token is stored here after login
+      const token = localStorage.getItem("token");
       const response = await fetch("https://careerhub25.onrender.com/check-resume", {
         method: "POST",
         headers: {
@@ -52,32 +53,69 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
       const data = await response.json().catch(() => ({ error: "Invalid response format" }));
       if (data.error) throw new Error(data.error);
       setAnalysisResult(data);
-      onLoginClick?.(); // Show login modal if not logged in
     } catch (err) {
       setError(err.message);
       alert(`Error analyzing resume: ${err.message}`);
     } finally {
-      e.target.value = null; // Reset file input
+      e.target.value = null;
     }
   };
-
-  const [linkedinUrl, setLinkedinUrl] = useState("");
 
   const validateLinkedInUrl = (url) => {
     const regex = /^https?:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-_]+\/?$/;
     return regex.test(url.trim());
   };
 
-  const handleLinkedInAnalyse = () => {
-    if (!validateLinkedInUrl(linkedinUrl)) {
-      alert("Please enter a valid LinkedIn profile URL.");
-      return;
-    }
+  const handleLinkedInAnalyse = async () => {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".pdf";
+    fileInput.style.display = "none";
+    document.body.appendChild(fileInput);
 
-    // Placeholder for LinkedIn analysis (e.g., fetch PDF or profile data)
-    onLoginClick?.();
-    setLinkedinUrl("");
-    // TODO: Implement LinkedIn API call or PDF download logic
+    fileInput.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) {
+        document.body.removeChild(fileInput);
+        return;
+      }
+
+      const maxSize = 2 * 1024 * 1024;
+      if (file.size > maxSize) {
+        alert("File size must be less than 2MB.");
+        document.body.removeChild(fileInput);
+        return;
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append("linkedinPdf", file);
+        formData.append("jobDescription", jobDescription);
+
+        const token = localStorage.getItem("token");
+        const response = await fetch("https://careerhub25.onrender.com/api/linkedin-analyze", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+
+        if (!response.ok) throw new Error("Failed to analyze LinkedIn PDF");
+        const data = await response.json().catch(() => ({ error: "Invalid response format" }));
+        if (data.error) throw new Error(data.error);
+        setAnalysisResult(data);
+      } catch (err) {
+        setError(err.message);
+        alert(`Error analyzing LinkedIn PDF: ${err.message}`);
+      } finally {
+        document.body.removeChild(fileInput);
+        setLinkedinUrl("");
+        onLoginClick?.();
+      }
+    };
+
+    fileInput.click();
   };
 
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -195,8 +233,8 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
                         type="button"
                         onClick={() => {
                           if (fileInputRef.current) {
-                            fileInputRef.current.value = null; // Reset before opening picker
-                            fileInputRef.current.click(); // Open file picker
+                            fileInputRef.current.value = null;
+                            fileInputRef.current.click();
                           }
                         }}
                         aria-label="Upload your resume"
@@ -294,8 +332,16 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
                       type="text"
                       value={linkedinUrl}
                       onChange={(e) => setLinkedinUrl(e.target.value)}
-                      placeholder="https://linkedin.com/in/your-profile"
+                      placeholder="https://linkedin.com/in/your-profile (optional)"
                       className="w-full px-4 sm:px-5 py-2 sm:py-3 rounded-xl bg-white/80 border border-gray-300 placeholder-gray-500 text-sm sm:text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:bg-white transition"
+                    />
+
+                    <input
+                      type="text"
+                      value={jobDescription}
+                      onChange={(e) => setJobDescription(e.target.value)}
+                      placeholder="Enter job description"
+                      className="w-full px-4 sm:px-5 py-2 sm:py-3 rounded-xl bg-white/80 border border-gray-300 placeholder-gray-500 text-sm sm:text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:bg-white transition mt-2"
                     />
 
                     <button
@@ -307,6 +353,12 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
                   </div>
                 </div>
               </div>
+              {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+              {analysisResult && (
+                <div className="text-sm text-green-500 mt-2">
+                  Analysis: Match Score {analysisResult.matchScore}%
+                </div>
+              )}
             </div>
 
             {/* Right Image */}
@@ -717,7 +769,6 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
             } text-xl sm:text-2xl`}
           />
         </button>
-        
       </div>
     </>
   );
