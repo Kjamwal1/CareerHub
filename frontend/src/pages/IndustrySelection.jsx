@@ -82,17 +82,17 @@ const IndustrySelection = () => {
   ];
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="p-6 w-full max-w-md bg-white rounded-lg shadow-2xl border border-gray-200">
-        <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-2 sm:p-4">
+      <div className="p-4 sm:p-6 w-full max-w-md bg-white rounded-lg shadow-2xl border border-gray-200">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-gray-800 text-center">
           Select Your Industry
         </h2>
-        {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {error && <p className="text-red-500 text-xs sm:text-sm mb-2 sm:mb-4 text-center">{error}</p>}
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           <select
             value={industry}
             onChange={(e) => setIndustry(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm"
             required
             disabled={isLoading}
           >
@@ -105,9 +105,9 @@ const IndustrySelection = () => {
           </select>
           <button
             type="submit"
-            className={`w-full px-6 py-3 rounded-lg transition-all duration-200 ${
+            className={`w-full px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition-all duration-200 ${
               isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-            } text-white`}
+            } text-white text-xs sm:text-sm`}
             disabled={isLoading}
           >
             {isLoading ? 'Saving...' : 'Save and Continue'}

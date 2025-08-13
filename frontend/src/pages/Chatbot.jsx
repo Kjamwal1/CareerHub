@@ -139,29 +139,29 @@ const Chatbot = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen relative">
-      <div className="p-6 w-screen h-screen bg-white rounded-none shadow-2xl border border-gray-200 relative">
+    <div className="flex items-center justify-center min-h-screen p-2 sm:p-4 relative">
+      <div className="p-2 sm:p-4 w-full h-screen bg-white rounded-none shadow-2xl border border-gray-200 relative max-w-2xl sm:max-w-3xl md:max-w-4xl">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold text-gray-800 flex items-center">
-            <Bot className="mr-2 text-blue-500" size={24} />
+        <div className="flex justify-between items-center mb-2 sm:mb-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 flex items-center">
+            <Bot className="mr-1 sm:mr-2 text-blue-500" size={20} sm:size={24} />
             AI Mentor Chat
           </h2>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1 sm:space-x-2">
             <button
               onClick={() => setShowHistory(!showHistory)}
-              className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-all"
+              className="p-1 sm:p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-all"
             >
-              <History className="text-gray-600" size={24} />
+              <History className="text-gray-600" size={20} sm:size={24} />
             </button>
             <button
               onClick={handleClose}
-              className="p-2 bg-gray-600 text-white rounded-full hover:bg-gray-700 transition-colors"
+              className="p-1 sm:p-2 bg-gray-600 text-white rounded-full hover:bg-gray-700 transition-colors"
               aria-label="Close"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
+                className="h-5 sm:h-6 w-5 sm:w-6"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -178,26 +178,26 @@ const Chatbot = () => {
         </div>
 
         {showHistory && (
-          <div className="absolute top-16 right-6 w-80 bg-white border border-gray-200 rounded-lg shadow-lg p-4 max-h-96 overflow-y-auto z-10">
-            <h3 className="text-lg font-semibold mb-2">Chat History</h3>
+          <div className="absolute top-12 sm:top-16 right-2 sm:right-4 w-64 sm:w-80 bg-white border border-gray-200 rounded-lg shadow-lg p-2 sm:p-4 max-h-60 sm:max-h-96 overflow-y-auto z-10">
+            <h3 className="text-sm sm:text-lg font-semibold mb-1 sm:mb-2">Chat History</h3>
             {pastChats.length === 0 ? (
-              <p className="text-gray-500">No chat history available.</p>
+              <p className="text-gray-500 text-xs sm:text-sm">No chat history available.</p>
             ) : (
               pastChats.map((msg, index) => (
                 <div
                   key={index}
-                  className={`p-2 mb-2 rounded-lg ${
+                  className={`p-1 sm:p-2 mb-1 sm:mb-2 rounded-lg ${
                     msg.role === "user"
                       ? "bg-green-100 text-green-800"
                       : "bg-blue-100 text-blue-800"
                   }`}
                 >
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs sm:text-sm text-gray-500">
                     {msg.timestamp
                       ? new Date(msg.timestamp).toLocaleString()
                       : "No timestamp"}
                   </div>
-                  <div>{msg.content}</div>
+                  <div className="text-xs sm:text-sm">{msg.content}</div>
                 </div>
               ))
             )}
@@ -205,7 +205,7 @@ const Chatbot = () => {
         )}
 
         {/* Chat Messages */}
-        <div className="mb-6 h-[calc(100%-140px)] overflow-y-auto bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-4">
+        <div className="mb-2 sm:mb-4 h-[calc(100%-120px)] sm:h-[calc(100%-140px)] overflow-y-auto bg-gray-50 p-2 sm:p-4 rounded-xl border border-gray-200 space-y-2 sm:space-y-4">
           {chatHistory.map((msg, index) => (
             <div
               key={index}
@@ -215,22 +215,22 @@ const Chatbot = () => {
             >
               {msg.role === "system" && (
                 <Bot
-                  className="mr-2 text-blue-500 flex-shrink-0"
-                  size={20}
+                  className="mr-1 sm:mr-2 text-blue-500 flex-shrink-0"
+                  size={16} sm:size={20}
                 />
               )}
               {msg.role === "user" && (
                 <User
-                  className="ml-2 text-green-500 flex-shrink-0"
-                  size={20}
+                  className="ml-1 sm:ml-2 text-green-500 flex-shrink-0"
+                  size={16} sm:size={20}
                 />
               )}
               <div
-                className={`p-3 rounded-lg max-w-[80%] ${
+                className={`p-1 sm:p-2 rounded-lg max-w-[75%] sm:max-w-[80%] ${
                   msg.role === "user"
                     ? "bg-green-100 text-green-800"
                     : "bg-blue-100 text-blue-800"
-                } shadow-md`}
+                } shadow-md text-xs sm:text-sm`}
               >
                 {msg.content}
               </div>
@@ -240,19 +240,19 @@ const Chatbot = () => {
         </div>
 
         {/* Message Input */}
-        <div className="flex gap-3">
+        <div className="flex gap-2 sm:gap-3">
           <input
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full p-1 sm:p-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm"
             placeholder="Ask about resume, LinkedIn, or job strategies..."
             disabled={isLoading}
           />
           <button
             onClick={handleSend}
-            className={`px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 ${
+            className={`px-2 sm:px-4 py-1 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 ${
               isLoading ? "opacity-70 cursor-not-allowed" : ""
-            }`}
+            } text-xs sm:text-sm`}
             disabled={isLoading}
           >
             {isLoading ? "Sending..." : "Send"}

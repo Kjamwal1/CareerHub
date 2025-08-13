@@ -104,26 +104,26 @@ const MyDocumentsPage = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-white font-poppins p-6 text-center">
-        <p className="text-gray-600">Please log in to view your documents.</p>
+      <div className="min-h-screen bg-white font-poppins p-3 sm:p-6 text-center">
+        <p className="text-gray-600 text-sm sm:text-base">Please log in to view your documents.</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white font-poppins p-6">
+    <div className="min-h-screen bg-white font-poppins p-3 sm:p-6">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+        <h2 className="text-xl sm:text-2xl md:text-2xl font-semibold text-gray-800 mb-4 sm:mb-6 text-center">
           My Documents
         </h2>
 
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <div
             {...getRootProps()}
-            className="border-2 border-dashed border-gray-300 p-6 text-center rounded-lg hover:border-purple-500 transition-colors cursor-pointer"
+            className="border-2 border-dashed border-gray-300 p-3 sm:p-6 text-center rounded-lg hover:border-purple-500 transition-colors cursor-pointer"
           >
             <input {...getInputProps()} />
-            <p className="text-gray-600">
+            <p className="text-gray-600 text-sm sm:text-base">
               <span className="font-medium text-purple-600">Add Documents</span> - Drag and drop files here, or click to select (any type, 1KB to 2MB each)
             </p>
           </div>
@@ -132,7 +132,7 @@ const MyDocumentsPage = () => {
         {loading && (
           <div className="text-center text-gray-600">
             <svg
-              className="animate-spin h-8 w-8 mx-auto text-purple-600"
+              className="animate-spin h-6 sm:h-8 w-6 sm:w-8 mx-auto text-purple-600"
               viewBox="0 0 24 24"
             >
               <circle
@@ -150,23 +150,23 @@ const MyDocumentsPage = () => {
                 d="M4 12a8 8 0 018-8v8h8a8 8 0 01-8 8 8 8 0 01-8-8z"
               />
             </svg>
-            <p className="mt-2">Loading or uploading...</p>
+            <p className="mt-1 sm:mt-2 text-sm sm:text-base">Loading or uploading...</p>
           </div>
         )}
 
         {!loading && (
-          <div className="space-y-4">
+          <div className="space-y-2 sm:space-y-4">
             {documents.length === 0 ? (
-              <p className="text-center text-gray-600">No documents uploaded yet.</p>
+              <p className="text-center text-gray-600 text-sm sm:text-base">No documents uploaded yet.</p>
             ) : (
               documents.map((doc, index) => (
                 <div
                   key={doc._id || index}
-                  className="p-4 bg-gray-50 rounded-xl border border-gray-200 flex justify-between items-center"
+                  className="p-2 sm:p-4 bg-gray-50 rounded-xl border border-gray-200 flex flex-col sm:flex-row justify-between items-center"
                 >
-                  <div>
-                    <p className="text-gray-800 font-medium">{doc.filename}</p>
-                    <p className="text-sm text-gray-500">
+                  <div className="mb-2 sm:mb-0">
+                    <p className="text-gray-800 font-medium text-sm sm:text-base">{doc.filename}</p>
+                    <p className="text-xs sm:text-sm text-gray-500">
                       {new Date(doc.createdAt).toLocaleDateString()}
                     </p>
                   </div>
@@ -174,7 +174,7 @@ const MyDocumentsPage = () => {
                     href={doc.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
+                    className="text-blue-600 hover:underline text-sm sm:text-base"
                   >
                     View
                   </a>

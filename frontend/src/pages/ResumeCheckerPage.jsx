@@ -145,16 +145,16 @@ const ResumeCheckerPage = () => {
   };
 
   return (
-    <div className="min-h-screen p-6 bg-gradient-to-b from-[#0a0a23] to-[#12123a] font-poppins flex items-center justify-center relative">
+    <div className="min-h-screen p-2 sm:p-4 md:p-6 bg-gradient-to-b from-[#0a0a23] to-[#12123a] font-poppins flex items-center justify-center relative">
       {/* Close Button */}
       <button
         onClick={handleClose}
-        className="absolute top-4 left-4 bg-gray-600 text-white rounded-full p-2 hover:bg-gray-700 transition-colors z-10"
+        className="absolute top-2 sm:top-4 left-2 sm:left-4 bg-gray-600 text-white rounded-full p-1 sm:p-2 hover:bg-gray-700 transition-colors z-10"
         aria-label="Close"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
+          className="h-5 sm:h-6 w-5 sm:w-6"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -168,28 +168,28 @@ const ResumeCheckerPage = () => {
         </svg>
       </button>
 
-     
-
-      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-xl w-full border border-gray-200 relative z-0">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+      <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 md:p-8 max-w-md sm:max-w-lg md:max-w-xl w-full border border-gray-200 relative z-0">
+        <h2 className="text-xl sm:text-2xl md:text-2xl font-semibold text-gray-800 mb-3 sm:mb-4 md:mb-6 text-center">
           Upload Resume for ATS Check
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <div>
-            <label className="block text-gray-700 mb-2">Job Description:</label>
+            <label className="block text-gray-700 text-sm sm:text-base mb-1 sm:mb-2">
+              Job Description:
+            </label>
             <textarea
               value={jobDescription}
               onChange={(e) => setJobDescription(e.target.value)}
               placeholder="Paste or type the job description here..."
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600 text-black"
-              rows="5"
+              className="w-full p-2 sm:p-3 md:p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600 text-black text-sm sm:text-base"
+              rows="4 sm:rows-5"
               disabled={loading}
             />
           </div>
 
           <div
-            className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors duration-200 ${
+            className={`border-2 border-dashed rounded-xl p-3 sm:p-4 md:p-6 text-center transition-colors duration-200 ${
               dragActive
                 ? "border-purple-600 bg-purple-50"
                 : "border-gray-300 bg-gray-100"
@@ -198,7 +198,7 @@ const ResumeCheckerPage = () => {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
           >
-            <p className="text-gray-700 mb-2">
+            <p className="text-gray-700 text-sm sm:text-base mb-1 sm:mb-2">
               Drag and drop your <strong>PDF</strong>, <strong>DOCX</strong>,{" "}
               <strong>JPG</strong>, or <strong>PNG</strong> file here, or{" "}
               <label
@@ -216,31 +216,31 @@ const ResumeCheckerPage = () => {
               className="hidden"
               disabled={loading}
             />
-            <p className="text-sm text-gray-500">Max file size: 2MB</p>
+            <p className="text-xs sm:text-sm text-gray-500">Max file size: 2MB</p>
           </div>
 
           {selectedFile && (
-            <div className="text-sm text-green-600 font-medium">
+            <div className="text-sm sm:text-base text-green-600 font-medium">
               ✅ Selected: {selectedFile.name}
             </div>
           )}
 
           {error && (
-            <div className="text-sm text-red-500 font-medium">⚠️ {error}</div>
+            <div className="text-sm sm:text-base text-red-500 font-medium">⚠️ {error}</div>
           )}
 
           <button
             type="submit"
             disabled={!selectedFile || !jobDescription || loading}
-            className={`w-full py-2 px-4 rounded-md text-white font-semibold transition ${
+            className={`w-full py-1 sm:py-2 md:py-2 px-3 sm:px-4 md:px-4 rounded-md text-white font-semibold transition ${
               selectedFile && jobDescription && !loading
                 ? "bg-[#A259FF] hover:bg-[#8A42E8]"
                 : "bg-gray-400 cursor-not-allowed"
-            }`}
+            } text-sm sm:text-base`}
           >
             {loading ? (
               <span className="flex items-center justify-center">
-                <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                <svg className="animate-spin h-4 sm:h-5 w-4 sm:w-5 mr-1 sm:mr-2" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8h8a8 8 0 01-8 8 8 8 0 01-8-8z" />
                 </svg>
@@ -253,24 +253,24 @@ const ResumeCheckerPage = () => {
         </form>
 
         {analysis && (
-          <div className="mt-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
-            <h3 className="text-2xl font-bold text-green-700 mb-4 text-center">
+          <div className="mt-4 sm:mt-6 md:mt-6 p-3 sm:p-4 md:p-4 bg-gray-50 rounded-xl border border-gray-200">
+            <h3 className="text-xl sm:text-2xl md:text-2xl font-bold text-green-700 mb-2 sm:mb-3 md:mb-4 text-center">
               Resume Analysis Results
             </h3>
-            <div className="mb-6">
-              <h4 className="text-xl font-semibold text-gray-800">
+            <div className="mb-3 sm:mb-4 md:mb-6">
+              <h4 className="text-lg sm:text-xl md:text-xl font-semibold text-gray-800">
                 Match Score:
               </h4>
               <p
-                className={`text-3xl font-bold ${
+                className={`text-2xl sm:text-3xl md:text-3xl font-bold ${
                   getMatchLevel(analysis.matchScore).color
                 }`}
               >
                 {analysis.matchScore}%
               </p>
-              <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+              <div className="w-full bg-gray-200 rounded-full h-2 sm:h-2.5 md:h-2.5 mt-1 sm:mt-2">
                 <div
-                  className={`h-2.5 rounded-full ${
+                  className={`h-2 sm:h-2.5 md:h-2.5 rounded-full ${
                     getMatchLevel(analysis.matchScore).label === "Poor"
                       ? "bg-red-600"
                       : getMatchLevel(analysis.matchScore).label === "Fair"
@@ -283,75 +283,77 @@ const ResumeCheckerPage = () => {
                 ></div>
               </div>
               <p
-                className={`text-sm font-medium ${
+                className={`text-xs sm:text-sm md:text-sm font-medium ${
                   getMatchLevel(analysis.matchScore).color
-                } mt-1`}
+                } mt-0.5 sm:mt-1`}
               >
                 Match Level: {getMatchLevel(analysis.matchScore).label}
               </p>
             </div>
-            <div className="mb-6">
-              <h4 className="text-xl font-semibold text-gray-800">
+            <div className="mb-3 sm:mb-4 md:mb-6">
+              <h4 className="text-lg sm:text-xl md:text-xl font-semibold text-gray-800">
                 💪 Strengths:
               </h4>
-              <ul className="text-lg text-green-700 list-disc pl-5 space-y-2">
+              <ul className="text-base sm:text-lg md:text-lg text-green-700 list-disc pl-4 sm:pl-5 md:pl-5 space-y-1 sm:space-y-2">
                 {analysis.strengths?.map((strength, index) => (
                   <li key={index}>{strength}</li>
                 ))}
               </ul>
             </div>
-            <div className="mb-6">
-              <h4 className="text-xl font-semibold text-gray-800">🧱 Gaps:</h4>
-              <ul className="text-lg text-red-700 list-disc pl-5 space-y-2">
+            <div className="mb-3 sm:mb-4 md:mb-6">
+              <h4 className="text-lg sm:text-xl md:text-xl font-semibold text-gray-800">
+                🧱 Gaps:
+              </h4>
+              <ul className="text-base sm:text-lg md:text-lg text-red-700 list-disc pl-4 sm:pl-5 md:pl-5 space-y-1 sm:space-y-2">
                 {analysis.gaps?.map((gap, index) => (
                   <li key={index}>{gap}</li>
                 ))}
               </ul>
             </div>
-            <div className="mb-6">
-              <h4 className="text-xl font-semibold text-gray-800">
+            <div className="mb-3 sm:mb-4 md:mb-6">
+              <h4 className="text-lg sm:text-xl md:text-xl font-semibold text-gray-800">
                 🛠 Improvements:
               </h4>
-              <ul className="text-lg text-purple-700 list-disc pl-5 space-y-2">
+              <ul className="text-base sm:text-lg md:text-lg text-purple-700 list-disc pl-4 sm:pl-5 md:pl-5 space-y-1 sm:space-y-2">
                 {analysis.improvements?.map((improvement, index) => (
                   <li key={index}>{improvement}</li>
                 ))}
               </ul>
             </div>
             {analysis.optimizedSection && (
-              <div className="mb-6">
-                <h4 className="text-xl font-semibold text-gray-800">
+              <div className="mb-3 sm:mb-4 md:mb-6">
+                <h4 className="text-lg sm:text-xl md:text-xl font-semibold text-gray-800">
                   Optimized Section:
                 </h4>
-                <p className="text-lg text-gray-700 whitespace-pre-wrap">
+                <p className="text-base sm:text-lg md:text-lg text-gray-700 whitespace-pre-wrap">
                   {analysis.optimizedSection}
                 </p>
               </div>
             )}
             {analysis.beforeAfterComparison && (
-              <div className="mb-6">
-                <h4 className="text-xl font-semibold text-gray-800">
+              <div className="mb-3 sm:mb-4 md:mb-6">
+                <h4 className="text-lg sm:text-xl md:text-xl font-semibold text-gray-800">
                   Before vs. After:
                 </h4>
-                <p className="text-lg text-gray-700 whitespace-pre-wrap">
+                <p className="text-base sm:text-lg md:text-lg text-gray-700 whitespace-pre-wrap">
                   {analysis.beforeAfterComparison}
                 </p>
               </div>
             )}
-            <div className="mb-6">
-              <h4 className="text-xl font-semibold text-gray-800">
+            <div className="mb-3 sm:mb-4 md:mb-6">
+              <h4 className="text-lg sm:text-xl md:text-xl font-semibold text-gray-800">
                 Keyword Match Score:
               </h4>
               <p
-                className={`text-3xl font-bold ${
+                className={`text-2xl sm:text-3xl md:text-3xl font-bold ${
                   getMatchLevel(analysis.keywordMatchScore).color
                 }`}
               >
                 {analysis.keywordMatchScore}%
               </p>
-              <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+              <div className="w-full bg-gray-200 rounded-full h-2 sm:h-2.5 md:h-2.5 mt-1 sm:mt-2">
                 <div
-                  className={`h-2.5 rounded-full ${
+                  className={`h-2 sm:h-2.5 md:h-2.5 rounded-full ${
                     getMatchLevel(analysis.keywordMatchScore).label === "Poor"
                       ? "bg-red-600"
                       : getMatchLevel(analysis.keywordMatchScore).label === "Fair"
@@ -364,9 +366,9 @@ const ResumeCheckerPage = () => {
                 ></div>
               </div>
               <p
-                className={`text-sm font-medium ${
+                className={`text-xs sm:text-sm md:text-sm font-medium ${
                   getMatchLevel(analysis.keywordMatchScore).color
-                } mt-1`}
+                } mt-0.5 sm:mt-1`}
               >
                 Match Level: {getMatchLevel(analysis.keywordMatchScore).label}
               </p>
@@ -376,13 +378,13 @@ const ResumeCheckerPage = () => {
 
         {analysis && (
           <div
-            className="fixed bottom-6 right-6 bg-blue-600 text-white rounded-full p-4 cursor-pointer shadow-lg hover:bg-blue-700 transition"
+            className="fixed bottom-2 sm:bottom-4 right-2 sm:right-4 bg-blue-600 text-white rounded-full p-2 sm:p-3 md:p-4 cursor-pointer shadow-lg hover:bg-blue-700 transition"
             onClick={handleMentorClick}
             style={{ zIndex: 1000 }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
+              className="h-5 sm:h-6 md:h-6 w-5 sm:w-6 md:w-6"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -407,11 +409,11 @@ const ResumeCheckerPage = () => {
         )}
 
         {analysis && (
-          <div className="mt-6 p-4 bg-yellow-100 rounded-xl border-2 border-yellow-400">
-            <h4 className="text-2xl font-bold text-yellow-800 mb-4 text-center">
+          <div className="mt-4 sm:mt-6 md:mt-6 p-3 sm:p-4 md:p-4 bg-yellow-100 rounded-xl border-2 border-yellow-400">
+            <h4 className="text-xl sm:text-2xl md:text-2xl font-bold text-yellow-800 mb-2 sm:mb-3 md:mb-4 text-center">
               Job Matching Suggestions
             </h4>
-            <ul className="text-lg text-blue-600 list-disc pl-5 space-y-2">
+            <ul className="text-base sm:text-lg md:text-lg text-blue-600 list-disc pl-4 sm:pl-5 md:pl-5 space-y-1 sm:space-y-2">
               <li>
                 <a
                   href="https://www.jobscan.co"

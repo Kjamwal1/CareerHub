@@ -120,16 +120,16 @@ const LinkedInOptimizer = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a0a23] to-[#12123a] text-white px-6 py-12 font-poppins relative flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-b from-[#0a0a23] to-[#12123a] text-white px-2 sm:px-4 md:px-6 py-4 sm:py-8 md:py-12 font-poppins relative flex items-center justify-center">
       {/* Close Button */}
       <button
         onClick={handleClose}
-        className="absolute top-4 left-4 bg-gray-600 text-white rounded-full p-2 hover:bg-gray-700 transition-colors z-10"
+        className="absolute top-2 sm:top-4 left-2 sm:left-4 bg-gray-600 text-white rounded-full p-1 sm:p-2 hover:bg-gray-700 transition-colors z-10"
         aria-label="Close"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
+          className="h-5 sm:h-6 w-5 sm:w-6"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -143,14 +143,14 @@ const LinkedInOptimizer = () => {
         </svg>
       </button>
 
-      <div className="max-w-6xl w-full grid grid-cols-2 gap-8">
+      <div className="max-w-6xl w-full grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
         {/* LinkedIn Upload Section (Left) */}
-        <div className="bg-[#10102b] rounded-2xl p-6 shadow-lg border border-[#2d2d51] flex flex-col justify-between h-full">
+        <div className="bg-[#10102b] rounded-2xl p-2 sm:p-4 md:p-6 shadow-lg border border-[#2d2d51] flex flex-col justify-between h-full">
           <div>
-            <h2 className="text-2xl font-bold mb-4">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4">
               Upload your LinkedIn Profile PDF
             </h2>
-            <p className="text-sm text-gray-300 mb-4 leading-relaxed">
+            <p className="text-xs sm:text-sm md:text-base text-gray-300 mb-2 sm:mb-3 md:mb-4 leading-relaxed">
               1. Go to your public{" "}
               <a href="https://linkedin.com" className="text-blue-400 underline">
                 LinkedIn profile
@@ -166,7 +166,7 @@ const LinkedInOptimizer = () => {
 
           <div>
             <label
-              className={`flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-4 text-center transition-colors duration-200 ${
+              className={`flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-2 sm:p-3 md:p-4 text-center transition-colors duration-200 ${
                 dragActive
                   ? "border-blue-400 bg-blue-900/20"
                   : "border-gray-500 bg-[#1a1a40]"
@@ -176,8 +176,8 @@ const LinkedInOptimizer = () => {
               onDrop={handleDrop}
               aria-label="Upload LinkedIn profile PDF"
             >
-              <CloudUpload size={32} />
-              <p className="mt-2 text-sm text-gray-400">
+              <CloudUpload size={24} sm:size={28} md:size={32} />
+              <p className="mt-1 sm:mt-2 text-xs sm:text-sm md:text-base text-gray-400">
                 {selectedFile
                   ? selectedFile.name
                   : "Drag and drop your PDF here or click to browse"}
@@ -189,23 +189,25 @@ const LinkedInOptimizer = () => {
                 className="hidden"
                 disabled={loading}
               />
-              <p className="text-xs text-gray-500 mt-1">Max file size: 2MB</p>
+              <p className="text-xs sm:text-sm mt-1">Max file size: 2MB</p>
             </label>
 
             {selectedFile && (
-              <p className="mt-2 text-sm text-green-400 font-medium">
+              <p className="mt-1 sm:mt-2 text-sm text-green-400 font-medium">
                 ✅ Selected: {selectedFile.name}
               </p>
             )}
           </div>
 
-          <div className="mt-4">
-            <label className="block text-gray-300 mb-2">Job Description:</label>
+          <div className="mt-2 sm:mt-3 md:mt-4">
+            <label className="block text-gray-300 text-xs sm:text-sm mb-1 sm:mb-2">
+              Job Description:
+            </label>
             <textarea
               value={jobDescription}
               onChange={(e) => setJobDescription(e.target.value)}
               placeholder="Paste or type the job description here..."
-              className="w-full p-2 border border-gray-600 rounded-lg bg-[#1a1a40] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-1 sm:p-2 md:p-2 border border-gray-600 rounded-lg bg-[#1a1a40] text-white placeholder-gray-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows="3"
               disabled={loading}
             />
@@ -214,18 +216,18 @@ const LinkedInOptimizer = () => {
           <button
             onClick={handlePdfUpload}
             disabled={!selectedFile || !jobDescription || loading}
-            className={`mt-4 w-full py-2 rounded-lg transition font-semibold ${
+            className={`mt-2 sm:mt-3 md:mt-4 w-full py-1 sm:py-2 md:py-2 rounded-lg transition font-semibold ${
               selectedFile && jobDescription && !loading
                 ? "bg-blue-600 hover:bg-blue-700"
                 : "bg-blue-400 cursor-not-allowed"
-            }`}
+            } text-xs sm:text-sm`}
           >
             {loading ? "Analyzing..." : "Analyze PDF"}
           </button>
         </div>
 
         {/* Video Section (Right) */}
-        <div className="bg-[#10102b] rounded-2xl p-6 shadow-lg border border-[#2d2d51] flex items-center justify-center h-full">
+        <div className="bg-[#10102b] rounded-2xl p-2 sm:p-4 md:p-6 shadow-lg border border-[#2d2d51] flex items-center justify-center h-full">
           <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
             <iframe
               className="absolute top-0 left-0 w-full h-full rounded-lg"
@@ -241,22 +243,24 @@ const LinkedInOptimizer = () => {
 
       {/* Analysis Results */}
       {analysis && (
-        <div className="mt-8 bg-[#12123a] p-4 rounded-xl border border-blue-700 max-w-2xl mx-auto">
-          <h3 className="text-xl font-bold text-blue-400 mb-3 text-center">
+        <div className="mt-4 sm:mt-6 md:mt-8 bg-[#12123a] p-2 sm:p-3 md:p-4 rounded-xl border border-blue-700 max-w-sm sm:max-w-md md:max-w-2xl mx-auto">
+          <h3 className="text-lg sm:text-xl md:text-xl font-bold text-blue-400 mb-1 sm:mb-2 md:mb-3 text-center">
             LinkedIn Profile Analysis Results
           </h3>
-          <div className="mb-4">
-            <h4 className="text-lg font-semibold text-gray-300">Match Score:</h4>
+          <div className="mb-1 sm:mb-2 md:mb-4">
+            <h4 className="text-base sm:text-lg md:text-lg font-semibold text-gray-300">
+              Match Score:
+            </h4>
             <p
-              className={`text-2xl font-bold ${
+              className={`text-xl sm:text-2xl md:text-2xl font-bold ${
                 getMatchLevel(analysis.matchScore).color
               }`}
             >
               {analysis.matchScore}%
             </p>
-            <div className="w-full bg-gray-600 rounded-full h-2 mt-1">
+            <div className="w-full bg-gray-600 rounded-full h-1.5 sm:h-2 md:h-2 mt-0.5 sm:mt-1">
               <div
-                className={`h-2 rounded-full ${
+                className={`h-1.5 sm:h-2 md:h-2 rounded-full ${
                   getMatchLevel(analysis.matchScore).label === "Poor"
                     ? "bg-red-400"
                     : getMatchLevel(analysis.matchScore).label === "Fair"
@@ -269,65 +273,73 @@ const LinkedInOptimizer = () => {
               ></div>
             </div>
             <p
-              className={`text-sm font-medium ${
+              className={`text-xs sm:text-sm md:text-sm font-medium ${
                 getMatchLevel(analysis.matchScore).color
-              } mt-1`}
+              } mt-0.5 sm:mt-1`}
             >
               Match Level: {getMatchLevel(analysis.matchScore).label}
             </p>
           </div>
-          <div className="mb-4">
-            <h4 className="text-lg font-semibold text-gray-300">💪 Strengths:</h4>
-            <ul className="text-base text-green-400 list-disc pl-5 space-y-1">
+          <div className="mb-1 sm:mb-2 md:mb-4">
+            <h4 className="text-base sm:text-lg md:text-lg font-semibold text-gray-300">
+              💪 Strengths:
+            </h4>
+            <ul className="text-sm sm:text-base md:text-base text-green-400 list-disc pl-3 sm:pl-4 md:pl-5 space-y-0.5 sm:space-y-1">
               {analysis.strengths.map((strength, index) => (
                 <li key={index}>{strength}</li>
               ))}
             </ul>
           </div>
-          <div className="mb-4">
-            <h4 className="text-lg font-semibold text-gray-300">🧱 Gaps:</h4>
-            <ul className="text-base text-red-400 list-disc pl-5 space-y-1">
+          <div className="mb-1 sm:mb-2 md:mb-4">
+            <h4 className="text-base sm:text-lg md:text-lg font-semibold text-gray-300">
+              🧱 Gaps:
+            </h4>
+            <ul className="text-sm sm:text-base md:text-base text-red-400 list-disc pl-3 sm:pl-4 md:pl-5 space-y-0.5 sm:space-y-1">
               {analysis.gaps.map((gap, index) => (
                 <li key={index}>{gap}</li>
               ))}
             </ul>
           </div>
-          <div className="mb-4">
-            <h4 className="text-lg font-semibold text-gray-300">
+          <div className="mb-1 sm:mb-2 md:mb-4">
+            <h4 className="text-base sm:text-lg md:text-lg font-semibold text-gray-300">
               🛠 Improvements:
             </h4>
-            <ul className="text-base text-blue-400 list-disc pl-5 space-y-1">
+            <ul className="text-sm sm:text-base md:text-base text-blue-400 list-disc pl-3 sm:pl-4 md:pl-5 space-y-0.5 sm:space-y-1">
               {analysis.improvements.map((improvement, index) => (
                 <li key={index}>{improvement}</li>
               ))}
             </ul>
           </div>
-          <div className="mb-4">
-            <h4 className="text-lg font-semibold text-gray-300">
+          <div className="mb-1 sm:mb-2 md:mb-4">
+            <h4 className="text-base sm:text-lg md:text-lg font-semibold text-gray-300">
               📝 Optimized Profile Section:
             </h4>
-            <p className="text-base text-green-400 bg-[#1a1a40] p-2 rounded">
+            <p className="text-sm sm:text-base md:text-base text-green-400 bg-[#1a1a40] p-1 sm:p-2 rounded">
               {analysis.optimizedSection}
             </p>
           </div>
-          <div className="mb-4">
-            <h4 className="text-lg font-semibold text-gray-300">
+          <div className="mb-1 sm:mb-2 md:mb-4">
+            <h4 className="text-base sm:text-lg md:text-lg font-semibold text-gray-300">
               🔄 Before-After Comparison:
             </h4>
-            <p className="text-base text-gray-200 bg-[#1a1a40] p-2 rounded">
+            <p className="text-sm sm:text-base md:text-base text-gray-200 bg-[#1a1a40] p-1 sm:p-2 rounded">
               {analysis.beforeAfterComparison}
             </p>
           </div>
-          <div className="mb-4">
-            <h4 className="text-lg font-semibold text-gray-300">
+          <div className="mb-1 sm:mb-2 md:mb-4">
+            <h4 className="text-base sm:text-lg md:text-lg font-semibold text-gray-300">
               🔑 Keyword Match Score:
             </h4>
-            <p className={`text-2xl font-bold ${getMatchLevel(analysis.keywordMatchScore).color}`}>
+            <p
+              className={`text-xl sm:text-2xl md:text-2xl font-bold ${
+                getMatchLevel(analysis.keywordMatchScore).color
+              }`}
+            >
               {analysis.keywordMatchScore}%
             </p>
-            <div className="w-full bg-gray-600 rounded-full h-2 mt-1">
+            <div className="w-full bg-gray-600 rounded-full h-1.5 sm:h-2 md:h-2 mt-0.5 sm:mt-1">
               <div
-                className={`h-2 rounded-full ${
+                className={`h-1.5 sm:h-2 md:h-2 rounded-full ${
                   getMatchLevel(analysis.keywordMatchScore).label === "Poor"
                     ? "bg-red-400"
                     : getMatchLevel(analysis.keywordMatchScore).label === "Fair"
@@ -340,7 +352,9 @@ const LinkedInOptimizer = () => {
               ></div>
             </div>
             <p
-              className={`text-sm font-medium ${getMatchLevel(analysis.keywordMatchScore).color} mt-1`}
+              className={`text-xs sm:text-sm md:text-sm font-medium ${
+                getMatchLevel(analysis.keywordMatchScore).color
+              } mt-0.5 sm:mt-1`}
             >
               Match Level: {getMatchLevel(analysis.keywordMatchScore).label}
             </p>
@@ -350,13 +364,13 @@ const LinkedInOptimizer = () => {
 
       {analysis && (
         <div
-          className="fixed bottom-6 right-6 bg-blue-600 text-white rounded-full p-3 cursor-pointer shadow-lg hover:bg-blue-700 transition"
+          className="fixed bottom-2 sm:bottom-4 right-2 sm:right-4 bg-blue-600 text-white rounded-full p-1 sm:p-2 md:p-3 cursor-pointer shadow-lg hover:bg-blue-700 transition"
           onClick={handleMentorClick}
           style={{ zIndex: 1000 }}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
+            className="h-4 sm:h-5 md:h-5 w-4 sm:w-5 md:w-5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

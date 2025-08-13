@@ -3,25 +3,25 @@ import Spline from "@splinetool/react-spline";
 
 const Hero = ({ onGetStartedClick }) => {
   return (
-    <main className="flex min-h-[calc(100vh-6rem)] flex-col items-center justify-center font-poppins">
+    <main className="flex min-h-[calc(100vh-6rem)] sm:min-h-[calc(100vh-7rem)] flex-col items-center justify-center font-poppins">
       {/* Centered Content */}
       <div className="flex w-full h-full justify-center items-center">
         <div
           data-aos="fade-right"
           data-aos-offset="300"
           data-aos-easing="ease-in-sine"
-          className="max-w-4xl w-full text-center px-4 z-10"
+          className="max-w-4xl w-full text-center px-4 sm:px-6 lg:px-8 z-10"
         >
           {/* Badge */}
-          <div className="relative w-[95%] sm:w-48 h-10 mx-auto bg-gradient-to-r from-[#656565] to-[#1D4ED8] shadow-[0_0_20px_rgba(255,255,255,0.4)] rounded-full">
-            <div className="absolute inset-[3px] bg-black rounded-full flex items-center justify-center gap-1 text-white text-sm font-medium">
-              <i className="bx bx-diamond"></i>
+          <div className="relative w-[90%] sm:w-48 h-8 sm:h-10 mx-auto bg-gradient-to-r from-[#656565] to-[#1D4ED8] shadow-[0_0_20px_rgba(255,255,255,0.4)] rounded-full">
+            <div className="absolute inset-[2px] sm:inset-[3px] bg-black rounded-full flex items-center justify-center gap-1 text-xs sm:text-sm font-medium">
+              <i className="bx bx-diamond text-xs sm:text-base"></i>
               INTRODUCING
             </div>
           </div>
 
           {/* Heading */}
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[4.3rem] font-extrabold tracking-tight leading-tight my-10">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-tight leading-tight my-6 sm:my-8">
             <span className="block text-white">Your AI Career Wingman</span>
             <span className="block bg-gradient-to-r from-[#00cfff] to-[#007bff] text-transparent bg-clip-text">
               — From Resume to Recruiter
@@ -29,7 +29,7 @@ const Hero = ({ onGetStartedClick }) => {
           </h1>
 
           {/* Subheading */}
-          <p className="text-lg sm:text-xl tracking-wide text-gray-400 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-lg md:text-xl tracking-wide text-gray-400 max-w-xl sm:max-w-2xl mx-auto">
             <span className="text-gray-300 font-medium">
               All-In-One Platform. Zero Guesswork.
             </span>
@@ -41,12 +41,12 @@ const Hero = ({ onGetStartedClick }) => {
           </p>
 
           {/* Button */}
-          <div className="flex justify-center mt-10">
+          <div className="flex justify-center mt-6 sm:mt-8">
             <a
               onClick={onGetStartedClick}
-             className="cursor-pointer border border-[#2a2a2a] py-3 px-10 rounded-full text-lg font-semibold tracking-wider transition-colors duration-300 bg-gray-300 text-black hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600"
->
-              Get Started <i className="bx bx-link-external"></i>
+              className="cursor-pointer border border-[#2a2a2a] py-2 sm:py-3 px-6 sm:px-10 rounded-full text-base sm:text-lg font-semibold tracking-wider transition-colors duration-300 bg-gray-300 text-black hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600"
+            >
+              Get Started <i className="bx bx-link-external text-base sm:text-lg"></i>
             </a>
           </div>
         </div>

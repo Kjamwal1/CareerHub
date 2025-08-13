@@ -83,9 +83,9 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-white font-poppins text-gray-800 flex flex-col relative">
       {/* Navbar */}
-      <div className="w-full bg-gray-100 p-4 shadow-md flex justify-between items-center fixed top-0 z-20">
+      <div className="w-full bg-gray-100 p-2 sm:p-4 shadow-md flex justify-between items-center fixed top-0 z-20">
         <h1
-          className="text-4xl font-bold"
+          className="text-2xl sm:text-3xl md:text-4xl font-bold"
           style={{ fontFamily: "'Lobster', cursive" }}
         >
           CareerHub
@@ -95,22 +95,22 @@ const Home = () => {
             onClick={() => setShowProfileDropdown(!showProfileDropdown)}
             className="flex items-center text-gray-600 hover:text-gray-900"
           >
-            <UserCircleIcon className="h-8 w-8 mr-2" />
-            <span>
+            <UserCircleIcon className="h-6 sm:h-8 w-6 sm:w-8 mr-1 sm:mr-2" />
+            <span className="text-sm sm:text-base">
               {user?.name} {user?.surname}
             </span>
           </button>
           {showProfileDropdown && (
-            <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-[100]">
-              <p className="px-4 py-2 text-sm text-gray-700">
+            <div className="absolute right-0 top-full mt-1 sm:mt-2 w-40 sm:w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-[100]">
+              <p className="px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-gray-700">
                 Plan: <span className="font-medium">{user?.plan || "Free"}</span>
               </p>
-              <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              <button className="w-full text-left px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">
                 Edit Profile
               </button>
               <button
                 onClick={handleLogout}
-                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                className="w-full text-left px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-red-600 hover:bg-gray-100"
               >
                 Log Out
               </button>
@@ -120,26 +120,26 @@ const Home = () => {
       </div>
 
       {/* Left Sidebar */}
-      <div className="w-[13rem] bg-gray-100 p-6 shadow-md h-screen overflow-y-auto fixed top-[4rem] bottom-0 z-10">
+      <div className="w-[13rem] bg-gray-100 p-3 sm:p-6 shadow-md h-screen overflow-y-auto fixed top-[3.5rem] sm:top-[4rem] bottom-0 z-10 hidden md:block">
         <nav className="space-y-2 flex-1">
           <button
             onClick={() => setShowDashboardDropdown(!showDashboardDropdown)}
-            className="w-full text-left px-4 py-2 bg-gray-800 text-white rounded flex items-center justify-between hover:bg-gray-700"
+            className="w-full text-left px-3 sm:px-4 py-1 sm:py-2 bg-gray-800 text-white rounded flex items-center justify-between hover:bg-gray-700"
           >
-            <span>Dashboard</span>
-            <Bars3Icon className="h-5 w-5" />
+            <span className="text-sm sm:text-base">Dashboard</span>
+            <Bars3Icon className="h-4 sm:h-5 w-4 sm:w-5" />
           </button>
           {showDashboardDropdown && (
-            <div className="ml-4 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-[50]">
+            <div className="ml-2 sm:ml-4 mt-1 sm:mt-2 w-40 sm:w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-[50]">
               <button
                 onClick={() => handleFeatureClick("Resume Analyse History")}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                className="w-full text-left px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100"
               >
                 Resume Analyse History
               </button>
               <button
                 onClick={() => handleFeatureClick("Application Track")}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                className="w-full text-left px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100"
               >
                 Application Track
               </button>
@@ -147,34 +147,34 @@ const Home = () => {
           )}
           <button
             onClick={() => handleFeatureClick("My Documents")}
-            className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-200"
+            className="w-full text-left px-3 sm:px-4 py-1 sm:py-2 text-gray-600 hover:bg-gray-200"
           >
             My Documents
           </button>
-          <button className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-200">
+          <button className="w-full text-left px-3 sm:px-4 py-1 sm:py-2 text-gray-600 hover:bg-gray-200">
             Career Map
           </button>
-          <button className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-200">
+          <button className="w-full text-left px-3 sm:px-4 py-1 sm:py-2 text-gray-600 hover:bg-gray-200">
             Job Interviews
           </button>
-          <button className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-200">
+          <button className="w-full text-left px-3 sm:px-4 py-1 sm:py-2 text-gray-600 hover:bg-gray-200">
             Find Jobs
           </button>
         </nav>
-        <div className="mt-[12rem] bg-white p-4 rounded-lg shadow-md border border-gray-200">
-          <p className="text-sm text-gray-500 mb-2">Current plan: FREE</p>
-          <button className="w-full bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+        <div className="mt-8 sm:mt-[12rem] bg-white p-3 sm:p-4 rounded-lg shadow-md border border-gray-200">
+          <p className="text-xs sm:text-sm text-gray-500 mb-1 sm:mb-2">Current plan: FREE</p>
+          <button className="w-full bg-purple-600 text-white px-3 sm:px-4 py-1 sm:py-2 rounded hover:bg-purple-700 text-xs sm:text-sm">
             Upgrade
           </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="ml-[13rem] pt-[8rem] p-6 flex-1 relative z-0">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+      <div className="ml-0 md:ml-[13rem] pt-[3.5rem] sm:pt-[8rem] p-3 sm:p-6 flex-1 relative z-0">
+        <h2 className="text-xl sm:text-2xl md:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
           Welcome back, {user?.name || "Kanika"}!
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-12">
           {[
             {
               title: "Resume Checker",
@@ -203,21 +203,21 @@ const Home = () => {
           ].map(({ title, desc, icon: Icon, bg }) => (
             <div
               key={title}
-              className={`rounded-xl p-6 text-white shadow-lg transition transform hover:scale-[1.03] cursor-pointer ${bg} hover:opacity-90`}
+              className={`rounded-xl p-3 sm:p-4 text-white shadow-lg transition transform hover:scale-[1.03] cursor-pointer ${bg} hover:opacity-90`}
               onClick={() => handleFeatureClick(title)}
               data-aos="fade-up"
             >
-              <Icon className="h-8 w-8 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">{title}</h3>
-              <p className="text-sm opacity-90">{desc}</p>
+              <Icon className="h-6 sm:h-8 w-6 sm:w-8 mb-2 sm:mb-4" />
+              <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">{title}</h3>
+              <p className="text-xs sm:text-sm opacity-90">{desc}</p>
             </div>
           ))}
         </div>
 
         {/* More Tools */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">More Tools</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="mt-6 sm:mt-12">
+          <h2 className="text-xl sm:text-2xl md:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">More Tools</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {[
               { name: "LinkedIn Headline Generator", icon: "/icons/linkedin.svg" },
               { name: "Linkedin About", icon: "/icons/pdf.svg" },
@@ -230,15 +230,15 @@ const Home = () => {
             ].map((tool) => (
               <div
                 key={tool.name}
-                className="bg-white rounded-xl p-5 border hover:shadow-lg transition z-[10]"
+                className="bg-white rounded-xl p-2 sm:p-3 border hover:shadow-lg transition z-[10]"
                 data-aos="fade-up"
                 onClick={() => handleToolClick(tool.name)}
               >
-                <img src={tool.icon} alt={tool.name} className="h-8 w-8 mb-3" />
-                <h4 className="text-gray-800 font-medium text-lg mb-1">
+                <img src={tool.icon} alt={tool.name} className="h-6 sm:h-8 w-6 sm:w-8 mb-1 sm:mb-2" />
+                <h4 className="text-gray-800 font-medium text-sm sm:text-lg mb-0.5 sm:mb-1">
                   {tool.name}
                 </h4>
-                <p className="text-sm text-gray-500">
+                <p className="text-xs sm:text-sm text-gray-500">
                   Launch this tool to boost your productivity
                 </p>
               </div>
@@ -249,11 +249,11 @@ const Home = () => {
 
       {/* Floating AI Chatbot Icon */}
       <div
-        className="fixed bottom-6 right-6 bg-blue-600 text-white rounded-full p-4 cursor-pointer shadow-lg hover:bg-blue-700 transition z-[1000]"
+        className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 bg-blue-600 text-white rounded-full p-2 sm:p-3 cursor-pointer shadow-lg hover:bg-blue-700 transition z-[1000]"
         onClick={handleChatbotClick}
         style={{ zIndex: 1000 }}
       >
-        <ChatBubbleLeftIcon className="h-6 w-6" />
+        <ChatBubbleLeftIcon className="h-5 sm:h-6 w-5 sm:w-6" />
       </div>
     </div>
   );
