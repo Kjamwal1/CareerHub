@@ -399,60 +399,79 @@ app.post("/api/auth/login", async (req, res) => {
 
 // Resume Check Endpoint
 app.post(
-  "/check-resume",
-  authenticateToken,
-  upload.single("resume"),
-  async (req, res) => {
-    console.log("Request Body:", req.body);
-    console.log("Uploaded Files:", req.file);
+    "/check-resume",
+    authenticateToken,
+    upload.single("resume"),
+    async (req, res) => {
+      console.log("Request Body:", req.body);
+      console.log("Uploaded Files:", req.file);
 
-    if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded" });
-    }
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
 
-    const allowedTypes = [
-      "application/pdf",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "image/jpeg",
-      "image/png",
-    ];
-    if (!allowedTypes.includes(req.file.mimetype)) {
-      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-      return res
-        .status(400)
-        .json({ error: "Only PDF, DOCX, JPG, and PNG files are allowed" });
-    }
+      const allowedTypes = [
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "image/jpeg",
+        "image/png",
+      ];
+      if (!allowedTypes.includes(req.file.mimetype)) {
+        if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        return res
+          .status(400)
+          .json({ error: "Only PDF, DOCX, JPG, and PNG files are allowed" });
+      }
 
-    const jobDescription = req.body.jobDescription || "";
-    if (!jobDescription) {
-      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-      return res.status(400).json({ error: "Job description is required" });
-    }
+      const jobDescription = req.body.jobDescription || "";
+      if (!jobDescription) {
+        if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        return res.status(400).json({ error: "Job description is required" });
+      }
 
-    try {
-      let textContent = "";
-      if (req.file.mimetype.includes("pdf")) {
-        const pdfParser = new PDFParser();
-        pdfParser.on("pdfParser_dataError", (errData) => {
-          console.error("PDF Parsing Error:", errData.parserError);
+      try {
+        let textContent = "";
+        if (req.file.mimetype.includes("pdf")) {
+          const pdfParser = new PDFParser();
+          pdfParser.on("pdfParser_dataError", (errData) => {
+            console.error("PDF Parsing Error:", errData.parserError);
+            performOCR(req.file.path, res, jobDescription, req.user.userId);
+          });
+
+          pdfParser.on("pdfParser_dataReady", async (pdfData) => {
+            textContent = pdfData.Pages.map((page) =>
+              page.Texts.map((text) => decodeURIComponent(text.R[0].T)).join(" ")
+            )
+              .join("\n")
+              .trim()
+              .replace(/\n\s*\n/g, "\n");
+            console.log("Extracted PDF Text:", textContent);
+            if (!textContent) {
+              console.log("No text extracted, falling back to OCR");
+              performOCR(req.file.path, res, jobDescription, req.user.userId);
+            } else {
+              if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+              const analysis = await analyzeWithGemini(textContent, jobDescription);
+              const resumeAnalysis = new ResumeAnalysis({
+                userId: req.user.userId,
+                jobDescription,
+                analysis,
+              });
+              await resumeAnalysis.save();
+              res.json(analysis);
+            }
+          });
+
+          pdfParser.loadPDF(req.file.path);
+        } else if (req.file.mimetype.includes("openxmlformats")) {
+          const result = await mammoth.extractRawText({ path: req.file.path });
+          textContent = result.value.trim().replace(/\n\s*\n/g, "\n");
+          console.log("Extracted DOCX Text:", textContent);
           if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-          performOCR(req.file.path, res, jobDescription, req.user.userId);
-        });
-
-        pdfParser.on("pdfParser_dataReady", async (pdfData) => {
-          textContent = pdfData.Pages.map((page) =>
-            page.Texts.map((text) => decodeURIComponent(text.R[0].T)).join(" ")
-          )
-            .join("\n")
-            .trim()
-            .replace(/\n\s*\n/g, "\n");
-          console.log("Extracted PDF Text:", textContent);
-          if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-          try {
-            const analysis = await analyzeWithGemini(
-              textContent,
-              jobDescription
-            );
+          if (!textContent) {
+            performOCR(req.file.path, res, jobDescription, req.user.userId);
+          } else {
+            const analysis = await analyzeWithGemini(textContent, jobDescription);
             const resumeAnalysis = new ResumeAnalysis({
               userId: req.user.userId,
               jobDescription,
@@ -460,48 +479,22 @@ app.post(
             });
             await resumeAnalysis.save();
             res.json(analysis);
-          } catch (error) {
-            console.error("Analysis Error:", error.message);
-            res.status(500).json({
-              error: "Failed to analyze resume",
-              details: error.message,
-            });
           }
-        });
-
-        pdfParser.loadPDF(req.file.path);
-      } else if (req.file.mimetype.includes("openxmlformats")) {
-        const result = await mammoth.extractRawText({ path: req.file.path });
-        textContent = result.value.trim().replace(/\n\s*\n/g, "\n");
-        console.log("Extracted DOCX Text:", textContent);
-        if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-        if (!textContent) {
+        } else if (req.file.mimetype.includes("image")) {
           performOCR(req.file.path, res, jobDescription, req.user.userId);
-        } else {
-          const analysis = await analyzeWithGemini(textContent, jobDescription);
-          const resumeAnalysis = new ResumeAnalysis({
-            userId: req.user.userId,
-            jobDescription,
-            analysis,
-          });
-          await resumeAnalysis.save();
-          res.json(analysis);
         }
-      } else if (req.file.mimetype.includes("image")) {
-        performOCR(req.file.path, res, jobDescription, req.user.userId);
+      } catch (error) {
+        console.error("Unexpected Error:", error.message, error.stack);
+        if (req.file && fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+        }
+        res.status(500).json({
+          error: "Unexpected error during resume processing",
+          details: error.message,
+        });
       }
-    } catch (error) {
-      console.error("Unexpected Error:", error.message, error.stack);
-      if (req.file && fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
-      }
-      res.status(500).json({
-        error: "Unexpected error during resume processing",
-        details: error.message,
-      });
     }
-  }
-);
+  );
 
 // Save Chat History
 app.post("/api/chat/save", authenticateToken, async (req, res) => {
@@ -834,12 +827,12 @@ print(text)
 
 // Function to analyze resume with Gemini API
 async function analyzeWithGemini(textContent, jobDescription) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error("Gemini API key not configured");
-  }
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("Gemini API key not configured");
+    }
 
-  const prompt = `
+    const prompt = `
 Act as an HR manager with 20 years of experience. Analyze the provided resume against the given job description. Provide:
 - A match score (0-100) indicating how well the resume aligns with the job description.
 - A list of strengths (skills, experiences, or qualifications that align well with the job).
@@ -867,74 +860,83 @@ Return the response in JSON format:
 }
 `;
 
-  const models = ["gemini-1.5-flash", "gemini-1.5-pro"];
-  let errorMessage = "Failed to analyze with Gemini API";
+    const models = ["gemini-1.5-flash", "gemini-1.5-pro"];
+    let errorMessage = "Failed to analyze with Gemini API";
 
-  for (const model of models) {
-    try {
-      console.log(`Attempting analysis with model: ${model}`);
-      const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-        {
-          contents: [{ parts: [{ text: prompt }] }],
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": apiKey,
-          },
-        }
-      );
-
-      const result = response.data.candidates[0].content.parts[0].text;
-      console.log("Raw Gemini API Response:", result);
-
-      // Clean Markdown and invalid characters
-      const cleanedResult = result
-        .replace(/```json\n|```/g, "") // Remove ```json and ```
-        .replace(/`/g, "") // Remove stray backticks
-        .replace(/\n\s*\n/g, "\n") // Normalize newlines
-        .trim();
-
+    for (const model of models) {
       try {
-        const data = JSON.parse(cleanedResult);
-        // Validate and normalize response
-        return {
-          matchScore: Number(data.matchScore) || 0,
-          strengths: Array.isArray(data.strengths) ? data.strengths : [],
-          gaps: Array.isArray(data.gaps) ? data.gaps : [],
-          improvements: Array.isArray(data.improvements)
-            ? data.improvements
-            : [],
-          optimizedSection: data.optimizedSection || "",
-          beforeAfterComparison: data.beforeAfterComparison || "",
-          keywordMatchScore: Number(data.keywordMatchScore) || 0,
-        };
-      } catch (parseError) {
-        console.error(
-          "JSON Parsing Error:",
-          parseError.message,
-          "Raw Response:",
-          result
+        console.log(`Attempting analysis with model: ${model}`);
+        const response = await axios.post(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+          {
+            contents: [{ parts: [{ text: prompt }] }],
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "x-goog-api-key": apiKey,
+            },
+            timeout: 10000, // Add timeout to prevent hanging
+          }
         );
-        throw new Error(`Invalid JSON response from ${model}`);
+
+        const result = response.data.candidates[0].content.parts[0].text;
+        console.log("Raw Gemini API Response:", result);
+
+        // Clean Markdown and invalid characters
+        const cleanedResult = result
+          .replace(/```json\n|```/g, "") // Remove ```json and ```
+          .replace(/`/g, "") // Remove stray backticks
+          .replace(/\n\s*\n/g, "\n") // Normalize newlines
+          .trim();
+
+        try {
+          const data = JSON.parse(cleanedResult);
+          return {
+            matchScore: Number(data.matchScore) || 0,
+            strengths: Array.isArray(data.strengths) ? data.strengths : [],
+            gaps: Array.isArray(data.gaps) ? data.gaps : [],
+            improvements: Array.isArray(data.improvements) ? data.improvements : [],
+            optimizedSection: data.optimizedSection || "",
+            beforeAfterComparison: data.beforeAfterComparison || "",
+            keywordMatchScore: Number(data.keywordMatchScore) || 0,
+          };
+        } catch (parseError) {
+          console.error(
+            "JSON Parsing Error:",
+            parseError.message,
+            "Raw Response:",
+            cleanedResult
+          );
+          continue; // Try next model
+        }
+      } catch (error) {
+        console.error(
+          `Gemini API Error with ${model}:`,
+          error.response ? error.response.data : error.message
+        );
+        if (error.response && error.response.status === 429) {
+          console.log(`Quota exceeded for ${model}, trying next model...`);
+          continue;
+        }
+        errorMessage = `Failed with ${model}: ${
+          error.response ? error.response.data.message : error.message
+        }`;
+        if (model === models[models.length - 1]) {
+          console.warn("Falling back to default analysis due to errors");
+          return {
+            matchScore: 0,
+            strengths: [],
+            gaps: ["Unable to analyze due to processing error"],
+            improvements: ["Retry with a different file or contact support"],
+            optimizedSection: "",
+            beforeAfterComparison: "",
+            keywordMatchScore: 0,
+          };
+        }
       }
-    } catch (error) {
-      console.error(
-        `Gemini API Error with ${model}:`,
-        error.response ? error.response.data : error.message
-      );
-      if (error.response && error.response.status === 429) {
-        console.log(`Quota exceeded for ${model}, trying next model...`);
-        continue;
-      }
-      errorMessage = `Failed with ${model}: ${
-        error.response ? error.response.data.message : error.message
-      }`;
-      if (model === models[models.length - 1]) throw new Error(errorMessage);
     }
   }
-}
 
 // Function to generate chatbot response with Gemini API
 async function analyzeWithGeminiForChat(history) {
