@@ -13,9 +13,9 @@ const Hero = ({ onGetStartedClick }) => {
           className="max-w-4xl w-full text-center px-4 sm:px-6 lg:px-8 z-10"
         >
           {/* Badge */}
-          <div className="relative w-[90%] sm:w-48 h-8 sm:h-10 mx-auto bg-gradient-to-r from-[#656565] to-[#1D4ED8] shadow-[0_0_20px_rgba(255,255,255,0.4)] rounded-full">
-            <div className="absolute inset-[2px] sm:inset-[3px] bg-black rounded-full flex items-center justify-center gap-1 text-xs sm:text-sm font-medium">
-              <i className="bx bx-diamond text-xs sm:text-base"></i>
+          <div className="relative w-[70%] sm:w-40 h-6 sm:h-8 mx-auto bg-gradient-to-r from-[#656565] to-[#1D4ED8] shadow-[0_0_20px_rgba(255,255,255,0.4)] rounded-full">
+            <div className="absolute inset-[1px] sm:inset-[2px] bg-black rounded-full flex items-center justify-center gap-1 text-xs sm:text-sm font-medium">
+              <i className="bx bx-diamond text-xs sm:text-sm"></i>
               INTRODUCING
             </div>
           </div>
