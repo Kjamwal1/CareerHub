@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import Header from "../components/Header";
 import Hero from "../components/Hero";
 import Spline from "@splinetool/react-spline";
@@ -37,7 +37,6 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
     // ✅ Reset file input so onChange fires next time even for same file
     e.target.value = null;
   };
-
   const [linkedinUrl, setLinkedinUrl] = useState("");
 
   const validateLinkedInUrl = (url) => {
@@ -84,11 +83,11 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
 
       {/* 👇 Resume Checker Section */}
       <section
-        className="min-h-screen bg-gray-100 text-black flex items-center justify-center px-4 sm:px-6 lg:px-20 py-16"
+        className="min-h-screen bg-gray-100 text-black flex items-center justify-center px-4 lg:px-20 py-16"
         data-aos="fade-up"
         data-aos-duration="1000"
       >
-        <div className="flex flex-col lg:flex-row items-center justify-between w-full max-w-7xl gap-8 sm:gap-12">
+        <div className="flex flex-col lg:flex-row items-center justify-between w-full max-w-7xl gap-12">
           {/* Left Image */}
           <div
             className="w-full lg:w-1/2"
@@ -98,20 +97,20 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
             <img
               src="/resume-preview.gif"
               alt="Resume preview"
-              className="rounded-3xl shadow-2xl w-full max-w-[300px] sm:max-w-[400px] md:max-w-[500px] mx-auto"
+              className="rounded-3xl shadow-2xl w-full max-w-[500px] mx-auto"
             />
           </div>
 
           {/* Right Content */}
           <div
-            className="w-full lg:w-1/2 space-y-6 sm:space-y-8"
+            className="w-full lg:w-1/2 space-y-8"
             data-aos="fade-left"
             data-aos-delay="400"
           >
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 leading-tight text-center lg:text-left">
+            <h2 className="text-4xl lg:text-5xl font-extrabold text-gray-900 leading-tight text-center lg:text-left">
               Will Your Resume Beat the Bots?
             </h2>
-            <p className="text-gray-700 text-base sm:text-lg leading-relaxed text-center lg:text-left">
+            <p className="text-gray-700 text-lg leading-relaxed text-center lg:text-left">
               Your resume has to impress both recruiters and algorithms. Our AI
               checks design, keywords, and structure to help you beat ATS
               filters and land more interviews.
@@ -121,11 +120,11 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
 
             {/* Upload Box */}
             <div className="flex justify-center lg:justify-start">
-              <div className="rounded-2xl p-4 sm:p-6 text-center bg-white/60 backdrop-blur-xl border border-gray-300 shadow-2xl max-w-xs sm:max-w-sm md:max-w-md w-full transition-all hover:shadow-2xl">
-                <div className="flex flex-col items-center justify-center space-y-3 sm:space-y-4">
+              <div className="rounded-2xl p-6 text-center bg-white/60 backdrop-blur-xl border border-gray-300 shadow-2xl max-w-sm w-full transition-all hover:shadow-2xl">
+                <div className="flex flex-col items-center justify-center space-y-3">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 sm:h-8 w-6 sm:w-8 text-gray-700"
+                    className="h-8 w-8 text-gray-700"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -137,13 +136,13 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
                       d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12V4m0 0l-4 4m4-4l4 4"
                     />
                   </svg>
-                  <p className="font-semibold text-sm sm:text-base text-gray-800">
+                  <p className="font-semibold text-base text-gray-800">
                     Drop your resume here or{" "}
                     <span className="font-bold underline cursor-pointer">
                       choose a file
                     </span>
                   </p>
-                  <p className="text-xs sm:text-sm text-gray-600">
+                  <p className="text-xs text-gray-600">
                     PDF & DOCX only. Max 2MB file size.
                   </p>
 
@@ -168,15 +167,15 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
                         }
                       }}
                       aria-label="Upload your resume"
-                      className="cursor-pointer border border-[#2a2a2a] py-2 sm:py-3 px-6 sm:px-10 rounded-full relative overflow-hidden bg-[#0e132a] text-white text-sm sm:text-lg font-semibold transition-all duration-500 hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600"
+                      className="ursor-pointer border border-[#2a2a2a] py-3 px-10 rounded-full relative overflow-hidden bg-[#0e132a] text-white text-lg font-semibold transition-all duration-500 hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600"
                     >
                       <span className="relative z-10">Upload your resume</span>
                     </button>
                   </div>
-                  <p className="text-xs sm:text-sm text-gray-600 mt-1 flex items-center justify-center gap-1">
+                  <p className="text-xs text-gray-600 mt-1 flex items-center justify-center gap-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-3 sm:h-4 w-3 sm:w-4 text-red-500"
+                      className="h-4 w-4 text-red-500"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -199,7 +198,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
 
       {/* 👇 LinkedIn Checker Section */}
       <section
-        className="relative min-h-screen text-white flex items-center justify-center px-4 sm:px-6 lg:px-20 py-16 backdrop-blur-xl transition-all duration-700 z-0"
+        className="relative min-h-screen text-white flex items-center justify-center px-4 lg:px-20 py-16 backdrop-blur-xl transition-all duration-700 z-0"
         data-aos="fade-up"
         data-aos-duration="1000"
       >
@@ -210,32 +209,32 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
         />
         <div className="h-0 w-[40rem] absolute top-[20%] right-[-5%] shadow-[0_0_900px_20px_#1D4ED8] -rotate-[30deg] -z-10"></div>
 
-        <div className="flex flex-col-reverse lg:flex-row items-center justify-between gap-8 sm:gap-12 w-full max-w-7xl">
+        <div className="flex flex-col-reverse lg:flex-row items-center justify-between gap-12">
           {/* Text Content */}
           <div
             data-aos="fade-right"
             data-aos-offset="300"
             data-aos-easing="ease-in-sine"
             data-aos-duration="1000"
-            className="text-center lg:text-left max-w-xs sm:max-w-md md:max-w-xl"
+            className="text-center lg:text-left max-w-2xl"
           >
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight">
+            <h2 className="text-4xl lg:text-5xl font-extrabold leading-tight">
               Fix Your LinkedIn. Impress Recruiters. Get Hired.
             </h2>
-            <p className="mt-4 sm:mt-6 text-white/90 text-base sm:text-lg">
+            <p className="mt-6 text-white/90 text-lg">
               Get Seen. Get Chosen.
               <br />
               AI transforms your LinkedIn into a recruiter magnet—optimized,
               keyword-rich, and built to get you hired.
             </p>
 
-            <div className="mt-6 sm:mt-10 flex justify-center lg:justify-start">
-              <div className="rounded-2xl p-4 sm:p-6 bg-white/60 backdrop-blur-xl border border-white/30 shadow-xl max-w-xs sm:max-w-sm md:max-w-md w-full transition-all hover:shadow-2xl">
-                <div className="space-y-4 sm:space-y-5">
-                  <div className="flex items-center justify-center gap-2 sm:gap-3 text-[#0A66C2]">
+            <div className="mt-10 flex justify-center lg:justify-start">
+              <div className="rounded-2xl p-6 bg-white/60 backdrop-blur-xl border border-white/30 shadow-xl max-w-sm w-full transition-all hover:shadow-2xl">
+                <div className="space-y-5">
+                  <div className="flex items-center justify-center gap-3 text-[#0A66C2]">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 sm:h-7 w-5 sm:w-7"
+                      className="h-7 w-7"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -247,7 +246,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
                         d="M16 12a4 4 0 01-8 0m8 0V6a2 2 0 00-2-2H8a2 2 0 00-2 2v6m12 0h.01M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1"
                       />
                     </svg>
-                    <h3 className="font-semibold text-lg sm:text-xl text-gray-800">
+                    <h3 className="font-semibold text-lg text-gray-800">
                       LinkedIn Profile Checker
                     </h3>
                   </div>
@@ -257,12 +256,12 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
                     value={linkedinUrl}
                     onChange={(e) => setLinkedinUrl(e.target.value)}
                     placeholder="https://linkedin.com/in/your-profile"
-                    className="w-full px-4 sm:px-5 py-2 sm:py-3 rounded-xl bg-white/80 border border-gray-300 placeholder-gray-500 text-sm sm:text-base text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:bg-white transition"
+                    className="w-full px-5 py-3 rounded-xl bg-white/80 border border-gray-300 placeholder-gray-500 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0A66C2] focus:bg-white transition"
                   />
 
                   <button
                     onClick={handleLinkedInAnalyse}
-                    className="w-full bg-[#0A66C2] text-white py-2 sm:py-2.5 rounded-xl font-semibold transition-all duration-500 hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600"
+                    className="w-full bg-[#0A66C2] text-white py-2.5 rounded-xl font-semibold transition-all duration-500 hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600"
                   >
                     Analyze LinkedIn Profile
                   </button>
@@ -273,7 +272,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
 
           {/* Right Image */}
           <div
-            className="w-full max-w-xs sm:max-w-sm md:max-w-xl"
+            className="w-full max-w-xl"
             data-aos="fade-left"
             data-aos-offset="300"
             data-aos-easing="ease-in-sine"
@@ -289,22 +288,22 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
 
       {/* 👇 Job Application Tracker Section */}
       <section
-        className="min-h-screen bg-white text-black flex items-center justify-center px-4 sm:px-6 lg:px-20 py-16"
+        className="min-h-screen bg-white text-black flex items-center justify-center px-4 lg:px-20 py-16"
         data-aos="fade-up"
         data-aos-duration="1000"
       >
-        <div className="flex flex-col lg:flex-row items-center justify-between w-full max-w-7xl gap-8 sm:gap-12">
+        <div className="flex flex-col lg:flex-row items-center justify-between w-full max-w-7xl gap-12">
           {/* Text Content */}
           <div
-            className="w-full lg:w-1/2 space-y-6 sm:space-y-8"
+            className="w-full lg:w-1/2 space-y-8"
             data-aos="fade-right"
             data-aos-delay="200"
           >
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 leading-tight text-center lg:text-left">
+            <h2 className="text-4xl lg:text-5xl font-extrabold text-gray-900 leading-tight text-center lg:text-left">
               Track, Discover & Optimize Your Job Hunt — All from One Smart AI
               Dashboard.
             </h2>
-            <p className="text-gray-700 text-base sm:text-lg leading-relaxed text-center lg:text-left">
+            <p className="text-gray-700 text-lg leading-relaxed text-center lg:text-left">
               Stay on Top of Your Job Hunt — Effortlessly.
               <br />
               Track every job you’ve applied to, organize resumes and cover
@@ -317,7 +316,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
             <div className="flex justify-center lg:justify-start">
               <button
                 onClick={onLoginClick}
-                className="px-4 sm:px-6 py-2 sm:py-3 rounded-xl bg-white text-[#0e132a] font-medium shadow-md transition-all duration-500 hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600"
+                className="px-6 py-3 rounded-xl bg-white text-[#0e132a] font-medium shadow-md transition-all duration-500 hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600"
               >
                 Start Tracking Jobs
               </button>
@@ -333,7 +332,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
             <img
               src="/job-tracker-preview.gif"
               alt="Job Tracker Illustration"
-              className="rounded-3xl shadow-2xl w-full max-w-[300px] sm:max-w-[400px] md:max-w-[500px] mx-auto"
+              className="rounded-3xl shadow-2xl w-full max-w-[500px] mx-auto"
             />
           </div>
         </div>
@@ -341,7 +340,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
 
       {/* 👇 AI Mentor Chatbot Section */}
       <section
-        className="relative min-h-screen text-white flex items-center justify-center px-4 sm:px-6 lg:px-20 py-16 backdrop-blur-xl transition-all duration-700 z-0"
+        className="relative min-h-screen text-white flex items-center justify-center px-4 lg:px-20 py-16 backdrop-blur-xl transition-all duration-700 z-0"
         data-aos="fade-up"
         data-aos-duration="1000"
       >
@@ -352,28 +351,28 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
         />
         <div className="h-0 w-[40rem] absolute top-[20%] right-[-5%] shadow-[0_0_900px_20px_#1D4ED8] -rotate-[30deg] -z-10"></div>
 
-        <div className="flex flex-col-reverse lg:flex-row items-center justify-between gap-8 sm:gap-12 w-full max-w-7xl">
+        <div className="flex flex-col-reverse lg:flex-row items-center justify-between gap-12 w-full max-w-7xl">
           {/* Text Content */}
           <div
-            className="text-center lg:text-left max-w-xs sm:max-w-md md:max-w-xl"
+            className="text-center lg:text-left max-w-2xl"
             data-aos="fade-right"
             data-aos-offset="300"
             data-aos-easing="ease-in-sine"
           >
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight">
+            <h2 className="text-4xl lg:text-5xl font-extrabold leading-tight">
               Your Personal AI Mentor. Career Advice, Anytime.
             </h2>
-            <p className="mt-4 sm:mt-6 text-white/90 text-base sm:text-lg">
+            <p className="mt-6 text-white/90 text-lg">
               Confused about your career path, resume tone, or next steps?
               <br />
               Get instant, personalized guidance from your AI career mentor—
               available 24/7 to coach, review, and inspire.
             </p>
 
-            <div className="mt-6 sm:mt-10 flex justify-center lg:justify-start">
+            <div className="mt-10 flex justify-center lg:justify-start">
               <button
                 onClick={onLoginClick}
-                className="group px-4 sm:px-6 py-2 sm:py-3 rounded-xl bg-white text-[#0e132a] font-medium shadow-md transition-all duration-500 hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600"
+                className="group px-6 py-3 rounded-xl bg-white text-[#0e132a] font-medium shadow-md transition-all duration-500 hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600"
               >
                 Talk to Your AI Mentor
               </button>
@@ -384,7 +383,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
           <div className="absolute right-0 top-0 h-full w-full flex items-center justify-end overflow-visible pointer-events-none z-0">
             <Spline
               scene="https://prod.spline.design/o4HEAHymKMdBSmzs/scene.splinecode"
-              className="w-[1200px] sm:w-[1500px] lg:w-[1800px] h-[1200px] sm:h-[1500px] lg:h-[1800px] -mr-40 sm:-mr-60 lg:-mr-80 -mt-20 sm:-mt-30 lg:-mt-40"
+              className="w-[1800px] h-[1800px] -mr-80 -mt-40"
               data-aos="fade-zoom-in"
               data-aos-easing="ease-in-back"
               data-aos-delay="300"
@@ -396,19 +395,19 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
       </section>
 
       {/* Seamless Carousel */}
-      <section className="bg-gray-100 py-12 sm:py-16 overflow-hidden">
-        <div className="max-w-7xl mx-auto mb-6 sm:mb-8 text-center" data-aos="fade-up">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-2 sm:mb-4 text-gray-900">
+      <section className="bg-gray-100 py-16 overflow-hidden">
+        <div className="max-w-7xl mx-auto mb-8 text-center" data-aos="fade-up">
+          <h2 className="text-4xl font-bold mb-4 text-gray-900">
             How Career Hub Works
           </h2>
-          <p className="text-base sm:text-lg text-gray-600">
+          <p className="text-lg text-gray-600">
             See Career Hub in action — quick walkthroughs to help you get started.
           </p>
         </div>
 
         <div className="relative w-full overflow-hidden">
           <div
-            className="flex gap-4 sm:gap-6 animate-carousel"
+            className="flex gap-4 animate-carousel"
             style={{ animation: "scrollX 40s ease-in-out infinite alternate" }}
           >
             {[
@@ -424,7 +423,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
                 muted
                 loop
                 playsInline
-                className="h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px] w-auto object-cover flex-shrink-0 rounded-xl"
+                className="h-[500px] w-auto object-cover flex-shrink-0 rounded-xl"
               />
             ))}
           </div>
@@ -442,23 +441,23 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
         `}</style>
       </section>
 
-      {/* More Features */}
+      {/*more features */}
       <section
         id="more-features"
-        className="bg-white py-12 sm:py-16 px-4 sm:px-8 lg:px-20 relative"
+        className="bg-white py-16 px-4 sm:px-8 lg:px-20 relative"
       >
-        <div className="max-w-7xl mx-auto text-center mb-6 sm:mb-12" data-aos="fade-up">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-2 sm:mb-4 text-gray-900">
+        <div className="max-w-7xl mx-auto text-center mb-12" data-aos="fade-up">
+          <h2 className="text-4xl font-bold mb-4 text-gray-900">
             More Features of Career Hub
           </h2>
-          <p className="text-base sm:text-lg text-gray-600">
+          <p className="text-lg text-gray-600">
             Discover all the tools you need to build and optimize your job
             applications.
           </p>
         </div>
 
         <div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto"
           data-aos="fade-up"
           data-aos-delay="100"
         >
@@ -523,34 +522,34 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
               data-aos="zoom-in"
               data-aos-delay={index * 50}
               tabIndex={0}
-              className="bg-gray-50 rounded-2xl p-4 sm:p-6 shadow-md transition duration-300 transform hover:scale-[1.03] focus:outline-none text-center hover:shadow-[0_0_20px_5px_rgba(59,130,246,0.5),0_0_40px_10px_rgba(147,51,234,0.4)] focus:shadow-[0_0_20px_5px_rgba(59,130,246,0.5),0_0_40px_10px_rgba(147,51,234,0.4)]"
+              className="bg-gray-50 rounded-2xl p-6 shadow-md transition duration-300 transform hover:scale-[1.03] focus:outline-none text-center hover:shadow-[0_0_20px_5px_rgba(59,130,246,0.5),0_0_40px_10px_rgba(147,51,234,0.4)] focus:shadow-[0_0_20px_5px_rgba(59,130,246,0.5),0_0_40px_10px_rgba(147,51,234,0.4)]"
             >
-              <div className={`text-3xl sm:text-4xl mb-2 sm:mb-4 mx-auto ${feature.color}`}>
+              <div className={`text-4xl mb-4 mx-auto ${feature.color}`}>
                 <i className={`bx ${feature.icon}`}></i>
               </div>
-              <h3 className="font-semibold text-lg sm:text-xl mb-1 sm:mb-2 text-black">
+              <h3 className="font-semibold text-xl mb-2 text-black">
                 {feature.title}
               </h3>
-              <p className="text-gray-600 text-sm sm:text-base">{feature.desc}</p>
+              <p className="text-gray-600">{feature.desc}</p>
             </div>
           ))}
         </div>
 
         {/* CTA Block */}
         <div
-          className="text-center mt-8 sm:mt-12"
+          className="text-center mt-16"
           data-aos="fade-up"
           data-aos-delay="200"
         >
-          <p className="text-base sm:text-lg text-gray-700 mb-2 sm:mb-4">
+          <p className="text-lg text-gray-700 mb-4">
             And that's just the beginning...
           </p>
-          <h3 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-4 sm:mb-6">
+          <h3 className="text-2xl font-semibold text-gray-900 mb-6">
             Log in to explore all Career Hub has to offer!
           </h3>
           <button
             onClick={onLoginClick}
-            className="px-6 sm:px-8 py-2 sm:py-3 bg-black text-white font-medium rounded-full shadow-md transition duration-300 hover:scale-105 hover:shadow-xl hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600"
+            className="px-8 py-3 bg-black text-white font-medium rounded-full shadow-md transition duration-300 hover:scale-105 hover:shadow-xl hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600"
           >
             Log In to Explore More
           </button>
@@ -558,18 +557,17 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
 
         <a
           href="#more-features"
-          className="hidden sm:flex items-center justify-center w-12 sm:w-14 h-12 sm:h-14 bg-black text-white border border-black rounded-full shadow-md fixed bottom-4 sm:bottom-10 right-4 sm:right-6 z-50 transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white hover:shadow-[0_0_20px_5px_rgba(59,130,246,0.4),0_0_30px_8px_rgba(147,51,234,0.3)]"
+          className="hidden sm:flex items-center justify-center w-14 h-14 bg-black text-white border border-black rounded-full shadow-md fixed bottom-10 right-6 z-50 transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white hover:shadow-[0_0_20px_5px_rgba(59,130,246,0.4),0_0_30px_8px_rgba(147,51,234,0.3)]"
           data-aos="fade-left"
           title="See More Features"
         >
-          <i className="bx bx-chevrons-down text-xl sm:text-2xl"></i>
+          <i className="bx bx-chevrons-down text-2xl"></i>
         </a>
       </section>
-
       {/* Unified Footer */}
       <footer
         ref={footerRef}
-        className="relative bg-black text-white pt-12 sm:pt-16 px-4 sm:px-6 overflow-hidden"
+        className="relative bg-black text-white pt-24 px-6 overflow-hidden"
       >
         <video
           className="absolute inset-0 w-full h-full object-cover opacity-60 z-0"
@@ -582,38 +580,38 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
         </video>
 
         <div className="relative z-10 max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 sm:mb-4">
+          <h2 className="text-4xl font-bold mb-4">
             Ready to Land Your Dream Job?
           </h2>
-          <p className="text-base sm:text-lg text-white/80 mb-4 sm:mb-8">
+          <p className="text-lg text-white/80 mb-8">
             Let Career Hub supercharge your applications — resume to interview.
           </p>
 
-          <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 mb-8 sm:mb-12">
+          <div className="flex justify-center gap-4 mb-16">
             <button
               onClick={onSignupClick}
-              className="px-4 sm:px-6 py-2 sm:py-3 rounded-full bg-white text-black font-semibold hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all"
+              className="px-6 py-3 rounded-full bg-white text-black font-semibold hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white transition-all"
             >
               Get Started
             </button>
             <button
               onClick={onLoginClick}
-              className="px-4 sm:px-6 py-2 sm:py-3 rounded-full border border-white font-semibold hover:bg-white hover:text-black transition-all"
+              className="px-6 py-3 rounded-full border border-white font-semibold hover:bg-white hover:text-black transition-all"
             >
               Log In
             </button>
           </div>
         </div>
 
-        <div className="relative z-10 border-t border-white/20 pt-6 sm:pt-8 pb-4 sm:pb-6 px-4">
-          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-6 text-center sm:text-left">
+        <div className="relative z-10 border-t border-white/20 pt-10 pb-6 px-4">
+          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-6 text-center lg:text-left">
             <div>
-              <h4 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">Career Hub</h4>
+              <h4 className="text-xl font-semibold mb-2">Career Hub</h4>
               <p className="text-sm text-white/80">
                 Empowering your career journey with smart AI tools.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
               <a
                 href="/privacy-policy"
                 className="text-sm text-white/70 hover:text-white transition"
@@ -652,13 +650,13 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
             }
           }
         }}
-        className="fixed bottom-4 sm:bottom-10 right-4 sm:right-6 z-50 w-12 sm:w-14 h-12 sm:h-14 bg-black text-white border border-black rounded-full shadow-md transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white hover:shadow-[0_0_20px_5px_rgba(59,130,246,0.4),0_0_30px_8px_rgba(147,51,234,0.3)] flex items-center justify-center"
+        className="fixed bottom-10 right-6 z-50 w-14 h-14 bg-black text-white border border-black rounded-full shadow-md transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600 hover:text-white hover:shadow-[0_0_20px_5px_rgba(59,130,246,0.4),0_0_30px_8px_rgba(147,51,234,0.3)] flex items-center justify-center"
         title={showScrollTop ? "Back to Top" : "See More Features"}
       >
         <i
           className={`bx ${
             showScrollTop ? "bx-chevron-up" : "bx-chevrons-down"
-          } text-xl sm:text-2xl`}
+          } text-2xl`}
         />
       </button>
     </>
