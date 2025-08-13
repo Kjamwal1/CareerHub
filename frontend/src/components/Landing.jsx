@@ -413,7 +413,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
               style={{ animation: "scrollX 40s ease-in-out infinite alternate" }}
             >
               {[
-                "/videos/resume-checker.mp4",
+                "/resume_video.mp4",
                 "/videos/linkedin-checker.mp4",
                 "/videos/job-tracker.mp4",
                 "/videos/ai-mentor.mp4",
