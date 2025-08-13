@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+
 import Header from "../components/Header";
 import Hero from "../components/Hero";
 import Spline from "@splinetool/react-spline";
@@ -113,8 +114,8 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
                 Will Your Resume Beat the Bots?
               </h2>
               <p className="text-gray-700 text-base sm:text-lg leading-relaxed text-center lg:text-left">
-                Your resume has to impress both recruiters and algorithms. Our AI
-                checks design, keywords, and structure to help you beat ATS
+                Your resume has to impress both recruiters and algorithms. Our
+                AI checks design, keywords, and structure to help you beat ATS
                 filters and land more interviews.
                 <br />
                 Start strong. Apply smarter. Get hired faster.
@@ -171,7 +172,9 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
                         aria-label="Upload your resume"
                         className="cursor-pointer border border-[#2a2a2a] py-2 sm:py-3 px-6 sm:px-10 rounded-full relative overflow-hidden bg-[#0e132a] text-white text-sm sm:text-lg font-semibold transition-all duration-500 hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600"
                       >
-                        <span className="relative z-10">Upload your resume</span>
+                        <span className="relative z-10">
+                          Upload your resume
+                        </span>
                       </button>
                     </div>
                     <p className="text-xs sm:text-sm text-gray-600 mt-1 flex items-center justify-center gap-1">
@@ -280,7 +283,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
               data-aos-easing="ease-in-sine"
             >
               <img
-                src="linkedin.gif"
+                src="/linkedin.gif"
                 alt="LinkedIn illustration"
                 className="w-full rounded-xl shadow-lg"
               />
@@ -398,19 +401,23 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
 
         {/* Seamless Carousel */}
         <section className="bg-gray-100 py-12 sm:py-16 overflow-x-hidden">
-          <div className="max-w-7xl mx-auto mb-6 sm:mb-8 text-center" data-aos="fade-up">
+          <div
+            className="max-w-7xl mx-auto mb-6 sm:mb-8 text-center"
+            data-aos="fade-up"
+          >
             <h2 className="text-3xl sm:text-4xl font-bold mb-2 sm:mb-4 text-gray-900">
               How Career Hub Works
             </h2>
             <p className="text-base sm:text-lg text-gray-600">
-              See Career Hub in action — quick walkthroughs to help you get started.
+              See Career Hub in action — quick walkthroughs to help you get
+              started.
             </p>
           </div>
 
           <div className="relative w-full overflow-hidden">
             <div
               className="flex gap-4 sm:gap-6 animate-carousel"
-              style={{ animation: "scrollX 40s ease-in-out infinite alternate" }}
+              style={{ animation: "scrollX 30s linear infinite" }}
             >
               {[
                 "/resume_video.mp4",
@@ -433,9 +440,12 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
 
           <style>{`
             @keyframes scrollX {
-              0% { transform: translateX(0%); }
-              50% { transform: translateX(-50%); }
-              100% { transform: translateX(0%); }
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-50%); }
+            }
+            .animate-carousel {
+              display: flex;
+              width: 200%; /* Double the width to accommodate all videos */
             }
             .animate-carousel video {
               pointer-events: none;
@@ -448,7 +458,10 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
           id="more-features"
           className="bg-white py-12 sm:py-16 px-4 sm:px-8 lg:px-20 relative overflow-x-hidden"
         >
-          <div className="max-w-7xl mx-auto text-center mb-6 sm:mb-12" data-aos="fade-up">
+          <div
+            className="max-w-7xl mx-auto text-center mb-6 sm:mb-12"
+            data-aos="fade-up"
+          >
             <h2 className="text-3xl sm:text-4xl font-bold mb-2 sm:mb-4 text-gray-900">
               More Features of Career Hub
             </h2>
@@ -526,13 +539,17 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
                 tabIndex={0}
                 className="bg-gray-50 rounded-2xl p-4 sm:p-6 shadow-md transition duration-300 transform hover:scale-[1.03] focus:outline-none text-center hover:shadow-[0_0_20px_5px_rgba(59,130,246,0.5),0_0_40px_10px_rgba(147,51,234,0.4)] focus:shadow-[0_0_20px_5px_rgba(59,130,246,0.5),0_0_40px_10px_rgba(147,51,234,0.4)]"
               >
-                <div className={`text-3xl sm:text-4xl mb-2 sm:mb-4 mx-auto ${feature.color}`}>
+                <div
+                  className={`text-3xl sm:text-4xl mb-2 sm:mb-4 mx-auto ${feature.color}`}
+                >
                   <i className={`bx ${feature.icon}`}></i>
                 </div>
                 <h3 className="font-semibold text-lg sm:text-xl mb-1 sm:mb-2 text-black">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600 text-sm sm:text-base">{feature.desc}</p>
+                <p className="text-gray-600 text-sm sm:text-base">
+                  {feature.desc}
+                </p>
               </div>
             ))}
           </div>
@@ -587,7 +604,8 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
               Ready to Land Your Dream Job?
             </h2>
             <p className="text-base sm:text-lg text-white/80 mb-4 sm:mb-8">
-              Let Career Hub supercharge your applications — resume to interview.
+              Let Career Hub supercharge your applications — resume to
+              interview.
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 mb-8 sm:mb-12">
@@ -609,7 +627,9 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
           <div className="relative z-10 border-t border-white/20 pt-6 sm:pt-8 pb-4 sm:pb-6 px-4">
             <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-6 text-center sm:text-left">
               <div>
-                <h4 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">Career Hub</h4>
+                <h4 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">
+                  Career Hub
+                </h4>
                 <p className="text-sm text-white/80">
                   Empowering your career journey with smart AI tools.
                 </p>
