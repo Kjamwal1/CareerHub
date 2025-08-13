@@ -152,13 +152,17 @@ const LinkedInOptimizer = () => {
             </h2>
             <p className="text-xs sm:text-sm md:text-base text-gray-300 mb-2 sm:mb-3 md:mb-4 leading-relaxed">
               1. Go to your public{" "}
-              <a href="https://linkedin.com" className="text-blue-400 underline">
+              <a
+                href="https://linkedin.com"
+                className="text-blue-400 underline"
+              >
                 LinkedIn profile
               </a>
               <br />
               2. Click on "More..." → "Save to PDF"
               <br />
-              3. Upload the PDF below and provide a job description to get AI insights.
+              3. Upload the PDF below and provide a job description to get AI
+              insights.
               <br />
               Works best on English profiles. Max size: 2MB.
             </p>
@@ -229,14 +233,15 @@ const LinkedInOptimizer = () => {
         {/* Video Section (Right) */}
         <div className="bg-[#10102b] rounded-2xl p-2 sm:p-4 md:p-6 shadow-lg border border-[#2d2d51] flex items-center justify-center h-full">
           <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
-            <iframe
+            <video
               className="absolute top-0 left-0 w-full h-full rounded-lg"
-              src="frontend\public\linkedin_vid.mp4" // Placeholder video (Rickroll) - Replace with your video URL
+              src="/linkedin_vid.mp4" // Replace with your video filename in the public/videos folder
               title="LinkedIn Optimization Tutorial"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
+              controls
+              autoPlay
+              muted
+              loop
+            ></video>
           </div>
         </div>
       </div>
