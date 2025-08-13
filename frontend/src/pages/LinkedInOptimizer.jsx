@@ -232,16 +232,21 @@ const LinkedInOptimizer = () => {
 
         {/* Video Section (Right) */}
         <div className="bg-[#10102b] rounded-2xl p-2 sm:p-4 md:p-6 shadow-lg border border-[#2d2d51] flex items-center justify-center h-full">
-          <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
-            <video
-              className="absolute top-0 left-0 w-full h-full rounded-lg"
-              src="/linkedin_vid.mp4" // Replace with your video filename in the public/videos folder
-              title="LinkedIn Optimization Tutorial"
-              controls
-              autoPlay
-              muted
-              loop
-            ></video>
+          <div className="w-full">
+            <p className="text-center text-white text-sm sm:text-base md:text-lg font-semibold mb-2 sm:mb-4">
+              Here's the demo of how to download the LinkedIn's profile PDF
+            </p>
+            <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
+              <video
+                className="absolute top-0 left-0 w-full h-full rounded-lg"
+                src="/linkedin_vid.mp4" // Replace with your video filename in the public/videos folder
+                title="LinkedIn Optimization Tutorial"
+                controls
+                autoPlay
+                muted
+                loop
+              ></video>
+            </div>
           </div>
         </div>
       </div>
