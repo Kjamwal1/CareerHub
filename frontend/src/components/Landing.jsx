@@ -41,7 +41,10 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
       formData.append("jobDescription", jobDescription);
 
       const token = localStorage.getItem("token");
-      const response = await fetch("https://careerhub25.onrender.com/check-resume", {
+      if (!token) throw new Error("Please log in to analyze your resume.");
+
+      console.log("Sending resume analysis request to:", `${import.meta.env.VITE_API_URL}/check-resume`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/check-resume`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -49,11 +52,20 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
         body: formData,
       });
 
-      if (!response.ok) throw new Error("Failed to analyze resume");
-      const data = await response.json().catch(() => ({ error: "Invalid response format" }));
+      console.log("Response Status:", response.status, "Headers:", Object.fromEntries(response.headers.entries()));
+
+      if (!response.ok) {
+        const responseText = await response.text();
+        console.log("Response Body:", responseText);
+        throw new Error(`Failed to analyze resume: ${response.status} ${responseText}`);
+      }
+
+      const data = await response.json();
       if (data.error) throw new Error(data.error);
       setAnalysisResult(data);
+      setError(null);
     } catch (err) {
+      console.error("Resume analysis error:", err.message, err.stack);
       setError(err.message);
       alert(`Error analyzing resume: ${err.message}`);
     } finally {
@@ -93,7 +105,10 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
         formData.append("jobDescription", jobDescription);
 
         const token = localStorage.getItem("token");
-        const response = await fetch("https://careerhub25.onrender.com/api/linkedin-analyze", {
+        if (!token) throw new Error("Please log in to analyze your LinkedIn profile.");
+
+        console.log("Sending LinkedIn analysis request to:", `${import.meta.env.VITE_API_URL}/api/linkedin-analyze`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/linkedin-analyze`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -101,11 +116,20 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
           body: formData,
         });
 
-        if (!response.ok) throw new Error("Failed to analyze LinkedIn PDF");
-        const data = await response.json().catch(() => ({ error: "Invalid response format" }));
+        console.log("Response Status:", response.status, "Headers:", Object.fromEntries(response.headers.entries()));
+
+        if (!response.ok) {
+          const responseText = await response.text();
+          console.log("Response Body:", responseText);
+          throw new Error(`Failed to analyze LinkedIn PDF: ${response.status} ${responseText}`);
+        }
+
+        const data = await response.json();
         if (data.error) throw new Error(data.error);
         setAnalysisResult(data);
+        setError(null);
       } catch (err) {
+        console.error("LinkedIn analysis error:", err.message, err.stack);
         setError(err.message);
         alert(`Error analyzing LinkedIn PDF: ${err.message}`);
       } finally {
@@ -228,7 +252,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
                         onChange={handleFileSelect}
                       />
 
-                      {/* Upload Button (Triggers file input) */}
+                      {/* Upload Button */}
                       <button
                         type="button"
                         onClick={() => {
@@ -500,8 +524,11 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
             </p>
           </div>
 
-          <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] flex items-center justify-center">
-            <div className="absolute animate-circular-carousel" style={{ width: "100%", height: "100%" }}>
+          <div className="relative w-full overflow-hidden">
+            <div
+              className="flex gap-4 sm:gap-6 animate-circular-carousel"
+              style={{ animation: "circularScroll 20s linear infinite" }}
+            >
               {[
                 "/resume_video.mp4",
                 "/linkedin_video.mp4",
@@ -516,11 +543,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
               ].map((src, i) => (
                 <div
                   key={i}
-                  className="absolute w-[150px] sm:w-[200px] md:w-[250px] h-[100px] sm:h-[150px] md:h-[200px]"
-                  style={{
-                    transform: `rotate(${(i * 360) / 10}deg) translate(150px, 0) rotate(-${(i * 360) / 10}deg)`,
-                    transformOrigin: "center center",
-                  }}
+                  className="flex-shrink-0 w-[250px] sm:w-[300px] md:w-[350px] lg:w-[400px]"
                 >
                   <video
                     src={src}
@@ -528,7 +551,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
                     muted
                     loop
                     playsInline
-                    className="w-full h-full object-cover rounded-xl shadow-lg"
+                    className="h-[150px] sm:h-[200px] md:h-[250px] lg:h-[300px] w-full object-cover rounded-xl shadow-md"
                   />
                 </div>
               ))}
@@ -536,21 +559,19 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
           </div>
 
           <style>{`
-            @keyframes circular-carousel {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
+            @keyframes circularScroll {
+              0% { transform: translateX(0); }
+              100% { transform: translateX(-50%); }
             }
             .animate-circular-carousel {
-              animation: circular-carousel 20s linear infinite;
-              position: relative;
-              width: 100%;
-              height: 100%;
+              display: flex;
+              width: 200%;
             }
-            .animate-circular-carousel > div {
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              transform-origin: center center;
+            .animate-circular-carousel video {
+              pointer-events: none;
+            }
+            .animate-circular-carousel:hover {
+              animation-play-state: paused;
             }
           `}</style>
         </section>
