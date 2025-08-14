@@ -3,7 +3,7 @@ const multer = require("multer");
 const PDFParser = require("pdf2json");
 const mammoth = require("mammoth");
 const cors = require("cors");
-const fs = require("fs");
+const fs = require("fs").promises;
 const { spawn } = require("child_process");
 const path = require("path");
 const axios = require("axios");
@@ -30,21 +30,18 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 // Validate environment variables
-if (!process.env.MONGO_URI) {
-  console.error("Error: MONGO_URI is not defined in .env file");
-  process.exit(1);
-}
-if (!process.env.JWT_SECRET) {
-  console.error("Error: JWT_SECRET is not defined in .env file");
-  process.exit(1);
-}
-if (!process.env.GEMINI_API_KEY) {
-  console.error("Error: GEMINI_API_KEY is not defined in .env file");
-  process.exit(1);
-}
-if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-  console.error("Error: EMAIL_USER or EMAIL_PASS not defined in .env file");
-  process.exit(1);
+const requiredEnvVars = [
+  "MONGO_URI",
+  "JWT_SECRET",
+  "GEMINI_API_KEY",
+  "EMAIL_USER",
+  "EMAIL_PASS",
+];
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    console.error(`Error: ${envVar} is not defined in .env file`);
+    process.exit(1);
+  }
 }
 
 // MongoDB Connection
@@ -91,6 +88,28 @@ const ResumeAnalysisSchema = new mongoose.Schema({
 
 const ResumeAnalysis = mongoose.model("ResumeAnalysis", ResumeAnalysisSchema);
 
+// LinkedIn Analysis Schema
+const LinkedInAnalysisSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  jobDescription: { type: String, required: true },
+  analysis: {
+    matchScore: { type: Number, required: true },
+    strengths: { type: [String], required: true },
+    gaps: { type: [String], required: true },
+    improvements: { type: [String], required: true },
+    optimizedSection: { type: String, required: true }, // e.g., LinkedIn About or Skills section
+    beforeAfterComparison: { type: String, required: true },
+    keywordMatchScore: { type: Number, required: true },
+    profileCompleteness: { type: Number, required: true }, // LinkedIn-specific metric
+  },
+  createdAt: { type: Date, default: Date.now },
+});
+
+const LinkedInAnalysis = mongoose.model(
+  "LinkedInAnalysis",
+  LinkedInAnalysisSchema
+);
+
 // Chat Schema
 const ChatSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -135,10 +154,14 @@ const Document = mongoose.model("Document", DocumentSchema);
 
 // Configure multer to store files in uploads/ directory with file size limit
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
+  destination: async (req, file, cb) => {
     const dir = "uploads/";
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir);
-    cb(null, dir);
+    try {
+      await fs.mkdir(dir, { recursive: true });
+      cb(null, dir);
+    } catch (err) {
+      cb(err);
+    }
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
@@ -167,6 +190,24 @@ const upload = multer({
 
 // JWT Secret
 const JWT_SECRET = process.env.JWT_SECRET;
+
+// Utility Function for File Cleanup
+async function cleanupFiles(...paths) {
+  for (const filePath of paths) {
+    try {
+      if (
+        await fs
+          .access(filePath)
+          .then(() => true)
+          .catch(() => false)
+      ) {
+        await fs.unlink(filePath);
+      }
+    } catch (err) {
+      console.error(`Error cleaning up file ${filePath}:`, err.message);
+    }
+  }
+}
 
 // Authentication Middleware
 const authenticateToken = (req, res, next) => {
@@ -263,7 +304,7 @@ app.post("/api/jobs", authenticateToken, async (req, res) => {
 // Get Jobs
 app.get("/api/jobs", authenticateToken, async (req, res) => {
   try {
-    const jobs = await Job.find({ userId: req.user.userId}).sort({
+    const jobs = await Job.find({ userId: req.user.userId }).sort({
       createdAt: -1,
     });
     res.json(jobs);
@@ -402,9 +443,6 @@ app.post(
   authenticateToken,
   upload.single("resume"),
   async (req, res) => {
-    console.log("Request Body:", req.body);
-    console.log("Uploaded Files:", req.file);
-
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
     }
@@ -416,7 +454,7 @@ app.post(
       "image/png",
     ];
     if (!allowedTypes.includes(req.file.mimetype)) {
-      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      await cleanupFiles(req.file.path);
       return res
         .status(400)
         .json({ error: "Only PDF, DOCX, JPG, and PNG files are allowed" });
@@ -424,76 +462,50 @@ app.post(
 
     const jobDescription = req.body.jobDescription || "";
     if (!jobDescription) {
-      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+      await cleanupFiles(req.file.path);
       return res.status(400).json({ error: "Job description is required" });
     }
 
     try {
       let textContent = "";
       if (req.file.mimetype.includes("pdf")) {
-        const pdfParser = new PDFParser();
-        pdfParser.on("pdfParser_dataError", (errData) => {
-          console.error("PDF Parsing Error:", errData.parserError);
-          if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-          performOCR(req.file.path, res, jobDescription, req.user.userId);
-        });
-
-        pdfParser.on("pdfParser_dataReady", async (pdfData) => {
-          textContent = pdfData.Pages.map((page) =>
-            page.Texts.map((text) => decodeURIComponent(text.R[0].T)).join(" ")
-          )
-            .join("\n")
-            .trim()
-            .replace(/\n\s*\n/g, "\n");
-          console.log("Extracted PDF Text:", textContent);
-          if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-          try {
-            const analysis = await analyzeWithGemini(
-              textContent,
-              jobDescription
-            );
-            const resumeAnalysis = new ResumeAnalysis({
-              userId: req.user.userId,
-              jobDescription,
-              analysis,
-            });
-            await resumeAnalysis.save();
-            res.json(analysis);
-          } catch (error) {
-            console.error("Analysis Error:", error.message);
-            res.status(500).json({
-              error: "Failed to analyze resume",
-              details: error.message,
-            });
-          }
-        });
-
-        pdfParser.loadPDF(req.file.path);
+        textContent = await extractTextFromPDF(req.file.path);
+        if (!textContent || textContent.length < 50) {
+          textContent = await performOCR(req.file.path);
+        }
       } else if (req.file.mimetype.includes("openxmlformats")) {
         const result = await mammoth.extractRawText({ path: req.file.path });
         textContent = result.value.trim().replace(/\n\s*\n/g, "\n");
-        console.log("Extracted DOCX Text:", textContent);
-        if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-        if (!textContent) {
-          performOCR(req.file.path, res, jobDescription, req.user.userId);
-        } else {
-          const analysis = await analyzeWithGemini(textContent, jobDescription);
-          const resumeAnalysis = new ResumeAnalysis({
-            userId: req.user.userId,
-            jobDescription,
-            analysis,
-          });
-          await resumeAnalysis.save();
-          res.json(analysis);
+        if (!textContent || textContent.length < 50) {
+          textContent = await performOCR(req.file.path);
         }
       } else if (req.file.mimetype.includes("image")) {
-        performOCR(req.file.path, res, jobDescription, req.user.userId);
+        textContent = await performOCR(req.file.path);
       }
+
+      if (!textContent || textContent.length < 50) {
+        await cleanupFiles(req.file.path);
+        return res
+          .status(500)
+          .json({ error: "Failed to extract meaningful text from resume" });
+      }
+
+      const analysis = await analyzeWithGemini(
+        textContent,
+        jobDescription,
+        "resume"
+      );
+      const resumeAnalysis = new ResumeAnalysis({
+        userId: req.user.userId,
+        jobDescription,
+        analysis,
+      });
+      await resumeAnalysis.save();
+      await cleanupFiles(req.file.path);
+      res.json(analysis);
     } catch (error) {
-      console.error("Unexpected Error:", error.message, error.stack);
-      if (req.file && fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
-      }
+      console.error("Resume processing error:", error.message, error.stack);
+      await cleanupFiles(req.file.path);
       res.status(500).json({
         error: "Unexpected error during resume processing",
         details: error.message,
@@ -501,6 +513,169 @@ app.post(
     }
   }
 );
+
+// LinkedIn Analysis Endpoint
+app.post(
+  "/api/linkedin-analyze",
+  authenticateToken,
+  upload.single("linkedinPdf"),
+  async (req, res) => {
+    console.log("LinkedIn Analysis Request:", {
+      body: req.body,
+      file: req.file,
+    });
+
+    if (!req.file) {
+      return res.status(400).json({ error: "No LinkedIn PDF uploaded" });
+    }
+
+    if (req.file.mimetype !== "application/pdf") {
+      await cleanupFiles(req.file.path);
+      return res
+        .status(400)
+        .json({ error: "Only PDF files are allowed for LinkedIn analysis" });
+    }
+
+    const jobDescription = req.body.jobDescription || "";
+    if (!jobDescription) {
+      await cleanupFiles(req.file.path);
+      return res.status(400).json({ error: "Job description is required" });
+    }
+
+    try {
+      let textContent = await extractTextFromPDF(req.file.path);
+      if (!textContent || textContent.length < 50) {
+        console.log(
+          "Insufficient text extracted from PDF, falling back to OCR"
+        );
+        textContent = await performOCR(req.file.path, true); // true for LinkedIn-specific OCR
+      }
+
+      if (!textContent || textContent.length < 50) {
+        await cleanupFiles(req.file.path);
+        return res
+          .status(500)
+          .json({
+            error: "Failed to extract meaningful text from LinkedIn PDF",
+          });
+      }
+
+      const analysis = await analyzeWithGemini(
+        textContent,
+        jobDescription,
+        "linkedin"
+      );
+      const linkedinAnalysis = new LinkedInAnalysis({
+        userId: req.user.userId,
+        jobDescription,
+        analysis,
+      });
+      await linkedinAnalysis.save();
+      await cleanupFiles(req.file.path);
+      res.json(analysis);
+    } catch (error) {
+      console.error("LinkedIn processing error:", error.message, error.stack);
+      await cleanupFiles(req.file.path);
+      res.status(500).json({
+        error: "Unexpected error during LinkedIn PDF processing",
+        details: error.message,
+      });
+    }
+  }
+);
+
+// Extract Text from PDF
+async function extractTextFromPDF(filePath) {
+  return new Promise((resolve, reject) => {
+    const pdfParser = new PDFParser();
+    pdfParser.on("pdfParser_dataError", (errData) => {
+      console.error("PDF Parsing Error:", errData.parserError);
+      resolve(""); // Fallback to empty string on error
+    });
+    pdfParser.on("pdfParser_dataReady", (pdfData) => {
+      const textContent = pdfData.Pages.map((page) =>
+        page.Texts.map((text) => decodeURIComponent(text.R[0].T)).join(" ")
+      )
+        .join("\n")
+        .trim()
+        .replace(/\n\s*\n/g, "\n");
+      console.log("Extracted PDF Text:", textContent);
+      resolve(textContent);
+    });
+    pdfParser.loadPDF(filePath);
+  });
+}
+
+// Perform OCR
+async function performOCR(filePath, isLinkedIn = false) {
+  const tempDir = "temp_images/";
+  await fs.mkdir(tempDir, { recursive: true });
+
+  try {
+    if (filePath.endsWith(".pdf")) {
+      const pdf2img = spawn("convert", [
+        "-density",
+        "300",
+        "-quality",
+        "100",
+        filePath,
+        `${tempDir}page-%d.jpg`,
+      ]);
+
+      await new Promise((resolve, reject) => {
+        pdf2img.on("close", (code) =>
+          code === 0
+            ? resolve()
+            : reject(new Error("PDF to image conversion failed"))
+        );
+      });
+
+      const files = await fs.readdir(tempDir);
+      let textContent = "";
+      for (const file of files) {
+        const imagePath = path.join(tempDir, file);
+        const process = spawn("tesseract", [
+          imagePath,
+          "stdout",
+          "-l",
+          isLinkedIn ? "eng+fra" : "eng", // Use multiple languages for LinkedIn if needed
+          "--oem",
+          "3",
+          "--psm",
+          isLinkedIn ? "6" : "3", // LinkedIn PDFs may need different PSM
+        ]);
+
+        textContent += await new Promise((resolve) => {
+          let output = "";
+          process.stdout.on("data", (data) => (output += data.toString()));
+          process.on("close", () => resolve(output));
+        });
+
+        await cleanupFiles(imagePath);
+      }
+      await fs.rm(tempDir, { recursive: true, force: true });
+      return textContent.trim();
+    } else if (filePath.endsWith(".jpg") || filePath.endsWith(".png")) {
+      const process = spawn("tesseract", [
+        filePath,
+        "stdout",
+        "-l",
+        isLinkedIn ? "eng+fra" : "eng",
+      ]);
+      const textContent = await new Promise((resolve) => {
+        let output = "";
+        process.stdout.on("data", (data) => (output += data.toString()));
+        process.on("close", () => resolve(output));
+      });
+      return textContent.trim();
+    }
+    return "";
+  } catch (error) {
+    console.error("OCR Error:", error.message);
+    await fs.rm(tempDir, { recursive: true, force: true });
+    return "";
+  }
+}
 
 // Save Chat History
 app.post("/api/chat/save", authenticateToken, async (req, res) => {
@@ -720,140 +895,161 @@ app.get("/api/documents", authenticateToken, async (req, res) => {
   }
 });
 
-
-// linkedin
-app.post(
-  "/api/linkedin-analyze",
-  authenticateToken,
-  upload.single("linkedinPdf"),
-  async (req, res) => {
-    console.log("Request Body:", req.body);
-    console.log("Uploaded LinkedIn PDF:", req.file);
-
-    if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded" });
-    }
-
-    const allowedTypes = ["application/pdf"];
-    if (!allowedTypes.includes(req.file.mimetype)) {
-      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-      return res
-        .status(400)
-        .json({ error: "Only PDF files are allowed for LinkedIn analysis" });
-    }
-
-    const jobDescription = req.body.jobDescription || "";
-    if (!jobDescription) {
-      if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-      return res.status(400).json({ error: "Job description is required" });
-    }
-
-    try {
-      let textContent = "";
-      const pdfParser = new PDFParser();
-      pdfParser.on("pdfParser_dataError", (errData) => {
-        console.error("LinkedIn PDF Parsing Error:", errData.parserError);
-        performOCRForLinkedIn(req.file.path, res, jobDescription, req.user.userId);
-      });
-
-      pdfParser.on("pdfParser_dataReady", async (pdfData) => {
-        textContent = pdfData.Pages.map((page) =>
-          page.Texts.map((text) => decodeURIComponent(text.R[0].T)).join(" ")
-        )
-          .join("\n")
-          .trim()
-          .replace(/\n\s*\n/g, "\n");
-        console.log("Extracted LinkedIn PDF Text:", textContent);
-        if (!textContent || textContent.length < 50) { // Arbitrary threshold for meaningful text
-          console.log("Insufficient text extracted, falling back to OCR");
-          performOCRForLinkedIn(req.file.path, res, jobDescription, req.user.userId);
-        } else {
-          if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-          const analysis = await analyzeWithGemini(textContent, jobDescription);
-          const resumeAnalysis = new ResumeAnalysis({
-            userId: req.user.userId,
-            jobDescription,
-            analysis,
-          });
-          await resumeAnalysis.save();
-          res.json(analysis);
-        }
-      });
-
-      pdfParser.loadPDF(req.file.path);
-    } catch (error) {
-      console.error("Unexpected Error in LinkedIn Analysis:", error.message, error.stack);
-      if (req.file && fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
-      }
-      res.status(500).json({
-        error: "Unexpected error during LinkedIn PDF processing",
-        details: error.message,
-      });
-    }
+// Analyze with Gemini API
+async function analyzeWithGemini(textContent, jobDescription, type = "resume") {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("Gemini API key not configured");
   }
-);
 
-// Enhanced OCR function for LinkedIn PDFs
-function performOCRForLinkedIn(filePath, res, jobDescription, userId) {
-  const tempDir = "temp_images/";
-  if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
+  const prompt =
+    type === "linkedin"
+      ? `
+Act as an HR manager with 20 years of experience specializing in LinkedIn profile optimization. Analyze the provided LinkedIn profile PDF text against the given job description. Provide:
+- A match score (0-100) indicating how well the profile aligns with the job description.
+- A list of strengths (skills, experiences, or qualifications that align well with the job).
+- A list of gaps (missing skills, experiences, or qualifications required by the job).
+- Suggested improvements to enhance the LinkedIn profile (e.g., update About section, add skills).
+- An optimized version of the LinkedIn profile's main section (e.g., About or Skills) rewritten with recruiter-friendly keywords.
+- A before-and-after comparison highlighting key changes in the rewritten section.
+- A keyword match score (0-100) based on how well the original profile keywords match the job description.
+- A profile completeness score (0-100) based on LinkedIn profile best practices (e.g., presence of photo, headline, About section, skills).
 
-  if (filePath.endsWith(".pdf")) {
-    const pdf2img = spawn("convert", [
-      "-density",
-      "300",
-      "-quality",
-      "100",
-      filePath,
-      `${tempDir}page-%d.jpg`,
-    ]);
-    pdf2img.on("close", async () => {
-      fs.readdir(tempDir, async (err, files) => {
-        if (err) {
-          if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-          if (fs.existsSync(tempDir)) fs.rmdirSync(tempDir, { recursive: true });
-          return res.status(500).json({ error: "Error processing LinkedIn PDF images" });
+LinkedIn Profile Text:
+${textContent}
+
+Job Description:
+${jobDescription}
+
+Return the response in JSON format:
+{
+  "matchScore": number,
+  "strengths": string[],
+  "gaps": string[],
+  "improvements": string[],
+  "optimizedSection": string,
+  "beforeAfterComparison": string,
+  "keywordMatchScore": number,
+  "profileCompleteness": number
+}
+`
+      : `
+Act as an HR manager with 20 years of experience. Analyze the provided resume against the given job description. Provide:
+- A match score (0-100) indicating how well the resume aligns with the job description.
+- A list of strengths (skills, experiences, or qualifications that align well with the job).
+- A list of gaps (missing skills, experiences, or qualifications required by the job).
+- Suggested improvements to enhance the resume.
+- An optimized version of the resume's main section (e.g., Summary or Experience) rewritten with recruiter-friendly keywords.
+- A before-and-after comparison highlighting key changes in the rewritten section.
+- A keyword match score (0-100) based on how well the original resume keywords match the job description.
+
+Resume:
+${textContent}
+
+Job Description:
+${jobDescription}
+
+Return the response in JSON format:
+{
+  "matchScore": number,
+  "strengths": string[],
+  "gaps": string[],
+  "improvements": string[],
+  "optimizedSection": string,
+  "beforeAfterComparison": string,
+  "keywordMatchScore": number
+}
+`;
+
+  const models = ["gemini-1.5-flash", "gemini-1.5-pro"];
+  let lastError;
+
+  for (const model of models) {
+    try {
+      console.log(`Attempting analysis with model: ${model}`);
+      const response = await axios.post(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        {
+          contents: [{ parts: [{ text: prompt }] }],
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey,
+          },
         }
-        let textContent = "";
-        for (const file of files) {
-          const imagePath = path.join(tempDir, file);
-          const process = spawn("tesseract", [
-            imagePath,
-            "stdout",
-            "-l",
-            "eng+fra", // Add languages if LinkedIn uses multiple
-            "--oem",
-            "3",
-            "--psm",
-            "6", // Assume a single uniform block of text
-          ]);
-          process.stdout.on("data", (data) => {
-            textContent += data.toString();
-          });
-          process.on("close", () => {
-            if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
-          });
-        }
-        if (fs.existsSync(tempDir)) fs.rmdirSync(tempDir, { recursive: true });
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-        if (!textContent || textContent.length < 50) {
-          return res.status(500).json({
-            error: "Failed to extract meaningful text from LinkedIn PDF",
-          });
-        }
-        const analysis = await analyzeWithGemini(textContent, jobDescription);
-        const resumeAnalysis = new ResumeAnalysis({
-          userId,
-          jobDescription,
-          analysis,
-        });
-        await resumeAnalysis.save();
-        res.json(analysis);
-      });
-    });
+      );
+
+      const result = response.data.candidates[0].content.parts[0].text;
+      console.log("Raw Gemini API Response:", result);
+
+      // Clean and validate JSON
+      const cleanedResult = result
+        .replace(/```json\n|```/g, "")
+        .replace(/`/g, "")
+        .replace(/\n\s*\n/g, "\n")
+        .trim();
+
+      let data;
+      try {
+        data = JSON.parse(cleanedResult);
+      } catch (parseError) {
+        console.error(
+          "JSON Parsing Error:",
+          parseError.message,
+          "Raw Response:",
+          result
+        );
+        throw new Error("Invalid JSON response from Gemini API");
+      }
+
+      // Validate and normalize response
+      const normalizedData = {
+        matchScore: Number(data.matchScore) || 0,
+        strengths: Array.isArray(data.strengths) ? data.strengths : [],
+        gaps: Array.isArray(data.gaps) ? data.gaps : [],
+        improvements: Array.isArray(data.improvements) ? data.improvements : [],
+        optimizedSection: data.optimizedSection || "",
+        beforeAfterComparison: data.beforeAfterComparison || "",
+        keywordMatchScore: Number(data.keywordMatchScore) || 0,
+      };
+      if (type === "linkedin") {
+        normalizedData.profileCompleteness =
+          Number(data.profileCompleteness) || 0;
+      }
+
+      return normalizedData;
+    } catch (error) {
+      console.error(
+        `Gemini API Error with ${model}:`,
+        error.response ? error.response.data : error.message
+      );
+      lastError = error;
+      if (error.response && error.response.status === 429) {
+        console.log(`Quota exceeded for ${model}, trying next model...`);
+        continue;
+      }
+      if (model === models[models.length - 1]) {
+        throw new Error(
+          `Failed to analyze with Gemini API: ${lastError.message}`
+        );
+      }
+    }
   }
 }
+
+// Get LinkedIn Analyses Endpoint
+app.get("/api/linkedin-analyses", authenticateToken, async (req, res) => {
+  try {
+    const analyses = await LinkedInAnalysis.find({ userId: req.user.userId })
+      .sort({ createdAt: -1 })
+      .limit(10);
+    res.json(analyses);
+  } catch (error) {
+    console.error("Error fetching LinkedIn analyses:", error.message);
+    res.status(500).json({ error: "Failed to fetch LinkedIn analyses" });
+  }
+});
 
 // Function to perform OCR using pytesseract
 function performOCR(filePath, res, jobDescription, userId) {
@@ -962,168 +1158,6 @@ print(text)
       await resumeAnalysis.save();
       res.json(analysis);
     });
-  }
-}
-
-// Function to analyze resume with Gemini API
-async function analyzeWithGemini(textContent, jobDescription) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error("Gemini API key not configured");
-  }
-
-  const prompt = `
-Act as an HR manager with 20 years of experience. Analyze the provided resume against the given job description. Provide:
-- A match score (0-100) indicating how well the resume aligns with the job description.
-- A list of strengths (skills, experiences, or qualifications that align well with the job).
-- A list of gaps (missing skills, experiences, or qualifications required by the job).
-- Suggested improvements to enhance the resume.
-- An optimized version of the resume's main section (e.g., Summary or Experience) rewritten with recruiter-friendly keywords based on the job description.
-- A before-and-after comparison highlighting key changes in the rewritten section.
-- A keyword match score (0-100) based on how well the original resume keywords match those in the job description.
-
-Resume:
-${textContent}
-
-Job Description:
-${jobDescription}
-
-Return the response in JSON format:
-{
-  "matchScore": number,
-  "strengths": string[],
-  "gaps": string[],
-  "improvements": string[],
-  "optimizedSection": string,
-  "beforeAfterComparison": string,
-  "keywordMatchScore": number
-}
-`;
-
-  const models = ["gemini-1.5-flash", "gemini-1.5-pro"];
-  let errorMessage = "Failed to analyze with Gemini API";
-
-  for (const model of models) {
-    try {
-      console.log(`Attempting analysis with model: ${model}`);
-      const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-        {
-          contents: [{ parts: [{ text: prompt }] }],
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": apiKey,
-          },
-        }
-      );
-
-      const result = response.data.candidates[0].content.parts[0].text;
-      console.log("Raw Gemini API Response:", result);
-
-      // Clean Markdown and invalid characters
-      const cleanedResult = result
-        .replace(/```json\n|```/g, "") // Remove ```json and ```
-        .replace(/`/g, "") // Remove stray backticks
-        .replace(/\n\s*\n/g, "\n") // Normalize newlines
-        .trim();
-
-      try {
-        const data = JSON.parse(cleanedResult);
-        // Validate and normalize response
-        return {
-          matchScore: Number(data.matchScore) || 0,
-          strengths: Array.isArray(data.strengths) ? data.strengths : [],
-          gaps: Array.isArray(data.gaps) ? data.gaps : [],
-          improvements: Array.isArray(data.improvements)
-            ? data.improvements
-            : [],
-          optimizedSection: data.optimizedSection || "",
-          beforeAfterComparison: data.beforeAfterComparison || "",
-          keywordMatchScore: Number(data.keywordMatchScore) || 0,
-        };
-      } catch (parseError) {
-        console.error(
-          "JSON Parsing Error:",
-          parseError.message,
-          "Raw Response:",
-          result
-        );
-        throw new Error(`Invalid JSON response from ${model}`);
-      }
-    } catch (error) {
-      console.error(
-        `Gemini API Error with ${model}:`,
-        error.response ? error.response.data : error.message
-      );
-      if (error.response && error.response.status === 429) {
-        console.log(`Quota exceeded for ${model}, trying next model...`);
-        continue;
-      }
-      errorMessage = `Failed with ${model}: ${
-        error.response ? error.response.data.message : error.message
-      }`;
-      if (model === models[models.length - 1]) throw new Error(errorMessage);
-    }
-  }
-}
-
-// Function to generate chatbot response with Gemini API
-async function analyzeWithGeminiForChat(history) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error("Gemini API key not configured");
-  }
-
-  const prompt = history
-    .map((msg) => `${msg.role === "user" ? "User" : "AI"}: ${msg.content}`)
-    .join("\n");
-  const fullPrompt = `
-You are an AI career mentor with expertise in resume optimization, LinkedIn profiling, and job matching. Continue the conversation based on the following history and provide relevant career advice, job search strategies, or profile optimization tips. Respond naturally and contextually.
-
-Conversation History:
-${prompt}
-
-Please provide your response as plain text.
-`;
-
-  const models = ["gemini-1.5-flash", "gemini-1.5-pro"];
-  let errorMessage = "Failed to generate chatbot response";
-
-  for (const model of models) {
-    try {
-      console.log(`Attempting chat response with model: ${model}`);
-      const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-        {
-          contents: [{ parts: [{ text: fullPrompt }] }],
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-goog-api-key": apiKey,
-          },
-        }
-      );
-
-      const result = response.data.candidates[0].content.parts[0].text;
-      console.log("Chat API Response:", result);
-      return result.trim();
-    } catch (error) {
-      console.error(
-        `Gemini API Error with ${model}:`,
-        error.response ? error.response.data : error.message
-      );
-      if (error.response && error.response.status === 429) {
-        console.log(`Quota exceeded for ${model}, trying next model...`);
-        continue;
-      }
-      errorMessage = `Failed with ${model}: ${
-        error.response ? error.response.data.message : error.message
-      }`;
-      if (model === models[models.length - 1]) throw new Error(errorMessage);
-    }
   }
 }
 

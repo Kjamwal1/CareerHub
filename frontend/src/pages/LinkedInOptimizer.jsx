@@ -1,18 +1,18 @@
 import React, { useState, useContext } from "react";
 import { CloudUpload } from "lucide-react";
-import { AuthContext } from "../context/AuthContext"; // Import AuthContext
+import { AuthContext } from "../context/AuthContext";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 const LinkedInOptimizer = () => {
-  const { user } = useContext(AuthContext); // Use AuthContext for user authentication
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [selectedFile, setSelectedFile] = useState(null); // Renamed from pdfFile for clarity
-  const [jobDescription, setJobDescription] = useState(""); // Added for job description input
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [jobDescription, setJobDescription] = useState("");
   const [error, setError] = useState("");
-  const [analysis, setAnalysis] = useState(null); // Changed from result to analysis for consistency
+  const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [dragActive, setDragActive] = useState(false); // Added for drag-and-drop
+  const [dragActive, setDragActive] = useState(false);
 
   const handleFile = (file) => {
     if (!file || file.type !== "application/pdf") {
@@ -73,13 +73,13 @@ const LinkedInOptimizer = () => {
     setAnalysis(null);
 
     const formData = new FormData();
-    formData.append("pdf", selectedFile);
+    formData.append("linkedinPdf", selectedFile);
     formData.append("jobDescription", jobDescription);
 
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/check-resume`,
+        `${process.env.REACT_APP_API_URL}/api/linkedin-analyze`,
         {
           method: "POST",
           headers: {
@@ -90,13 +90,17 @@ const LinkedInOptimizer = () => {
       );
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.error || "Error analyzing LinkedIn profile.");
+        // Enhanced error handling
+        const errorMsg = data.error || "Error analyzing LinkedIn profile.";
+        throw new Error(errorMsg);
       }
       setAnalysis(data);
+      toast.success("LinkedIn profile analyzed successfully!");
     } catch (err) {
-      console.error("PDF upload error:", err);
-      setError(err.message || "Error analyzing LinkedIn profile.");
-      toast.error(err.message || "Error analyzing LinkedIn profile.");
+      console.error("PDF upload error:", err.message, err.stack); // Improved logging
+      const errorMsg = err.message || "Error analyzing LinkedIn profile.";
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -116,7 +120,15 @@ const LinkedInOptimizer = () => {
   };
 
   const handleClose = () => {
-    navigate("/home"); // Navigate back to the home page
+    navigate("/home");
+  };
+
+  // New: Handle form reset
+  const handleReset = () => {
+    setSelectedFile(null);
+    setJobDescription("");
+    setError("");
+    setAnalysis(null);
   };
 
   return (
@@ -152,10 +164,7 @@ const LinkedInOptimizer = () => {
             </h2>
             <p className="text-xs sm:text-sm md:text-base text-gray-300 mb-2 sm:mb-3 md:mb-4 leading-relaxed">
               1. Go to your public{" "}
-              <a
-                href="https://linkedin.com"
-                className="text-blue-400 underline"
-              >
+              <a href="https://linkedin.com" className="text-blue-400 underline">
                 LinkedIn profile
               </a>
               <br />
@@ -217,17 +226,52 @@ const LinkedInOptimizer = () => {
             />
           </div>
 
-          <button
-            onClick={handlePdfUpload}
-            disabled={!selectedFile || !jobDescription || loading}
-            className={`mt-2 sm:mt-3 md:mt-4 w-full py-1 sm:py-2 md:py-2 rounded-lg transition font-semibold ${
-              selectedFile && jobDescription && !loading
-                ? "bg-blue-600 hover:bg-blue-700"
-                : "bg-blue-400 cursor-not-allowed"
-            } text-xs sm:text-sm`}
-          >
-            {loading ? "Analyzing..." : "Analyze PDF"}
-          </button>
+          <div className="flex gap-2 mt-2 sm:mt-3 md:mt-4">
+            <button
+              onClick={handlePdfUpload}
+              disabled={!selectedFile || !jobDescription || loading}
+              className={`flex-1 py-1 sm:py-2 md:py-2 rounded-lg transition font-semibold ${
+                selectedFile && jobDescription && !loading
+                  ? "bg-blue-600 hover:bg-blue-700"
+                  : "bg-blue-400 cursor-not-allowed"
+              } text-xs sm:text-sm`}
+            >
+              {loading ? (
+                <span className="flex items-center justify-center">
+                  <svg
+                    className="animate-spin h-4 w-4 mr-2"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Analyzing...
+                </span>
+              ) : (
+                "Analyze PDF"
+              )}
+            </button>
+            {/* New: Reset Button */}
+            <button
+              onClick={handleReset}
+              className="flex-1 py-1 sm:py-2 md:py-2 rounded-lg bg-gray-600 hover:bg-gray-700 transition font-semibold text-xs sm:text-sm"
+            >
+              Clear
+            </button>
+          </div>
         </div>
 
         {/* Video Section (Right) */}
@@ -239,7 +283,7 @@ const LinkedInOptimizer = () => {
             <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
               <video
                 className="absolute top-0 left-0 w-full h-full rounded-lg"
-                src="/linkedin_vid.mp4" // Replace with your video filename in the public/videos folder
+                src="/linkedin_vid.mp4"
                 title="LinkedIn's Profile Pdf Download Tutorial"
                 controls
                 autoPlay
@@ -257,6 +301,7 @@ const LinkedInOptimizer = () => {
           <h3 className="text-lg sm:text-xl md:text-xl font-bold text-blue-400 mb-1 sm:mb-2 md:mb-3 text-center">
             LinkedIn Profile Analysis Results
           </h3>
+          {/* Match Score */}
           <div className="mb-1 sm:mb-2 md:mb-4">
             <h4 className="text-base sm:text-lg md:text-lg font-semibold text-gray-300">
               Match Score:
@@ -288,6 +333,40 @@ const LinkedInOptimizer = () => {
               } mt-0.5 sm:mt-1`}
             >
               Match Level: {getMatchLevel(analysis.matchScore).label}
+            </p>
+          </div>
+          {/* New: Profile Completeness */}
+          <div className="mb-1 sm:mb-2 md:mb-4">
+            <h4 className="text-base sm:text-lg md:text-lg font-semibold text-gray-300">
+              Profile Completeness:
+            </h4>
+            <p
+              className={`text-xl sm:text-2xl md:text-2xl font-bold ${
+                getMatchLevel(analysis.profileCompleteness).color
+              }`}
+            >
+              {analysis.profileCompleteness}%
+            </p>
+            <div className="w-full bg-gray-600 rounded-full h-1.5 sm:h-2 md:h-2 mt-0.5 sm:mt-1">
+              <div
+                className={`h-1.5 sm:h-2 md:h-2 rounded-full ${
+                  getMatchLevel(analysis.profileCompleteness).label === "Poor"
+                    ? "bg-red-400"
+                    : getMatchLevel(analysis.profileCompleteness).label === "Fair"
+                    ? "bg-yellow-400"
+                    : getMatchLevel(analysis.profileCompleteness).label === "Good"
+                    ? "bg-blue-400"
+                    : "bg-green-400"
+                }`}
+                style={{ width: `${analysis.profileCompleteness}%` }}
+              ></div>
+            </div>
+            <p
+              className={`text-xs sm:text-sm md:text-sm font-medium ${
+                getMatchLevel(analysis.profileCompleteness).color
+              } mt-0.5 sm:mt-1`}
+            >
+              Completeness Level: {getMatchLevel(analysis.profileCompleteness).label}
             </p>
           </div>
           <div className="mb-1 sm:mb-2 md:mb-4">
