@@ -79,7 +79,7 @@ const LinkedInOptimizer = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/linkedin-analyze`,
+        `${import.meta.env.VITE_API_URL}/api/linkedin-analyze`,
         {
           method: "POST",
           headers: {
@@ -88,16 +88,24 @@ const LinkedInOptimizer = () => {
           body: formData,
         }
       );
-      const data = await response.json();
+
       if (!response.ok) {
-        // Enhanced error handling
-        const errorMsg = data.error || "Error analyzing LinkedIn profile.";
+        let errorMsg = "Error analyzing LinkedIn profile.";
+        try {
+          const data = await response.text();
+          const parsedData = data ? JSON.parse(data) : {};
+          errorMsg = parsedData.error || `Server responded with status ${response.status}`;
+        } catch (parseErr) {
+          errorMsg = `Server error: ${response.status} ${response.statusText}`;
+        }
         throw new Error(errorMsg);
       }
+
+      const data = await response.json();
       setAnalysis(data);
       toast.success("LinkedIn profile analyzed successfully!");
     } catch (err) {
-      console.error("PDF upload error:", err.message, err.stack); // Improved logging
+      console.error("PDF upload error:", err.message, err.stack);
       const errorMsg = err.message || "Error analyzing LinkedIn profile.";
       setError(errorMsg);
       toast.error(errorMsg);
@@ -123,7 +131,6 @@ const LinkedInOptimizer = () => {
     navigate("/home");
   };
 
-  // New: Handle form reset
   const handleReset = () => {
     setSelectedFile(null);
     setJobDescription("");
@@ -133,7 +140,6 @@ const LinkedInOptimizer = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a0a23] to-[#12123a] text-white px-2 sm:px-4 md:px-6 py-4 sm:py-8 md:py-12 font-poppins relative flex items-center justify-center">
-      {/* Close Button */}
       <button
         onClick={handleClose}
         className="absolute top-2 sm:top-4 left-2 sm:left-4 bg-gray-600 text-white rounded-full p-1 sm:p-2 hover:bg-gray-700 transition-colors z-10"
@@ -156,7 +162,6 @@ const LinkedInOptimizer = () => {
       </button>
 
       <div className="max-w-6xl w-full grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
-        {/* LinkedIn Upload Section (Left) */}
         <div className="bg-[#10102b] rounded-2xl p-2 sm:p-4 md:p-6 shadow-lg border border-[#2d2d51] flex flex-col justify-between h-full">
           <div>
             <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3 md:mb-4">
@@ -264,7 +269,6 @@ const LinkedInOptimizer = () => {
                 "Analyze PDF"
               )}
             </button>
-            {/* New: Reset Button */}
             <button
               onClick={handleReset}
               className="flex-1 py-1 sm:py-2 md:py-2 rounded-lg bg-gray-600 hover:bg-gray-700 transition font-semibold text-xs sm:text-sm"
@@ -274,7 +278,6 @@ const LinkedInOptimizer = () => {
           </div>
         </div>
 
-        {/* Video Section (Right) */}
         <div className="bg-[#10102b] rounded-2xl p-2 sm:p-4 md:p-6 shadow-lg border border-[#2d2d51] flex items-center justify-center h-full">
           <div className="w-full">
             <p className="text-center text-white text-sm sm:text-base md:text-lg font-semibold mb-2 sm:mb-4">
@@ -295,13 +298,11 @@ const LinkedInOptimizer = () => {
         </div>
       </div>
 
-      {/* Analysis Results */}
       {analysis && (
         <div className="mt-4 sm:mt-6 md:mt-8 bg-[#12123a] p-2 sm:p-3 md:p-4 rounded-xl border border-blue-700 max-w-sm sm:max-w-md md:max-w-2xl mx-auto">
           <h3 className="text-lg sm:text-xl md:text-xl font-bold text-blue-400 mb-1 sm:mb-2 md:mb-3 text-center">
             LinkedIn Profile Analysis Results
           </h3>
-          {/* Match Score */}
           <div className="mb-1 sm:mb-2 md:mb-4">
             <h4 className="text-base sm:text-lg md:text-lg font-semibold text-gray-300">
               Match Score:
@@ -335,7 +336,6 @@ const LinkedInOptimizer = () => {
               Match Level: {getMatchLevel(analysis.matchScore).label}
             </p>
           </div>
-          {/* New: Profile Completeness */}
           <div className="mb-1 sm:mb-2 md:mb-4">
             <h4 className="text-base sm:text-lg md:text-lg font-semibold text-gray-300">
               Profile Completeness:
