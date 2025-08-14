@@ -16,24 +16,14 @@ require("dotenv").config({ quiet: true });
 
 const app = express();
 
-// Middleware
-app.use((req, res, next) => {
-  const allowedOrigins = [
-    "https://career-hub-25.vercel.app",
-    process.env.NODE_ENV === "development" ? "http://localhost:5173" : null,
-  ].filter(Boolean);
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.header("Access-Control-Allow-Origin", origin);
-  }
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Credentials", "true");
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-  next();
-});
+// CORS Middleware
+app.use(cors({
+  origin: ["https://career-hub-25.vercel.app", "http://localhost:5173"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+}));
+
 app.use(express.json());
 
 // Validate environment variables
@@ -428,6 +418,15 @@ app.post("/api/jobs", authenticateToken, upload.single("file"), async (req, res)
     if (req.file) await cleanupFiles(req.file.path);
     res.status(500).json({ error: "Failed to add job" });
   }
+});
+
+// Explicit OPTIONS handler for /api/jobs
+app.options("/api/jobs", (req, res) => {
+  res.header("Access-Control-Allow-Origin", "https://career-hub-25.vercel.app");
+  res.header("Access-Control-Allow-Methods", "GET, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.status(200).end();
 });
 
 // Get Jobs
