@@ -9,6 +9,7 @@ import {
   UserCircleIcon,
   Bars3Icon,
   ChatBubbleLeftIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/solid";
 
 const Home = () => {
@@ -16,6 +17,7 @@ const Home = () => {
   const navigate = useNavigate();
   const [showDashboardDropdown, setShowDashboardDropdown] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
 
   useEffect(() => {
     document.title = `Welcome, ${user?.name || "Kanika"}`;
@@ -54,6 +56,7 @@ const Home = () => {
       navigate(destination);
     }
     setShowDashboardDropdown(false);
+    setShowSidebar(false); // Close sidebar on mobile after navigation
   };
 
   const handleLogout = () => {
@@ -68,6 +71,7 @@ const Home = () => {
     } else {
       navigate("/chatbot");
     }
+    setShowSidebar(false); // Close sidebar on mobile
   };
 
   const handleToolClick = (toolName) => {
@@ -78,18 +82,28 @@ const Home = () => {
         navigate("/linkedin-headline-generator");
       }
     }
+    setShowSidebar(false); // Close sidebar on mobile
   };
 
   return (
     <div className="min-h-screen bg-white font-poppins text-gray-800 flex flex-col relative">
       {/* Navbar */}
       <div className="w-full bg-gray-100 p-2 sm:p-4 shadow-md flex justify-between items-center fixed top-0 z-20">
-        <h1
-          className="text-2xl sm:text-3xl md:text-4xl font-bold"
-          style={{ fontFamily: "'Lobster', cursive" }}
-        >
-          CareerHub
-        </h1>
+        <div className="flex items-center">
+          <button
+            className="md:hidden mr-2 sm:mr-3 text-gray-600 hover:text-gray-900"
+            onClick={() => setShowSidebar(!showSidebar)}
+            aria-label="Toggle Sidebar"
+          >
+            <Bars3Icon className="h-6 sm:h-8 w-6 sm:w-8" />
+          </button>
+          <h1
+            className="text-2xl sm:text-3xl md:text-4xl font-bold"
+            style={{ fontFamily: "'Lobster', cursive" }}
+          >
+            CareerHub
+          </h1>
+        </div>
         <div className="relative">
           <button
             onClick={() => setShowProfileDropdown(!showProfileDropdown)}
@@ -120,7 +134,21 @@ const Home = () => {
       </div>
 
       {/* Left Sidebar */}
-      <div className="w-[13rem] bg-gray-100 p-3 sm:p-6 shadow-md h-screen overflow-y-auto fixed top-[3.5rem] sm:top-[4rem] bottom-0 z-10 hidden md:block">
+      <div
+        className={`fixed top-[3.5rem] sm:top-[4rem] bottom-0 w-64 sm:w-72 bg-gray-100 p-3 sm:p-6 shadow-md h-screen overflow-y-auto z-30 transform transition-transform duration-300 ${
+          showSidebar ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 md:w-[13rem]`}
+      >
+        <div className="flex justify-between items-center mb-4 md:hidden">
+          <h2 className="text-lg font-semibold text-gray-800">Menu</h2>
+          <button
+            onClick={() => setShowSidebar(false)}
+            className="text-gray-600 hover:text-gray-900"
+            aria-label="Close Sidebar"
+          >
+            <XMarkIcon className="h-6 w-6" />
+          </button>
+        </div>
         <nav className="space-y-2 flex-1">
           <button
             onClick={() => setShowDashboardDropdown(!showDashboardDropdown)}
