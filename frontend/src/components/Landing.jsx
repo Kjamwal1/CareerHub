@@ -508,7 +508,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
             >
               {[
                 "/resume_video.mp4",
-                "/videos/linkedin-checker.mp4",
+                "/linkedin_video.mp4",
                 "/videos/job-tracker.mp4",
                 "/videos/ai-mentor.mp4",
               ].map((src, i) => (
