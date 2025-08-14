@@ -143,7 +143,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
         <Header onLoginClick={onLoginClick} onSignupClick={onSignupClick} />
         <Hero onGetStartedClick={onGetStartedClick} />
 
-        {/* 👇 Resume Checker Section */}
+        {/* Resume Checker Section */}
         <section
           className="min-h-screen bg-gray-100 text-black flex items-center justify-center px-4 sm:px-6 lg:px-20 py-16 overflow-x-hidden"
           data-aos="fade-up"
@@ -273,7 +273,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
           </div>
         </section>
 
-        {/* 👇 LinkedIn Checker Section */}
+        {/* LinkedIn Checker Section */}
         <section
           className="relative min-h-screen text-white flex items-center justify-center px-4 sm:px-6 lg:px-20 py-16 backdrop-blur-xl transition-all duration-700 z-0 overflow-x-hidden"
           data-aos="fade-up"
@@ -377,8 +377,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
           </div>
         </section>
 
-
-        {/* 👇 Job Application Tracker Section */}
+        {/* Job Application Tracker Section */}
         <section
           className="min-h-screen bg-white text-black flex items-center justify-center px-4 sm:px-6 lg:px-20 py-16 overflow-x-hidden"
           data-aos="fade-up"
@@ -430,7 +429,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
           </div>
         </section>
 
-        {/* 👇 AI Mentor Chatbot Section */}
+        {/* AI Mentor Chatbot Section */}
         <section
           className="relative min-h-screen text-white flex items-center justify-center px-4 sm:px-6 lg:px-20 py-16 backdrop-blur-xl transition-all duration-700 z-0 overflow-x-hidden"
           data-aos="fade-up"
@@ -501,42 +500,57 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
             </p>
           </div>
 
-          <div className="relative w-full overflow-hidden">
-            <div
-              className="flex gap-4 sm:gap-6 animate-carousel"
-              style={{ animation: "scrollX 30s linear infinite" }}
-            >
+          <div className="relative w-full h-[300px] sm:h-[400px] md:h-[500px] flex items-center justify-center">
+            <div className="absolute animate-circular-carousel" style={{ width: "100%", height: "100%" }}>
               {[
                 "/resume_video.mp4",
                 "/linkedin_video.mp4",
                 "/linkedin.mp4",
                 "/chatbot.mp4",
                 "/job_tracker.mp4",
+                "/resume_video.mp4",
+                "/linkedin_video.mp4",
+                "/linkedin.mp4",
+                "/chatbot.mp4",
+                "/job_tracker.mp4",
               ].map((src, i) => (
-                <video
+                <div
                   key={i}
-                  src={src}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px] w-auto object-cover flex-shrink-0 rounded-xl"
-                />
+                  className="absolute w-[150px] sm:w-[200px] md:w-[250px] h-[100px] sm:h-[150px] md:h-[200px]"
+                  style={{
+                    transform: `rotate(${(i * 360) / 10}deg) translate(150px, 0) rotate(-${(i * 360) / 10}deg)`,
+                    transformOrigin: "center center",
+                  }}
+                >
+                  <video
+                    src={src}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="w-full h-full object-cover rounded-xl shadow-lg"
+                  />
+                </div>
               ))}
             </div>
           </div>
 
           <style>{`
-            @keyframes scrollX {
-              0% { transform: translateX(0); }
-              100% { transform: translateX(-50%); }
+            @keyframes circular-carousel {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
             }
-            .animate-carousel {
-              display: flex;
-              width: 200%; /* Double the width to accommodate all videos */
+            .animate-circular-carousel {
+              animation: circular-carousel 20s linear infinite;
+              position: relative;
+              width: 100%;
+              height: 100%;
             }
-            .animate-carousel video {
-              pointer-events: none;
+            .animate-circular-carousel > div {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform-origin: center center;
             }
           `}</style>
         </section>
