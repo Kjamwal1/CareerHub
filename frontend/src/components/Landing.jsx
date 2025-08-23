@@ -445,7 +445,7 @@ const Landing = ({ onLoginClick, onSignupClick, onGetStartedClick }) => {
               data-aos-delay="400"
             >
               <img
-                src="/job-tracker-preview.gif"
+                src="/job_application.webp"
                 alt="Job Tracker Illustration"
                 className="rounded-3xl shadow-2xl w-full max-w-[300px] sm:max-w-[400px] md:max-w-[500px]"
               />
