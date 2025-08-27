@@ -24,7 +24,7 @@ const Header = ({ onLoginClick, onSignupClick }) => {
         <img
           src="/logo.png"
           alt="Caryo Logo"
-          className="h-8 sm:h-12 md:h-16 lg:h-20 w-auto object-contain mtmill mt-1 sm:mt-2"
+          className="h-8 sm:h-12 md:h-16 lg:h-20 w-auto object-contain mt-1 sm:mt-2"
         />
         <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-light m-0">
           CAREER HUB
@@ -42,13 +42,11 @@ const Header = ({ onLoginClick, onSignupClick }) => {
             onClick={() => toggleDropdown("checker")}
           >
             CHECKER
-            <i className="bx bx-chevron-down text-sm sm:text-lg mt-0.5 sm:mt-1"></i>
+            <i className={`bx ${openDropdown === "checker" ? "bx-chevron-up" : "bx-chevron-down"} text-sm sm:text-lg mt-0.5 sm:mt-1`}></i>
           </a>
           <div
             className={`absolute top-full left-0 w-48 bg-white text-black shadow-lg rounded-md overflow-hidden transition-all duration-300 ease-in-out transform ${
-              openDropdown === "checker"
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 -translate-y-2 pointer-events-none"
+              openDropdown === "checker" ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
             }`}
           >
             <div className="py-2">
@@ -71,13 +69,11 @@ const Header = ({ onLoginClick, onSignupClick }) => {
             onClick={() => toggleDropdown("builder")}
           >
             BUILDER
-            <i className="bx bx-chevron-down text-sm sm:text-lg mt-0.5 sm:mt-1"></i>
+            <i className={`bx ${openDropdown === "builder" ? "bx-chevron-up" : "bx-chevron-down"} text-sm sm:text-lg mt-0.5 sm:mt-1`}></i>
           </a>
           <div
             className={`absolute top-full left-0 w-48 bg-white text-black shadow-lg rounded-md overflow-hidden transition-all duration-300 ease-in-out transform ${
-              openDropdown === "builder"
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 -translate-y-2 pointer-events-none"
+              openDropdown === "builder" ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
             }`}
           >
             <div className="py-2">
@@ -100,13 +96,11 @@ const Header = ({ onLoginClick, onSignupClick }) => {
             onClick={() => toggleDropdown("resources")}
           >
             RESOURCES
-            <i className="bx bx-chevron-down text-sm sm:text-lg mt-0.5 sm:mt-1"></i>
+            <i className={`bx ${openDropdown === "resources" ? "bx-chevron-up" : "bx-chevron-down"} text-sm sm:text-lg mt-0.5 sm:mt-1`}></i>
           </a>
           <div
             className={`absolute top-full left-0 w-48 bg-white text-black shadow-lg rounded-md overflow-hidden transition-all duration-300 ease-in-out transform ${
-              openDropdown === "resources"
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 -translate-y-2 pointer-events-none"
+              openDropdown === "resources" ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
             }`}
           >
             <div className="py-2">
@@ -129,14 +123,11 @@ const Header = ({ onLoginClick, onSignupClick }) => {
             onClick={() => toggleDropdown("features")}
           >
             FEATURES
-            <i className="bx bx-chevron-down text-sm sm:text-lg mt-0.5 sm:mt-1"></i>
+            <i className={`bx ${openDropdown === "features" ? "bx-chevron-up" : "bx-chevron-down"} text-sm sm:text-lg mt-0.5 sm:mt-1`}></i>
           </a>
           <div
-            className={`absolute top-full left-0 w-48 bg-white text-black shadow-lg rounded-md overflow-hidden实际情况
-            transition-all duration-300 ease-in-out transform ${
-              openDropdown === "features"
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 -translate-y-2 pointer-events-none"
+            className={`absolute top-full left-0 w-48 bg-white text-black shadow-lg rounded-md overflow-hidden transition-all duration-300 ease-in-out transform ${
+              openDropdown === "features" ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
             }`}
           >
             <div className="py-2">
@@ -156,8 +147,7 @@ const Header = ({ onLoginClick, onSignupClick }) => {
       <div className="hidden md:flex items-center gap-2 sm:gap-3 z-50">
         <button
           onClick={onLoginClick}
-          className="bg-[#a7a7a7] text-black py-1 sm:py-2 px-4 sm:px-6 rounded-full border-none font-mediumintre
-          font-medium text-sm sm:text-base transition-all duration-500 hover:bg-white cursor-pointer z-50"
+          className="bg-[#a7a7a7] text-black py-1 sm:py-2 px-4 sm:px-6 rounded-full border-none font-medium text-sm sm:text-base transition-all duration-500 hover:bg-white cursor-pointer z-50"
         >
           SIGN IN
         </button>
