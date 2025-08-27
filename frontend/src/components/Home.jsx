@@ -75,12 +75,22 @@ const Home = () => {
   };
 
   const handleToolClick = (toolName) => {
-    if (toolName === "LinkedIn Headline Generator") {
-      if (!user?.industry) {
-        navigate("/industry-selection", { state: { from: "/linkedin-headline-generator" } });
-      } else {
-        navigate("/linkedin-headline-generator");
-      }
+    let destination;
+    switch (toolName) {
+      case "Career Path Planner":
+        destination = "/career-path-planner";
+        break;
+      case "LinkedIn Headline Generator":
+        destination = "/linkedin-headline-generator";
+        break;
+      default:
+        destination = "/home"; // Fallback for other tools
+        break;
+    }
+    if (!user?.industry) {
+      navigate("/industry-selection", { state: { from: destination } });
+    } else {
+      navigate(destination);
     }
     setShowSidebar(false); // Close sidebar on mobile
   };
@@ -247,6 +257,7 @@ const Home = () => {
           <h2 className="text-xl sm:text-2xl md:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">More Tools</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {[
+              { name: "Career Path Planner", icon: "/icons/career-path.svg" },
               { name: "LinkedIn Headline Generator", icon: "/icons/linkedin.svg" },
               { name: "Linkedin About", icon: "/icons/pdf.svg" },
               { name: "Linkedin Post", icon: "/icons/website.svg" },

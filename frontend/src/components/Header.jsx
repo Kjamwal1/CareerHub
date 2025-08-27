@@ -18,7 +18,7 @@ const Header = ({ onLoginClick, onSignupClick }) => {
   };
 
   return (
-    <header className="flex justify-between items-center py-2 sm:py-3 px-3 sm:px-6 lg:px-20">
+    <header className="flex justify-between items-center py-2 sm:py-3 px-3 sm:px-6 lg:px-20 relative z-50">
       {/* Logo and Name */}
       <div className="flex items-center gap-1 sm:gap-2">
         <img
@@ -47,7 +47,7 @@ const Header = ({ onLoginClick, onSignupClick }) => {
           <div
             className={`absolute top-full left-0 w-48 bg-white text-black shadow-lg rounded-md overflow-hidden transition-all duration-300 ease-in-out transform ${
               openDropdown === "checker" ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
-            }`}
+            } z-[100]`}
           >
             <div className="py-2">
               {/* Add your CHECKER dropdown items here */}
@@ -74,7 +74,7 @@ const Header = ({ onLoginClick, onSignupClick }) => {
           <div
             className={`absolute top-full left-0 w-48 bg-white text-black shadow-lg rounded-md overflow-hidden transition-all duration-300 ease-in-out transform ${
               openDropdown === "builder" ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
-            }`}
+            } z-[100]`}
           >
             <div className="py-2">
               {/* Add your BUILDER dropdown items here */}
@@ -101,7 +101,7 @@ const Header = ({ onLoginClick, onSignupClick }) => {
           <div
             className={`absolute top-full left-0 w-48 bg-white text-black shadow-lg rounded-md overflow-hidden transition-all duration-300 ease-in-out transform ${
               openDropdown === "resources" ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
-            }`}
+            } z-[100]`}
           >
             <div className="py-2">
               {/* Add your RESOURCES dropdown items here */}
@@ -128,7 +128,7 @@ const Header = ({ onLoginClick, onSignupClick }) => {
           <div
             className={`absolute top-full left-0 w-48 bg-white text-black shadow-lg rounded-md overflow-hidden transition-all duration-300 ease-in-out transform ${
               openDropdown === "features" ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
-            }`}
+            } z-[100]`}
           >
             <div className="py-2">
               {/* Add your FEATURES dropdown items here */}
@@ -175,7 +175,7 @@ const Header = ({ onLoginClick, onSignupClick }) => {
       >
         <nav className="flex flex-col gap-4 sm:gap-6 items-center">
           <a
-            className="text-sm sm:text-base tracking-wider transition-colors hover:text-gray-300 z-50"
+            className="text-sm sm:text-base tracking-wider transition-colors принять hover:text-gray-300 z-50"
             href="#"
           >
             CHECKER
