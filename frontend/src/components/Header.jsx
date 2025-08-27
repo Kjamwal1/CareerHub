@@ -1,6 +1,9 @@
+import { useState } from "react";
 import "boxicons/css/boxicons.min.css";
 
 const Header = ({ onLoginClick, onSignupClick }) => {
+  const [openDropdown, setOpenDropdown] = useState(null);
+
   const toggleMobileMenu = () => {
     const mobileMenu = document.getElementById("mobileMenu");
     if (mobileMenu.classList.contains("hidden")) {
@@ -10,6 +13,10 @@ const Header = ({ onLoginClick, onSignupClick }) => {
     }
   };
 
+  const toggleDropdown = (menu) => {
+    setOpenDropdown(openDropdown === menu ? null : menu);
+  };
+
   return (
     <header className="flex justify-between items-center py-2 sm:py-3 px-3 sm:px-6 lg:px-20">
       {/* Logo and Name */}
@@ -17,7 +24,7 @@ const Header = ({ onLoginClick, onSignupClick }) => {
         <img
           src="/logo.png"
           alt="Caryo Logo"
-          className="h-8 sm:h-12 md:h-16 lg:h-20 w-auto object-contain mt-1 sm:mt-2"
+          className="h-8 sm:h-12 md:h-16 lg:h-20 w-auto object-contain mtmill mt-1 sm:mt-2"
         />
         <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-light m-0">
           CAREER HUB
@@ -26,53 +33,131 @@ const Header = ({ onLoginClick, onSignupClick }) => {
 
       {/* Desktop Navigation */}
       <nav className="hidden md:flex items-center gap-4 sm:gap-6 lg:gap-12">
-        <a
-          data-aos="fade-down"
-          data-aos-easing="linear"
-          data-aos-duration="400"
-          className="flex items-center gap-1 text-sm sm:text-base tracking-wider transition-colors hover:text-gray-300 z-50 cursor-pointer"
-          href="#"
-        >
-          CHECKER
-          <i className="bx bx-chevron-down text-sm sm:text-lg mt-0.5 sm:mt-1"></i>
-        </a>
-        <a
-          data-aos="fade-down"
-          data-aos-easing="linear"
-          data-aos-duration="500"
-          className="flex items-center gap-1 text-sm sm:text-base tracking-wider transition-colors hover:text-gray-300 z-50 cursor-pointer"
-          href="#"
-        >
-          BUILDER
-          <i className="bx bx-chevron-down text-sm sm:text-lg mt-0.5 sm:mt-1"></i>
-        </a>
-        <a
-          data-aos="fade-down"
-          data-aos-easing="linear"
-          data-aos-duration="600"
-          className="flex items-center gap-1 text-sm sm:text-base tracking-wider transition-colors hover:text-gray-300 z-50 cursor-pointer"
-          href="#"
-        >
-          RESOURCES
-          <i className="bx bx-chevron-down text-sm sm:text-lg mt-0.5 sm:mt-1"></i>
-        </a>
-        <a
-          data-aos="fade-down"
-          data-aos-easing="linear"
-          data-aos-duration="700"
-          className="flex items-center gap-1 text-sm sm:text-base tracking-wider transition-colors hover:text-gray-300 z-50 cursor-pointer"
-          href="#"
-        >
-          FEATURES
-          <i className="bx bx-chevron-down text-sm sm:text-lg mt-0.5 sm:mt-1"></i>
-        </a>
+        <div className="relative">
+          <a
+            data-aos="fade-down"
+            data-aos-easing="linear"
+            data-aos-duration="400"
+            className="flex items-center gap-1 text-sm sm:text-base tracking-wider transition-colors hover:text-gray-300 z-50 cursor-pointer"
+            onClick={() => toggleDropdown("checker")}
+          >
+            CHECKER
+            <i className="bx bx-chevron-down text-sm sm:text-lg mt-0.5 sm:mt-1"></i>
+          </a>
+          <div
+            className={`absolute top-full left-0 w-48 bg-white text-black shadow-lg rounded-md overflow-hidden transition-all duration-300 ease-in-out transform ${
+              openDropdown === "checker"
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 -translate-y-2 pointer-events-none"
+            }`}
+          >
+            <div className="py-2">
+              {/* Add your CHECKER dropdown items here */}
+              <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-sm">
+                Checker Item 1
+              </a>
+              <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-sm">
+                Checker Item 2
+              </a>
+            </div>
+          </div>
+        </div>
+        <div className="relative">
+          <a
+            data-aos="fade-down"
+            data-aos-easing="linear"
+            data-aos-duration="500"
+            className="flex items-center gap-1 text-sm sm:text-base tracking-wider transition-colors hover:text-gray-300 z-50 cursor-pointer"
+            onClick={() => toggleDropdown("builder")}
+          >
+            BUILDER
+            <i className="bx bx-chevron-down text-sm sm:text-lg mt-0.5 sm:mt-1"></i>
+          </a>
+          <div
+            className={`absolute top-full left-0 w-48 bg-white text-black shadow-lg rounded-md overflow-hidden transition-all duration-300 ease-in-out transform ${
+              openDropdown === "builder"
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 -translate-y-2 pointer-events-none"
+            }`}
+          >
+            <div className="py-2">
+              {/* Add your BUILDER dropdown items here */}
+              <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-sm">
+                Builder Item 1
+              </a>
+              <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-sm">
+                Builder Item 2
+              </a>
+            </div>
+          </div>
+        </div>
+        <div className="relative">
+          <a
+            data-aos="fade-down"
+            data-aos-easing="linear"
+            data-aos-duration="600"
+            className="flex items-center gap-1 text-sm sm:text-base tracking-wider transition-colors hover:text-gray-300 z-50 cursor-pointer"
+            onClick={() => toggleDropdown("resources")}
+          >
+            RESOURCES
+            <i className="bx bx-chevron-down text-sm sm:text-lg mt-0.5 sm:mt-1"></i>
+          </a>
+          <div
+            className={`absolute top-full left-0 w-48 bg-white text-black shadow-lg rounded-md overflow-hidden transition-all duration-300 ease-in-out transform ${
+              openDropdown === "resources"
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 -translate-y-2 pointer-events-none"
+            }`}
+          >
+            <div className="py-2">
+              {/* Add your RESOURCES dropdown items here */}
+              <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-sm">
+                Resource Item 1
+              </a>
+              <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-sm">
+                Resource Item 2
+              </a>
+            </div>
+          </div>
+        </div>
+        <div className="relative">
+          <a
+            data-aos="fade-down"
+            data-aos-easing="linear"
+            data-aos-duration="700"
+            className="flex items-center gap-1 text-sm sm:text-base tracking-wider transition-colors hover:text-gray-300 z-50 cursor-pointer"
+            onClick={() => toggleDropdown("features")}
+          >
+            FEATURES
+            <i className="bx bx-chevron-down text-sm sm:text-lg mt-0.5 sm:mt-1"></i>
+          </a>
+          <div
+            className={`absolute top-full left-0 w-48 bg-white text-black shadow-lg rounded-md overflow-hidden实际情况
+            transition-all duration-300 ease-in-out transform ${
+              openDropdown === "features"
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 -translate-y-2 pointer-events-none"
+            }`}
+          >
+            <div className="py-2">
+              {/* Add your FEATURES dropdown items here */}
+              <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-sm">
+                Feature Item 1
+              </a>
+              <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-sm">
+                Feature Item 2
+              </a>
+            </div>
+          </div>
+        </div>
       </nav>
 
       {/* Buttons - Desktop */}
       <div className="hidden md:flex items-center gap-2 sm:gap-3 z-50">
         <button
           onClick={onLoginClick}
-          className="bg-[#a7a7a7] text-black py-1 sm:py-2 px-4 sm:px-6 rounded-full border-none font-medium text-sm sm:text-base transition-all duration-500 hover:bg-white cursor-pointer z-50"
+          className="bg-[#a7a7a7] text-black py-1 sm:py-2 px-4 sm:px-6 rounded-full border-none font-mediumintre
+          font-medium text-sm sm:text-base transition-all duration-500 hover:bg-white cursor-pointer z-50"
         >
           SIGN IN
         </button>
