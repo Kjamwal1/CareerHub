@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import "boxicons/css/boxicons.min.css";
 
 const Header = ({ onLoginClick, onSignupClick }) => {
@@ -51,12 +50,18 @@ const Header = ({ onLoginClick, onSignupClick }) => {
             } z-[100] backdrop-blur-sm`}
           >
             <div className="py-3 px-2">
-              <Link to="/login" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
+              <button
+                onClick={onLoginClick}
+                className="block w-full text-left px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors"
+              >
                 Resume Checker
-              </Link>
-              <Link to="/login" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
+              </button>
+              <button
+                onClick={onLoginClick}
+                className="block w-full text-left px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors"
+              >
                 LinkedIn Checker
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -77,24 +82,42 @@ const Header = ({ onLoginClick, onSignupClick }) => {
             } z-[100] backdrop-blur-sm`}
           >
             <div className="py-3 px-2">
-              <Link to="/login" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
+              <button
+                onClick={onLoginClick}
+                className="block w-full text-left px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors"
+              >
                 Resume Templates
-              </Link>
-              <Link to="/login" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
+              </button>
+              <button
+                onClick={onLoginClick}
+                className="block w-full text-left px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors"
+              >
                 Career Path Planner
-              </Link>
-              <Link to="/login" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
+              </button>
+              <button
+                onClick={onLoginClick}
+                className="block w-full text-left px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors"
+              >
                 LinkedIn About
-              </Link>
-              <Link to="/login" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
+              </button>
+              <button
+                onClick={onLoginClick}
+                className="block w-full text-left px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors"
+              >
                 LinkedIn Headline
-              </Link>
-              <Link to="/login" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
+              </button>
+              <button
+                onClick={onLoginClick}
+                className="block w-full text-left px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors"
+              >
                 LinkedIn Post
-              </Link>
-              <Link to="/login" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
+              </button>
+              <button
+                onClick={onLoginClick}
+                className="block w-full text-left px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors"
+              >
                 Cover Letter
-              </Link>
+              </button>
             </div>
           </div>
         </div>
