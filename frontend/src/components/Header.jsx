@@ -45,16 +45,16 @@ const Header = ({ onLoginClick, onSignupClick }) => {
             <i className={`bx ${openDropdown === "checker" ? "bx-chevron-up" : "bx-chevron-down"} text-sm sm:text-lg mt-0.5 sm:mt-1`}></i>
           </a>
           <div
-            className={`absolute top-full left-0 w-48 bg-white text-black shadow-lg rounded-md overflow-hidden transition-all duration-300 ease-in-out transform ${
-              openDropdown === "checker" ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
-            } z-[100]`}
+            className={`absolute top-full left-0 w-56 bg-gradient-to-br from-[#3B82F6] via-[#5F6EF8] to-[#7C3AED] text-white shadow-xl rounded-xl overflow-hidden transition-all duration-300 ease-in-out transform ${
+              openDropdown === "checker" ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-2 scale-95 pointer-events-none"
+            } z-[100] backdrop-blur-sm`}
           >
-            <div className="py-2">
+            <div className="py-3 px-2">
               {/* Add your CHECKER dropdown items here */}
-              <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-sm">
+              <a href="#" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
                 Checker Item 1
               </a>
-              <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-sm">
+              <a href="#" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
                 Checker Item 2
               </a>
             </div>
@@ -72,16 +72,16 @@ const Header = ({ onLoginClick, onSignupClick }) => {
             <i className={`bx ${openDropdown === "builder" ? "bx-chevron-up" : "bx-chevron-down"} text-sm sm:text-lg mt-0.5 sm:mt-1`}></i>
           </a>
           <div
-            className={`absolute top-full left-0 w-48 bg-white text-black shadow-lg rounded-md overflow-hidden transition-all duration-300 ease-in-out transform ${
-              openDropdown === "builder" ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
-            } z-[100]`}
+            className={`absolute top-full left-0 w-56 bg-gradient-to-br from-[#3B82F6] via-[#5F6EF8] to-[#7C3AED] text-white shadow-xl rounded-xl overflow-hidden transition-all duration-300 ease-in-out transform ${
+              openDropdown === "builder" ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-2 scale-95 pointer-events-none"
+            } z-[100] backdrop-blur-sm`}
           >
-            <div className="py-2">
+            <div className="py-3 px-2">
               {/* Add your BUILDER dropdown items here */}
-              <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-sm">
+              <a href="#" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
                 Builder Item 1
               </a>
-              <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-sm">
+              <a href="#" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
                 Builder Item 2
               </a>
             </div>
@@ -99,16 +99,16 @@ const Header = ({ onLoginClick, onSignupClick }) => {
             <i className={`bx ${openDropdown === "resources" ? "bx-chevron-up" : "bx-chevron-down"} text-sm sm:text-lg mt-0.5 sm:mt-1`}></i>
           </a>
           <div
-            className={`absolute top-full left-0 w-48 bg-white text-black shadow-lg rounded-md overflow-hidden transition-all duration-300 ease-in-out transform ${
-              openDropdown === "resources" ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
-            } z-[100]`}
+            className={`absolute top-full left-0 w-56 bg-gradient-to-br from-[#3B82F6] via-[#5F6EF8] to-[#7C3AED] text-white shadow-xl rounded-xl overflow-hidden transition-all duration-300 ease-in-out transform ${
+              openDropdown === "resources" ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-2 scale-95 pointer-events-none"
+            } z-[100] backdrop-blur-sm`}
           >
-            <div className="py-2">
+            <div className="py-3 px-2">
               {/* Add your RESOURCES dropdown items here */}
-              <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-sm">
+              <a href="#" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
                 Resource Item 1
               </a>
-              <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-sm">
+              <a href="#" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
                 Resource Item 2
               </a>
             </div>
@@ -126,16 +126,16 @@ const Header = ({ onLoginClick, onSignupClick }) => {
             <i className={`bx ${openDropdown === "features" ? "bx-chevron-up" : "bx-chevron-down"} text-sm sm:text-lg mt-0.5 sm:mt-1`}></i>
           </a>
           <div
-            className={`absolute top-full left-0 w-48 bg-white text-black shadow-lg rounded-md overflow-hidden transition-all duration-300 ease-in-out transform ${
-              openDropdown === "features" ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"
-            } z-[100]`}
+            className={`absolute top-full left-0 w-56 bg-gradient-to-br from-[#3B82F6] via-[#5F6EF8] to-[#7C3AED] text-white shadow-xl rounded-xl overflow-hidden transition-all duration-300 ease-in-out transform ${
+              openDropdown === "features" ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-2 scale-95 pointer-events-none"
+            } z-[100] backdrop-blur-sm`}
           >
-            <div className="py-2">
+            <div className="py-3 px-2">
               {/* Add your FEATURES dropdown items here */}
-              <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-sm">
+              <a href="#" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
                 Feature Item 1
               </a>
-              <a href="#" className="block px-4 py-2 hover:bg-gray-100 text-sm">
+              <a href="#" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
                 Feature Item 2
               </a>
             </div>
@@ -175,7 +175,7 @@ const Header = ({ onLoginClick, onSignupClick }) => {
       >
         <nav className="flex flex-col gap-4 sm:gap-6 items-center">
           <a
-            className="text-sm sm:text-base tracking-wider transition-colors принять hover:text-gray-300 z-50"
+            className="text-sm sm:text-base tracking-wider transition-colors hover:text-gray-300 z-50"
             href="#"
           >
             CHECKER
