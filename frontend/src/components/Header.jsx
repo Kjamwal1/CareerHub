@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import "boxicons/css/boxicons.min.css";
 
 const Header = ({ onLoginClick, onSignupClick }) => {
@@ -45,18 +46,17 @@ const Header = ({ onLoginClick, onSignupClick }) => {
             <i className={`bx ${openDropdown === "checker" ? "bx-chevron-up" : "bx-chevron-down"} text-sm sm:text-lg mt-0.5 sm:mt-1`}></i>
           </a>
           <div
-            className={`absolute top-full left-0 w-56 bg-gradient-to-br from-[#3B82F6] via-[#5F6EF8] to-[#7C3AED] text-white shadow-xl rounded-xl overflow-hidden transition-all duration-300 ease-in-out transform ${
+            className={`absolute top-full left-0 w-56 bg-gradient-to-br from-[#3B82F6] via-[#5F6EF8] to-[#-pen3AED] text-white shadow-xl rounded-xl overflow-hidden transition-all duration-300 ease-in-out transform ${
               openDropdown === "checker" ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-2 scale-95 pointer-events-none"
             } z-[100] backdrop-blur-sm`}
           >
             <div className="py-3 px-2">
-              {/* Add your CHECKER dropdown items here */}
-              <a href="#" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
-                Checker Item 1
-              </a>
-              <a href="#" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
-                Checker Item 2
-              </a>
+              <Link to="/login" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
+                Resume Checker
+              </Link>
+              <Link to="/login" className="block px-4 py-2.5 rounded-lg hover:bg-white/20 text-sm font-medium transition-colors">
+                LinkedIn Checker
+              </Link>
             </div>
           </div>
         </div>
