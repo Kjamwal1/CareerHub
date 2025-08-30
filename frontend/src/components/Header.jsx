@@ -45,9 +45,9 @@ const Header = ({ onLoginClick, onSignupClick }) => {
             <i className={`bx ${openDropdown === "checker" ? "bx-chevron-up" : "bx-chevron-down"} text-sm sm:text-lg mt-0.5 sm:mt-1`}></i>
           </a>
           <div
-            className={`absolute top-full left-0 w-56 bg-gradient-to-br from-[#3B82F6] via-[#5F6EF8] to-[#7C3AED] text-white shadow-xl rounded-xl overflow-hidden transition-all duration-300 ease-in-out transform ${
+            className={`absolute top-full left-0 w-56 bg-gray-900/90 text-white shadow-xl rounded-xl overflow-hidden transition-all duration-300 ease-in-out transform border border-white/20 ${
               openDropdown === "checker" ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-2 scale-95 pointer-events-none"
-            } z-[100] backdrop-blur-sm`}
+            } z-[100] backdrop-blur-md`}
           >
             <div className="py-3 px-2">
               <button
@@ -77,9 +77,9 @@ const Header = ({ onLoginClick, onSignupClick }) => {
             <i className={`bx ${openDropdown === "builder" ? "bx-chevron-up" : "bx-chevron-down"} text-sm sm:text-lg mt-0.5 sm:mt-1`}></i>
           </a>
           <div
-            className={`absolute top-full left-0 w-56 bg-gradient-to-br from-[#3B82F6] via-[#5F6EF8] to-[#7C3AED] text-white shadow-xl rounded-xl overflow-hidden transition-all duration-300 ease-in-out transform ${
+            className={`absolute top-full left-0 w-56 bg-gray-900/90 text-white shadow-xl rounded-xl overflow-hidden transition-all duration-300 ease-in-out transform border border-white/20 ${
               openDropdown === "builder" ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-2 scale-95 pointer-events-none"
-            } z-[100] backdrop-blur-sm`}
+            } z-[100] backdrop-blur-md`}
           >
             <div className="py-3 px-2">
               <button
@@ -133,9 +133,9 @@ const Header = ({ onLoginClick, onSignupClick }) => {
             <i className={`bx ${openDropdown === "resources" ? "bx-chevron-up" : "bx-chevron-down"} text-sm sm:text-lg mt-0.5 sm:mt-1`}></i>
           </a>
           <div
-            className={`absolute top-full left-0 w-56 bg-gradient-to-br from-[#3B82F6] via-[#5F6EF8] to-[#7C3AED] text-white shadow-xl rounded-xl overflow-hidden transition-all duration-300 ease-in-out transform ${
+            className={`absolute top-full left-0 w-56 bg-gray-900/90 text-white shadow-xl rounded-xl overflow-hidden transition-all duration-300 ease-in-out transform border border-white/20 ${
               openDropdown === "resources" ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-2 scale-95 pointer-events-none"
-            } z-[100] backdrop-blur-sm`}
+            } z-[100] backdrop-blur-md`}
           >
             <div className="py-3 px-2">
               {/* Add your RESOURCES dropdown items here */}
@@ -160,9 +160,9 @@ const Header = ({ onLoginClick, onSignupClick }) => {
             <i className={`bx ${openDropdown === "features" ? "bx-chevron-up" : "bx-chevron-down"} text-sm sm:text-lg mt-0.5 sm:mt-1`}></i>
           </a>
           <div
-            className={`absolute top-full left-0 w-56 bg-gradient-to-br from-[#3B82F6] via-[#5F6EF8] to-[#7C3AED] text-white shadow-xl rounded-xl overflow-hidden transition-all duration-300 ease-in-out transform ${
+            className={`absolute top-full left-0 w-56 bg-gray-900/90 text-white shadow-xl rounded-xl overflow-hidden transition-all duration-300 ease-in-out transform border border-white/20 ${
               openDropdown === "features" ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-2 scale-95 pointer-events-none"
-            } z-[100] backdrop-blur-sm`}
+            } z-[100] backdrop-blur-md`}
           >
             <div className="py-3 px-2">
               {/* Add your FEATURES dropdown items here */}
