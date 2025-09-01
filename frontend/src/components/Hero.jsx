@@ -23,7 +23,7 @@ const Hero = ({ onGetStartedClick }) => {
           {/* Heading */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-tight leading-tight my-6 sm:my-8">
             <span className="block text-white">Your AI Career Wingman</span>
-            <span className="block text-transparent bg-clip-text animate-color-transition">
+            <span className="block text-transparent bg-clip-text animate-slide-in">
               — From Resume to Recruiter
             </span>
           </h1>
@@ -52,25 +52,25 @@ const Hero = ({ onGetStartedClick }) => {
         </div>
       </div>
 
-      {/* Inline CSS for color transition animation */}
+      {/* Inline CSS for slide-in transition */}
       <style jsx>{`
-        @keyframes colorTransition {
+        @keyframes slideIn {
           0% {
-            background-image: linear-gradient(to right, #00cfff, #007bff);
-          }
-          50% {
-            background-image: linear-gradient(to right, #a855f7, #6b21a8);
+            transform: translateX(20px);
+            opacity: 0;
           }
           100% {
-            background-image: linear-gradient(to right, #00cfff, #007bff);
+            transform: translateX(0);
+            opacity: 1;
           }
         }
 
-        .animate-color-transition {
-          animation: colorTransition 4s infinite;
+        .animate-slide-in {
+          background-image: linear-gradient(to right, #00cfff, #007bff); /* Fixed gradient */
           background-clip: text;
           -webkit-background-clip: text;
           color: transparent;
+          animation: slideIn 1.5s ease-out forwards;
         }
       `}</style>
     </main>
