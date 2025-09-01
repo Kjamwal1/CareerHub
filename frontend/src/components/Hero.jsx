@@ -25,7 +25,7 @@ const Hero = ({ onGetStartedClick }) => {
             <span className="block text-white">Your AI Career Wingman</span>
             <span
               className="block text-transparent bg-clip-text 
-                         bg-gradient-to-r from-[#00cfff] via-[#007bff] to-[#00cfff]
+                         bg-gradient-to-r from-[#007bff] via-[#8b5cf6] to-[#007bff]
                          animate-gradient"
             >
               — From Resume to Recruiter
