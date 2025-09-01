@@ -23,7 +23,11 @@ const Hero = ({ onGetStartedClick }) => {
           {/* Heading */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-tight leading-tight my-6 sm:my-8">
             <span className="block text-white">Your AI Career Wingman</span>
-            <span className="block bg-gradient-to-r from-[#00cfff] to-[#007bff] text-transparent bg-clip-text">
+            <span
+              className="block text-transparent bg-clip-text 
+                         bg-gradient-to-r from-[#00cfff] via-[#007bff] to-[#00cfff]
+                         animate-gradient"
+            >
               — From Resume to Recruiter
             </span>
           </h1>
@@ -46,7 +50,8 @@ const Hero = ({ onGetStartedClick }) => {
               onClick={onGetStartedClick}
               className="cursor-pointer border border-[#2a2a2a] py-2 sm:py-3 px-6 sm:px-10 rounded-full text-base sm:text-lg font-semibold tracking-wider transition-colors duration-300 bg-gray-300 text-black hover:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600"
             >
-              Get Started <i className="bx bx-link-external text-base sm:text-lg"></i>
+              Get Started{" "}
+              <i className="bx bx-link-external text-base sm:text-lg"></i>
             </a>
           </div>
         </div>
