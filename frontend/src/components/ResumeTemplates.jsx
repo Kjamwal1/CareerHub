@@ -59,32 +59,41 @@ const templates = [
       </div>
     `,
   },
+  {
+    id: 4,
+    name: "Creative",
+    content: `
+      <div class="p-6">
+        <h2 class="text-2xl font-bold">Emily Brown</h2>
+        <p class="text-sm text-gray-600">101 Elm St, City, ST 90123 | (111) 222-3333 | emily.b@email.com</p>
+        <h3 class="text-lg font-semibold mt-4">Summary</h3>
+        <p class="mt-2">Graphic designer with a passion for innovative visual solutions.</p>
+        <h3 class="text-lg font-semibold mt-4">Work Experience</h3>
+        <p class="mt-2"><strong>Graphic Designer</strong> - Design Studio, Apr 2021 - Present</p>
+        <p>Created branding materials for 20+ clients.</p>
+        <h3 class="text-lg font-semibold mt-4">Education</h3>
+        <p class="mt-2"><strong>B.F.A. Graphic Design</strong> - Art Institute, 2017-2021</p>
+        <h3 class="text-lg font-semibold mt-4">Skills</h3>
+        <p class="mt-2">Adobe Photoshop, Illustrator, UI/UX</p>
+      </div>
+    `,
+  },
 ];
 
 const ResumeTemplates = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [editedContent, setEditedContent] = useState(templates[0].content);
-  const [isEditing, setIsEditing] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [editedContent, setEditedContent] = useState("");
 
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % templates.length);
-    setEditedContent(templates[(currentIndex + 1) % templates.length].content);
-  };
-
-  const handlePrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + templates.length) % templates.length);
-    setEditedContent(templates[(currentIndex - 1 + templates.length) % templates.length].content);
-  };
-
-  const handleEdit = () => {
-    setIsEditing(true);
+  const handleEdit = (template) => {
+    setSelectedTemplate(template);
+    setEditedContent(template.content);
   };
 
   const handleDownload = () => {
     const element = document.createElement("div");
     element.innerHTML = editedContent;
-    html2pdf().from(element).save(`${templates[currentIndex].name}_Resume.pdf`);
-    setIsEditing(false);
+    html2pdf().from(element).save(`${selectedTemplate.name}_Resume.pdf`);
+    setSelectedTemplate(null);
   };
 
   const handleContentChange = (e) => {
@@ -92,38 +101,28 @@ const ResumeTemplates = () => {
   };
 
   return (
-    <div className="w-full h-screen bg-gray-100 p-6">
-      <h1 className="text-3xl font-bold mb-6">Resume Templates</h1>
-      <div className="flex flex-col items-center">
-        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl mb-4">
+    <div className="w-full min-h-screen bg-gray-100 p-6">
+      <h1 class="text-3xl font-bold mb-6">Resume Templates</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {templates.map((template) => (
           <div
-            className="prose"
-            dangerouslySetInnerHTML={{ __html: editedContent }}
-          />
-        </div>
-        <div className="flex gap-4 mb-4">
-          <button
-            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-            onClick={handlePrev}
+            key={template.id}
+            className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer border border-gray-200"
+            onClick={() => handleEdit(template)}
           >
-            Previous
-          </button>
-          <button
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            onClick={handleNext}
-          >
-            Next
-          </button>
-          <button
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-            onClick={handleEdit}
-          >
-            Edit
-          </button>
-        </div>
-        {isEditing && (
-          <div className="bg-white p-6 rounded-lg w-full max-w-2xl shadow-lg">
-            <h2 className="text-2xl font-bold mb-4">{templates[currentIndex].name} Resume Editor</h2>
+            <h2 className="text-xl font-semibold mb-2">{template.name}</h2>
+            <div
+              className="text-sm text-gray-600 prose"
+              dangerouslySetInnerHTML={{ __html: template.content.substring(0, 150) + "..." }}
+            />
+          </div>
+        ))}
+      </div>
+
+      {selectedTemplate && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-full max-w-2xl">
+            <h2 className="text-2xl font-bold mb-4">{selectedTemplate.name} Resume Editor</h2>
             <textarea
               className="w-full h-64 p-2 border rounded mb-4"
               value={editedContent}
@@ -132,7 +131,7 @@ const ResumeTemplates = () => {
             <div className="flex justify-end gap-4">
               <button
                 className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                onClick={() => setIsEditing(false)}
+                onClick={() => setSelectedTemplate(null)}
               >
                 Cancel
               </button>
@@ -144,8 +143,8 @@ const ResumeTemplates = () => {
               </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
