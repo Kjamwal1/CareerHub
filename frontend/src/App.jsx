@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { useAuth, AuthContext } from "./context/AuthContext.jsx";
+import { useAuth, AuthContext } from "./context/AuthContext";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,9 +17,9 @@ import Chatbot from "./pages/Chatbot";
 import JobTracker from "./pages/JobTracker";
 import IndustrySelection from "./pages/IndustrySelection";
 import ErrorBoundary from "./components/ErrorBoundary";
-import LinkedInHeadlineGenerator from "./components/LinkedInHeadlineGenerator.jsx"; 
+import LinkedInHeadlineGenerator from "./components/LinkedInHeadlineGenerator";
 import CoverLetterBuilder from "./components/CoverLetterBuilder";
-import ResumeTemplates from "./components/ResumeTemplates.jsx"; 
+import ResumeTemplates from "./components/ResumeTemplates";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 library.add(fas);
@@ -194,7 +194,7 @@ export default function App() {
                 <ResumeTemplates />
               </ProtectedRoute>
             }
-          /> 
+          />
         </Routes>
       </ErrorBoundary>
     </main>
