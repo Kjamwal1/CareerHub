@@ -15,10 +15,11 @@ import ResumeHistoryPage from "./components/ResumeHistoryPage";
 import LinkedInOptimizer from "./pages/LinkedInOptimizer";
 import Chatbot from "./pages/Chatbot";
 import JobTracker from "./pages/JobTracker";
-import IndustrySelection from "./pages/IndustrySelection"; // New import
+import IndustrySelection from "./pages/IndustrySelection";
 import ErrorBoundary from "./components/ErrorBoundary";
-import LinkedInHeadlineGenerator from "./components/LinkedinHeadlineGenerator.jsx";
+import LinkedInHeadlineGenerator from "./components/LinkedInHeadlineGenerator.jsx";
 import CoverLetterBuilder from "./components/CoverLetterBuilder";
+import ResumeTemplates from "./components/ResumeTemplates"; // Add this import
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 library.add(fas);
@@ -180,9 +181,20 @@ export default function App() {
           />
           <Route
             path="/linkedin-headline-generator"
-            element={<LinkedInHeadlineGenerator />}
+            element={
+              <ProtectedRoute>
+                <LinkedInHeadlineGenerator />
+              </ProtectedRoute>
+            }
           />
-          <Route path="/resume-templates" element={<ResumeTemplates />} />
+          <Route
+            path="/resume-templates"
+            element={
+              <ProtectedRoute>
+                <ResumeTemplates />
+              </ProtectedRoute>
+            }
+          /> 
         </Routes>
       </ErrorBoundary>
     </main>
