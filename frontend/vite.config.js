@@ -16,6 +16,7 @@ export default defineConfig({
     },
   },
   resolve: {
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
     alias: {
       '@': '/src', // Maps @ to the src directory
     },
