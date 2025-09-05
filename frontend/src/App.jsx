@@ -113,10 +113,7 @@ export default function App() {
               )
             }
           />
-          <Route
-            path="/industry-selection"
-            element={<IndustrySelection />}
-          />
+          <Route path="/industry-selection" element={<IndustrySelection />} />
           <Route
             path="/home"
             element={
@@ -185,6 +182,7 @@ export default function App() {
             path="/linkedin-headline-generator"
             element={<LinkedInHeadlineGenerator />}
           />
+          <Route path="/resume-templates" element={<ResumeTemplates />} />
         </Routes>
       </ErrorBoundary>
     </main>

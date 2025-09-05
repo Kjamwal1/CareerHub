@@ -83,6 +83,9 @@ const Home = () => {
       case "LinkedIn Headline Generator":
         destination = "/linkedin-headline-generator";
         break;
+      case "Resume Templates":
+        destination = "/resume-templates";
+        break;
       default:
         destination = "/home"; // Fallback for other tools
         break;
