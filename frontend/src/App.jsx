@@ -17,9 +17,9 @@ import Chatbot from "./pages/Chatbot";
 import JobTracker from "./pages/JobTracker";
 import IndustrySelection from "./pages/IndustrySelection";
 import ErrorBoundary from "./components/ErrorBoundary";
-import LinkedInHeadlineGenerator from "./components/LinkedInHeadlineGenerator.jsx";
+import LinkedInHeadlineGenerator from "./components/LinkedInHeadlineGenerator.jsx"; 
 import CoverLetterBuilder from "./components/CoverLetterBuilder";
-import ResumeTemplates from "./components/ResumeTemplates"; // Add this import
+import ResumeTemplates from "./components/ResumeTemplates.jsx"; 
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { fas } from "@fortawesome/free-solid-svg-icons";
 library.add(fas);
