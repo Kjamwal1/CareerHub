@@ -1,128 +1,131 @@
-import React, { useRef } from 'react';
-import html2pdf from 'html2pdf.js'; // Import the library
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import html2pdf from "html2pdf.js";
+
+const templates = [
+  {
+    id: 1,
+    name: "Professional",
+    content: `
+      <div class="p-4">
+        <h2 class="text-xl font-bold">John Doe</h2>
+        <p class="text-sm">123 Main St, City, ST 12345 | (123) 456-7890 | john.doe@email.com</p>
+        <h3 class="text-lg font-semibold mt-4">Summary</h3>
+        <p>Experienced software engineer with 5+ years in developing scalable applications.</p>
+        <h3 class="text-lg font-semibold mt-4">Work Experience</h3>
+        <p><strong>Software Engineer</strong> - Tech Corp, Jan 2020 - Present</p>
+        <p>Designed and implemented features for a customer-facing platform.</p>
+        <h3 class="text-lg font-semibold mt-4">Education</h3>
+        <p><strong>B.S. Computer Science</strong> - University Name, 2016-2020</p>
+        <h3 class="text-lg font-semibold mt-4">Skills</h3>
+        <p>Python, JavaScript, React, SQL</p>
+      </div>
+    `,
+  },
+  {
+    id: 2,
+    name: "Modern",
+    content: `
+      <div class="p-4">
+        <h2 class="text-xl font-bold">Jane Smith</h2>
+        <p class="text-sm">456 Oak Ave, City, ST 67890 | (987) 654-3210 | jane.smith@email.com</p>
+        <h3 class="text-lg font-semibold mt-4">Profile</h3>
+        <p>Marketing professional with a focus on digital strategy and campaign management.</p>
+        <h3 class="text-lg font-semibold mt-4">Work Experience</h3>
+        <p><strong>Marketing Manager</strong> - Ad Agency, Mar 2019 - Present</p>
+        <p>Led campaigns increasing engagement by 30%.</p>
+        <h3 class="text-lg font-semibold mt-4">Education</h3>
+        <p><strong>MBA</strong> - Business School, 2015-2017</p>
+        <h3 class="text-lg font-semibold mt-4">Skills</h3>
+        <p>SEO, Google Analytics, Content Creation</p>
+      </div>
+    `,
+  },
+  {
+    id: 3,
+    name: "Simple",
+    content: `
+      <div class="p-4">
+        <h2 class="text-xl font-bold">Alex Johnson</h2>
+        <p class="text-sm">789 Pine St, City, ST 34567 | (555) 123-4567 | alex.j@email.com</p>
+        <h3 class="text-lg font-semibold mt-4">Objective</h3>
+        <p>Seeking a project management role to leverage organizational skills.</p>
+        <h3 class="text-lg font-semibold mt-4">Work Experience</h3>
+        <p><strong>Project Coordinator</strong> - Build Co, Jun 2018 - Present</p>
+        <p>Managed timelines and budgets for multiple projects.</p>
+        <h3 class="text-lg font-semibold mt-4">Education</h3>
+        <p><strong>B.A. Business Administration</strong> - College Name, 2014-2018</p>
+        <h3 class="text-lg font-semibold mt-4">Skills</h3>
+        <p>MS Project, Team Leadership, Budgeting</p>
+      </div>
+    `,
+  },
+];
 
 const ResumeTemplates = () => {
-  const navigate = useNavigate();
-  const templateRefs = [useRef(), useRef(), useRef()]; // Refs for each template
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [editedContent, setEditedContent] = useState("");
 
-  const templates = [
-    {
-      name: 'Chronological Resume',
-      description: 'Standard format emphasizing work history in reverse chronological order. ATS-friendly with clean sections.',
-    },
-    {
-      name: 'Functional Resume',
-      description: 'Focuses on skills and experience rather than timeline. Great for career changers.',
-    },
-    {
-      name: 'Modern Minimal Resume',
-      description: 'Clean, concise design with bold headings. Simple fonts and structure for ATS compatibility.',
-    },
-    // Add more templates as needed
-  ];
+  const handleEdit = (template) => {
+    setSelectedTemplate(template);
+    setEditedContent(template.content);
+  };
 
-  const downloadPDF = (index) => {
-    const element = templateRefs[index].current;
-    const opt = {
-      margin: 0.5,
-      filename: `${templates[index].name}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-    };
-    html2pdf().from(element).set(opt).save();
+  const handleDownload = () => {
+    const element = document.createElement("div");
+    element.innerHTML = editedContent;
+    html2pdf().from(element).save(`${selectedTemplate.name}_Resume.pdf`);
+    setSelectedTemplate(null);
+  };
+
+  const handleContentChange = (e) => {
+    setEditedContent(e.target.value);
   };
 
   return (
-    <div className="min-h-screen bg-white font-poppins text-gray-800 p-6">
-      <h1 className="text-3xl font-bold mb-8">Resume Templates</h1>
-      <p className="mb-6 text-gray-600">
-        Choose a template below. Edit the content directly, then download as PDF. All templates are ATS-friendly (plain text, standard fonts, no graphics).
-      </p>
-      {templates.map((template, index) => (
-        <div key={template.name} className="mb-12 border p-4 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold mb-2">{template.name}</h2>
-          <p className="mb-4 text-gray-500">{template.description}</p>
+    <div className="w-full h-screen bg-gray-100 p-6">
+      <h1 className="text-3xl font-bold mb-6">Resume Templates</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {templates.map((template) => (
           <div
-            ref={templateRefs[index]}
-            className="bg-white p-6 border border-gray-300 max-w-3xl mx-auto"
-            style={{ fontFamily: 'Arial, sans-serif', fontSize: '12pt', lineHeight: '1.5' }}
-            contentEditable={true}
-            suppressContentEditableWarning={true}
+            key={template.id}
+            className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => handleEdit(template)}
           >
-            {/* Template-specific content */}
-            {index === 0 && (
-              <>
-                <h1 contentEditable={true} style={{ fontSize: '18pt', fontWeight: 'bold', textAlign: 'center' }}>Your Name</h1>
-                <p contentEditable={true} style={{ textAlign: 'center' }}>Your Address | Phone | Email | LinkedIn</p>
-                <hr style={{ margin: '10px 0' }} />
-                <h2 style={{ fontSize: '14pt', fontWeight: 'bold' }}>Professional Summary</h2>
-                <p contentEditable={true}>A brief summary of your professional background and key skills.</p>
-                <h2 style={{ fontSize: '14pt', fontWeight: 'bold' }}>Work Experience</h2>
-                <p contentEditable={true}><strong>Job Title</strong>, Company Name, City, State — Dates</p>
-                <ul contentEditable={true} style={{ listStyleType: 'disc', marginLeft: '20px' }}>
-                  <li>Achievement or responsibility.</li>
-                  <li>Another bullet point.</li>
-                </ul>
-                <h2 style={{ fontSize: '14pt', fontWeight: 'bold' }}>Education</h2>
-                <p contentEditable={true}><strong>Degree</strong>, Institution, Graduation Year</p>
-                <h2 style={{ fontSize: '14pt', fontWeight: 'bold' }}>Skills</h2>
-                <ul contentEditable={true} style={{ listStyleType: 'disc', marginLeft: '20px' }}>
-                  <li>Skill 1</li>
-                  <li>Skill 2</li>
-                </ul>
-              </>
-            )}
-            {index === 1 && (
-              <>
-                <h1 contentEditable={true} style={{ fontSize: '18pt', fontWeight: 'bold', textAlign: 'center' }}>Your Name</h1>
-                <p contentEditable={true} style={{ textAlign: 'center' }}>Your Address | Phone | Email | LinkedIn</p>
-                <hr style={{ margin: '10px 0' }} />
-                <h2 style={{ fontSize: '14pt', fontWeight: 'bold' }}>Skills Summary</h2>
-                <ul contentEditable={true} style={{ listStyleType: 'disc', marginLeft: '20px' }}>
-                  <li>Key Skill 1: Description of experience.</li>
-                  <li>Key Skill 2: Description of experience.</li>
-                </ul>
-                <h2 style={{ fontSize: '14pt', fontWeight: 'bold' }}>Professional Experience</h2>
-                <p contentEditable={true}><strong>Job Title</strong>, Company Name — Dates</p>
-                <h2 style={{ fontSize: '14pt', fontWeight: 'bold' }}>Education</h2>
-                <p contentEditable={true}><strong>Degree</strong>, Institution, Graduation Year</p>
-              </>
-            )}
-            {index === 2 && (
-              <>
-                <h1 contentEditable={true} style={{ fontSize: '18pt', fontWeight: 'bold' }}>Your Name</h1>
-                <p contentEditable={true}>Phone | Email | LinkedIn | Location</p>
-                <h2 style={{ fontSize: '14pt', fontWeight: 'bold', borderBottom: '1px solid #000', marginBottom: '5px' }}>Summary</h2>
-                <p contentEditable={true}>Concise professional summary.</p>
-                <h2 style={{ fontSize: '14pt', fontWeight: 'bold', borderBottom: '1px solid #000', marginBottom: '5px' }}>Experience</h2>
-                <p contentEditable={true}><strong>Job Title</strong> at Company — Dates</p>
-                <ul contentEditable={true} style={{ listStyleType: 'none', marginLeft: '0' }}>
-                  <li>- Achievement 1</li>
-                  <li>- Achievement 2</li>
-                </ul>
-                <h2 style={{ fontSize: '14pt', fontWeight: 'bold', borderBottom: '1px solid #000', marginBottom: '5px' }}>Education</h2>
-                <p contentEditable={true}>Degree from Institution, Year</p>
-                <h2 style={{ fontSize: '14pt', fontWeight: 'bold', borderBottom: '1px solid #000', marginBottom: '5px' }}>Skills</h2>
-                <p contentEditable={true}>Skill 1, Skill 2, Skill 3</p>
-              </>
-            )}
+            <h2 className="text-xl font-semibold">{template.name}</h2>
+            <div
+              className="mt-2 text-sm"
+              dangerouslySetInnerHTML={{ __html: template.content.substring(0, 100) + "..." }}
+            />
           </div>
-          <button
-            onClick={() => downloadPDF(index)}
-            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Download as PDF
-          </button>
+        ))}
+      </div>
+
+      {selectedTemplate && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg w-full max-w-2xl">
+            <h2 className="text-2xl font-bold mb-4">{selectedTemplate.name} Resume Editor</h2>
+            <textarea
+              className="w-full h-64 p-2 border rounded mb-4"
+              value={editedContent}
+              onChange={handleContentChange}
+            />
+            <div className="flex justify-end gap-4">
+              <button
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                onClick={() => setSelectedTemplate(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                onClick={handleDownload}
+              >
+                Download PDF
+              </button>
+            </div>
+          </div>
         </div>
-      ))}
-      <button
-        onClick={() => navigate('/home')}
-        className="mt-8 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
-      >
-        Back to Home
-      </button>
+      )}
     </div>
   );
 };
